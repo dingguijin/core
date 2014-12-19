@@ -26,7 +26,7 @@ module.exports.eventsHandle = function (event) {
                     "Caller-Caller-ID-Name": jsonEvent["Caller-Caller-ID-Name"],
                     "Caller-Caller-ID-Number": jsonEvent["Caller-Caller-ID-Number"],
                     "Caller-Destination-Number": jsonEvent["Caller-Destination-Number"],
-                    "variable_w_account_origination_uuid": jsonEvent["variable_w_account_origination_uuid"],
+                    "variable_w_account_origination_uuid": jsonEvent["variable_webitel_call_uuid"],
                     "variable_w_jsclient_xtransfer": jsonEvent["variable_w_jsclient_xtransfer"] || jsonEvent['variable_sip_h_X-WebitelXTransfer'],
                     "variable_w_jsclient_originate_number": jsonEvent["variable_w_jsclient_originate_number"],
                     "Call-Info": jsonEvent["Call-Info"],
