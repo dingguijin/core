@@ -1,0 +1,48 @@
+{
+    "ssl": {
+        "enabled": false,
+        "ssl_key": "/core/cert/wss.key",
+        "ssl_cert": "/core/cert/wss.crt"
+    },
+    "server": {
+        "host": "0.0.0.0",
+        "port": 10022,
+        "socket": {
+            "originHost": false
+        }
+    },
+    "webitelServer": {
+        "host": "wconsole",
+        "port": "6873",
+        "account": "root",
+        "secret": "",
+        "reconnect": 5
+    },
+    "freeSWITCH": {
+        "host": "freeswitch",
+        "port": 8021,
+        "pwd": "ClueCon",
+        "reconnect": 5
+    },
+    "application": {
+        "loglevel": "info",
+        "socketTimeUnauthorized": 5,
+        "sleepConnectToWebitel": 1000,
+        "freeSWITCHEvents": [
+            "CHANNEL_CREATE",
+            "CHANNEL_DESTROY",
+            "CHANNEL_CALLSTATE",
+            "CHANNEL_ANSWER",
+            "CHANNEL_HANGUP_COMPLETE",
+            "CHANNEL_HOLD",
+            "CHANNEL_UNHOLD",
+            "RECORD_START",
+            "RECORD_STOP",
+            "CHANNEL_BRIDGE",
+            "CHANNEL_UNBRIDGE",
+            "CHANNEL_UUID",
+            "CHANNEL_OUTGOING",
+            "DTMF"
+        ]
+    }
+}
