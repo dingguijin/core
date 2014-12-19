@@ -2,7 +2,7 @@ var log = require('../lib/log')(module);
 module.exports = function (ws) {
     try {
         var userId = ws['upgradeReq']['webitelId'],
-            user = User.get(userId);
+            user = Users.get(userId);
         if (user) {
             for (var key in user.ws) {
                 if (user.ws[key].readyState == user.ws[key].CLOSED) {

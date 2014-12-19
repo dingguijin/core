@@ -2,7 +2,9 @@ var HashCollection = require('../lib/HashCollection'),
     log = require('../lib/log')(module),
     Domains = global.Domains = new HashCollection('id'),
     Users = global.Users = new HashCollection('id'),
-    handleSocketError = require('../middleware/handleSocketError');
+    handleSocketError = require('../middleware/handleSocketError'),
+    ACCOUNT_EVENTS = require('../consts').ACCOUNT_EVENTS;
+
 
 Domains.broadcast = function (domainName, event) {
     if (!domainName || !event) return;
@@ -17,7 +19,7 @@ Domains.broadcast = function (domainName, event) {
             for (var key in _usersKeys) {
                 try {
                     _user = Users.get(_usersKeys[key]);
-                    if (!_user) break;
+                    if (!_user) continue;
                     _userWS = _user['ws'];
                     if(_userWS instanceof Array) {
                         _userWS.forEach(function (_ws) {
@@ -43,7 +45,15 @@ Users.on('added', function (evn) {
     try {
         var _id = evn.id.split('@'),
             _domain = _id[1] || _id[0],
-            domain = Domains.get(_domain);
+            domain = Domains.get(_domain),
+            jsonEvent;
+//        try {
+//            jsonEvent = getJSONUserEvent(ACCOUNT_EVENTS.ONLINE, _domain, _id[0]);
+//            log.info(jsonEvent['Event-Name'] + ' -> ' + evn.id);
+//            Domains.broadcast(_domain, JSON.stringify(jsonEvent));
+//        } catch (e) {
+//            log.warn('Broadcast account event: ', domain);
+//        }
         if (!domain) {
             Domains.add(_domain, {
                 id: _domain,
@@ -64,7 +74,15 @@ Users.on('removed', function (evn) {
     try {
         var _id = evn.id.split('@'),
             _domain = _id[1] || _id[0],
-            domain = Domains.get(_domain);
+            domain = Domains.get(_domain),
+            jsonEvent;
+        try {
+            jsonEvent = getJSONUserEvent(ACCOUNT_EVENTS.OFFLINE, _domain, _id[0]);
+            log.info(jsonEvent['Event-Name'] + ' -> ' + evn.id);
+            Domains.broadcast(_domain, JSON.stringify(jsonEvent));
+        } catch (e) {
+            log.warn('Broadcast account event: ', domain);
+        };
         if (domain) {
             var _index = domain.users.indexOf(evn.id);
             if (_index != -1) {
@@ -74,8 +92,20 @@ Users.on('removed', function (evn) {
                     log.info('Domains session: ', Domains.length());
                 };
             };
-        }
+        };
     } catch (e) {
         log.warn('On remove domain error: ', e.message);
     }
 });
+
+var getJSONUserEvent = function (eventName, domainName, userId) {
+    return {
+        "Event-Name": eventName,
+        "Event-Domain": domainName,
+        "User-ID": userId,
+        "User-Domain": domainName,
+        "User-Scheme":"account",
+        "Content-Type":"text/event-json",
+        "webitel-event-name":"user"
+    };
+};
