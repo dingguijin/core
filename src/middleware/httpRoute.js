@@ -1,6 +1,7 @@
 var log = require('../lib/log')(module),
-    webitel = global.webitel,
-    checkUser = require('../middleware/checkUser');
+    conf = require('../conf'),
+    rootName = conf.get('webitelServer:account'),
+    rootPassword = conf.get('webitelServer:secret') || '';
 
 module.exports.processRequest = function (req, res) {
     try {
@@ -19,40 +20,34 @@ module.exports.processRequest = function (req, res) {
             });
 
             req.on('end', function () {
-                checkUser(username, password, function(err) {
-                    if (err) {
-                        handleForbidden(res);
-                    } else {
-                        try {
-                            var resultObject = JSON.parse(responseString);
-                            log.info(resultObject);
-                        } catch (e) {
-                            log.warn('Parse error: ', e.message);
-                            res.writeHead(400, {'Content-Type': 'text/plain'});
-                            res.write(e.message);
-                            res.end();
-                            return;
-                        };
-                        handleRequest(req, res, resultObject);
-                    }
-                });
-
-            });
-        } else {
-            checkUser(username, password, function(err) {
-                if (err) {
+                if (rootName != username || rootPassword != password) {
                     handleForbidden(res);
                 } else {
-                    handleRequest(req, res, {});
+                    try {
+                        var resultObject = JSON.parse(responseString);
+                        log.trace(resultObject);
+                    } catch (e) {
+                        log.warn('Parse error: ', e.message);
+                        res.writeHead(400, {'Content-Type': 'text/plain'});
+                        res.write(e.message);
+                        res.end();
+                        return;
+                    };
+                    handleRequest(req, res, resultObject);
                 }
             });
-        }
-
+        } else {
+            if (rootName !== username || rootPassword !== password) {
+                handleForbidden(res);
+            } else {
+                handleRequest(req, res, {});
+            }
+        };
     } catch (e) {
         res.writeHead(500, {'Content-Type': 'text/plain'});
         res.write(e.message);
         res.end();
-    }
+    };
 
 };
 
@@ -99,8 +94,10 @@ function handleRequest(req, res, resultObject) {
         if (req.url === '/api/v1/domains') {
             if (resultObject && resultObject['domain_name'] && resultObject['customer_id']) {
                 // Create domain
+                if (!doSendWebitelCommand(res)) return;
+
                 webitel.domainCreate(resultObject['domain_name'], resultObject['customer_id'], function (request) {
-                    res.writeHead(201,
+                    res.writeHead(200,
                         {'Content-Type': 'text/plain'});
                     res.write(request.body);
                     res.end();
@@ -113,13 +110,17 @@ function handleRequest(req, res, resultObject) {
         } else if (req.url === '/api/v1/accounts') {
             if (resultObject && resultObject['login'] && resultObject['role'] &&
                 resultObject['domain']) {
+
+                if (!doSendWebitelCommand(res)) return;
+
                 var _param =[];
                 _param.push(resultObject['login']);
                 if (resultObject['password'] && resultObject['password'] != '')
                     _param.push(':' + resultObject['password']);
                 _param.push('@' + resultObject['domain']);
+
                 webitel.userCreate(resultObject['role'], _param.join(''), function(request) {
-                    res.writeHead(201,
+                    res.writeHead(200,
                         {'Content-Type': 'text/plain'});
                     res.write(request.body);
                     res.end();
@@ -136,8 +137,11 @@ function handleRequest(req, res, resultObject) {
         var url = /^\/api\/v1\/domain\/(.*)$/g.exec(req.url || '');
         if (url) {
             if (url[1]) {
+
+                if (!doSendWebitelCommand(res)) return;
+
                 webitel.domainRemove(url[1], function(request) {
-                    res.writeHead(201, {'Content-Type': 'text/plain'});
+                    res.writeHead(200, {'Content-Type': 'text/plain'});
                     res.write(request.body);
                     res.end()
                 })
@@ -158,4 +162,19 @@ var handleForbidden = function(res) {
     res.writeHead(403, {'Content-Type': 'text/plain'});
     res.write("Forbidden!");
     res.end();
+};
+
+var doSendWebitelCommand = function (res) {
+    if (!webitel.authed) {
+        try {
+            res.writeHead(500, {'Content-Type': 'text/plain'});
+            res.write("Error: Webitel server disconnect!");
+            res.end();
+            return false;
+        } catch (e) {
+            log.warn('Write message:', e.message);
+            return false;
+        };
+    };
+    return true;
 };

@@ -26,7 +26,12 @@ module.exports = function (login, password, cb) {
             var registered = (a1Hash == res.body);
 
             if (registered) {
-                cb(null);
+                cb(null, res);
+                /* TODO определить роль пользователя
+                eslConn.api('user_data ' + login + ' var account_role', function (res) {
+                    cb(null, res);
+                });
+                */
             } else {
                 cb(((res.body && res.body.indexOf('-ERR no reply\n') == 0)
                     ? 'user not found'

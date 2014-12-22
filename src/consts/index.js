@@ -17,6 +17,7 @@ module.exports.WebitelCommandTypes = {
     Auth: 'auth', // +-
     GetVar: 'getvar', // +-
     SetVar: 'setvar', // +-
+    Answer: 'answer', // +-
 
     // SYS Api
     Domain: {
@@ -42,7 +43,16 @@ module.exports.WebitelCommandTypes = {
     // Favbet
     Login: 'login',
     Logout: 'logout',
-    ReloadAgents: 'reloadAgents'
+    ReloadAgents: 'reloadAgents',
+    Rawapi: 'rawapi',
+    Eavesdrop: 'eavesdrop',
+    Displace: 'displace',
+    Dump: 'channel_dump'
 };
 
 module.exports.RootName = 'root';
+
+module.exports.ACCOUNT_EVENTS = {
+    ONLINE: 'ACCOUNT_ONLINE',
+    OFFLINE: 'ACCOUNT_OFFLINE'
+};
