@@ -1,7 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="699ecbe4-7a9d-48f4-b5c8-619b4eaf9f96" name="Default" comment="" />
+    <list default="true" id="699ecbe4-7a9d-48f4-b5c8-619b4eaf9f96" name="Default" comment="">
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/middleware/logo.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/lib/WebitelModule2.js" afterPath="$PROJECT_DIR$/src/lib/WebitelModule2.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/app.js" afterPath="$PROJECT_DIR$/src/app.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/conf/config.json" afterPath="$PROJECT_DIR$/src/conf/config.json" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/middleware/eslEvents.js" afterPath="$PROJECT_DIR$/src/middleware/eslEvents.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/middleware/handleSocketError.js" afterPath="$PROJECT_DIR$/src/middleware/handleSocketError.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/middleware/httpRoute.js" afterPath="$PROJECT_DIR$/src/middleware/httpRoute.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/consts/index.js" afterPath="$PROJECT_DIR$/src/consts/index.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/lib/log.js" afterPath="$PROJECT_DIR$/src/lib/log.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/middleware/userSessions.js" afterPath="$PROJECT_DIR$/src/middleware/userSessions.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/middleware/webitelEvents.js" afterPath="$PROJECT_DIR$/src/middleware/webitelEvents.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+    </list>
     <ignored path="core.iws" />
     <ignored path=".idea/workspace.xml" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -427,8 +440,8 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="-8" y="-8" width="1936" height="1056" extended-state="7" />
-    <editor active="true" />
+    <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
+    <editor active="false" />
     <layout>
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.30054054" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Regex Tester" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="11" side_tool="false" content_ui="tabs" />
@@ -436,7 +449,7 @@
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32972974" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Mongo Explorer" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.15565032" sideWeight="0.5" order="1" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.15565032" sideWeight="0.5" order="1" side_tool="false" content_ui="combo" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.5254054" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="true" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.42378378" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
