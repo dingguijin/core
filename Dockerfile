@@ -1,6 +1,7 @@
 FROM node:slim
 MAINTAINER Vitaly Kovalyshyn "v.kovalyshyn@webitel.com"
-ENV VERSION 3.0 $(cat .git/ORIG_HEAD)
+
+ENV VERSION 3.0.4124
 
 COPY src /core
 
