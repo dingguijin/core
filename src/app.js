@@ -8,6 +8,9 @@ var handleSocketError = require('./middleware/handleSocketError');
 
 var webitel = global.webitel = null;
 var waitTimeReconnectWebitel = conf.get('webitelServer:reconnect') * 1000;
+var ACCOUNT_EVENTS = require('./consts').ACCOUNT_EVENTS;
+
+require('./middleware/logo')();
 
 var doConnectWebitel = function() {
     webitel = global.webitel = new Webitel({
@@ -25,26 +28,24 @@ var doConnectWebitel = function() {
 
     webitel.on('error', function (err) {
         log.warn('Webitel warn:', err);
-		setTimeout(doConnectWebitel, waitTimeReconnectWebitel);
     })
     webitel.on('webitel::event::auth::success', function () {
         log.info('Connect Webitel - OK');
-//        webitel.subscribe('all');
+        webitel.subscribe('all');
     });
 
     webitel.on('webitel::event::auth::fail', function () {
+        webitel.authed = false;
         log.error('webitel::event::auth::fail');
-		setTimeout(doConnectWebitel, waitTimeReconnectWebitel);
     });
 
     webitel.on('webitel::end', function () {
+        webitel.authed = false;
         log.error('Webitel: socket close.');
-		setTimeout(doConnectWebitel, waitTimeReconnectWebitel);
     });
 
     webitel.on('webitel::event::disconnect::notice', function () {
         log.error('webitel::event::disconnect::notice');
-		setTimeout(doConnectWebitel, waitTimeReconnectWebitel);
     });
 
     webitel.on('webitel::event::event::**', require('./middleware/webitelEvents').eventsHandle);
@@ -75,6 +76,25 @@ var doSendFreeSWITCHCommand = function (id, socket) {
                 'exec-complete': '+ERR',
                 'exec-response': {
                     'response': 'FreeSWITCH connect error.'
+                }
+            }))
+            return false;
+        } catch (e) {
+            log.warn('User socket close:', e.message);
+            return false;
+        };
+    };
+    return true;
+};
+
+var doSendWebitelCommand = function (id, socket) {
+    if (!webitel.authed) {
+        try {
+            socket.send(JSON.stringify({
+                'exec-uuid': id,
+                'exec-complete': '+ERR',
+                'exec-response': {
+                    'response': 'Webitel connect error.'
                 }
             }))
             return false;
@@ -186,7 +206,7 @@ wss.on('connection', function(ws) {
         }, socketTimeUnauthorized * 1000);
     }
     ws.on('message', function(message) {
-        log.info('received: %s', message);
+        log.trace('received: %s', message);
         try {
             var msg = JSON.parse(message);
             var execId = msg['exec-uuid'];
@@ -205,7 +225,7 @@ wss.on('connection', function(ws) {
                                         'login': err
                                     }
                                 }));
-                                ws.close();
+//                                ws.close();
                             } catch (e) {
                                 log.warn('User socket close:', e.message);
                             };
@@ -217,12 +237,13 @@ wss.on('connection', function(ws) {
                                 if (!user) {
                                     Users.add(webitelId, {
                                         ws: [ws],
-                                        id: msg['exec-args']['account']
+                                        id: msg['exec-args']['account'],
+                                        logged: false
                                     });
                                 } else {
                                     user.ws.push(ws);
                                 };
-                                log.info('Users session: ', Users.length());
+                                log.debug('Users session: ', Users.length());
 
                                 ws.send(JSON.stringify({
                                     'exec-uuid': execId,
@@ -238,7 +259,6 @@ wss.on('connection', function(ws) {
                     });
                     break;
                 case WebitelCommandTypes.Call:
-					if (!doSendFreeSWITCHCommand(execId, ws)) return;
                     var _originatorParam = new Array('w_jsclient_originate_number=' + args['extension']),
                         _autoAnswerParam = [].concat( args['auto_answer_param'] || []),
                         _param = '[' + _originatorParam.concat(_autoAnswerParam).join(',') + ']';
@@ -302,18 +322,8 @@ wss.on('connection', function(ws) {
                     break;
                 case WebitelCommandTypes.Dtmf:
                     if (!doSendFreeSWITCHCommand(execId, ws)) return;
-                    var _digits = args['digits'];
                     eslConn.api(('uuid_recv_dtmf ' + args['channel-uuid'] + ' ' + args['digits']), function (res) {
-                        try {
-                            if (res['body'] && res['body'].indexOf('-ERR no reply') == 0) {
-                                res['body'] = '+OK ' + _digits;
-                                getCommandResponseJSON(ws, execId, res)
-                            } else {
-                                getCommandResponseJSON(ws, execId, res)
-                            }
-                        } catch (e) {
-                            log.error('Command DTMF: %s', e);
-                        }
+                        getCommandResponseJSON(ws, execId, res)
                     });
                     break;
                 case WebitelCommandTypes.Broadcast:
@@ -324,11 +334,12 @@ wss.on('connection', function(ws) {
                     break;
                 case WebitelCommandTypes.AttXfer:
                     if (!doSendFreeSWITCHCommand(execId, ws)) return;
-                    eslConn.api(('uuid_broadcast ' + args['channel-uuid'] + ' set::origination_cancel_key=#'), function () {
-                        eslConn.api(('uuid_broadcast ' + args['channel-uuid'] + ' att_xfer::user/' + args['destination'] + ''), function (res) {
+                        var _account = args['user'].split('@')[0];
+                        eslConn.api(('uuid_broadcast ' + args['channel-uuid'] + ' att_xfer::{origination_cancel_key=#,origination_caller_id_name=' +
+                            _account + ',origination_caller_id_number=' + _account +
+                            ',webitel_att_xfer=true}user/' + args['destination'] + ''), function (res) {
                             getCommandResponseJSON(ws, execId, res)
                         });
-                    });
                     break;
                 case WebitelCommandTypes.AttXfer2:
                     if (!doSendFreeSWITCHCommand(execId, ws)) return;
@@ -338,7 +349,6 @@ wss.on('connection', function(ws) {
                         _param = '[' + _originatorParam.concat(_autoAnswerParam).join(',') + ']';
                     var dialString = ('originate ' + _param + 'user/' + args['user'] + ' ' + args['extension'].split('@')[0] +
                         ' xml default ' + args['user'].split('@')[0] + ' ' + args['user'].split('@')[0]);
-                    log.info('att_xfer2_dial ',dialString);
                     eslConn.bgapi(dialString, function (res) {
                         getCommandResponseJSON(ws, execId, res);
                     });
@@ -351,10 +361,27 @@ wss.on('connection', function(ws) {
                     break;
                 case WebitelCommandTypes.AttXferCancel:
                     if (!doSendFreeSWITCHCommand(execId, ws)) return;
-                    eslConn.api('uuid_kill ' + args['channel-uuid-leg-c'], function (res) {
+                    var _play = 'start',
+                        killCn = (args['kill-channel'] || true);
+                    _play += ' silence_stream://0 3';
+                    eslConn.api('uuid_displace ' + args['channel-uuid-leg-b'] + ' ' + _play, function (res) {
+                        if (killCn) {
+                            eslConn.api('uuid_kill ' + args['channel-uuid-leg-c'], function (res) {
+                                getCommandResponseJSON(ws, execId, res);
+                            });
+                        } else {
+                            getCommandResponseJSON(ws, execId, res);
+                        };
+                    });
+                    break;
+
+                case WebitelCommandTypes.Dump:
+                    if (!doSendFreeSWITCHCommand(execId, ws)) return;
+                    eslConn.api('uuid_dump ' + args['channel-uuid'], function (res) {
                         getCommandResponseJSON(ws, execId, res);
                     });
                     break;
+
                 case WebitelCommandTypes.GetVar:
                     if (!doSendFreeSWITCHCommand(execId, ws)) return;
                     eslConn.api('uuid_getvar ' + args['channel-uuid'] + ' ' + args['variable'] + ' ' +
@@ -369,20 +396,47 @@ wss.on('connection', function(ws) {
                         getCommandResponseJSON(ws, execId, res);
                     });
                     break;
+                case WebitelCommandTypes.Eavesdrop:
+                    if (!doSendFreeSWITCHCommand(execId, ws)) return;
+                    eslConn.bgapi('originate user/' + (args['user'] || '') + ' &eavesdrop(' + (args['channel-uuid'] || '') +
+                        ') XML default ' + args['side'] + ' ' + args['side'], function (res) {
+                        getCommandResponseJSON(ws, execId, res);
+                    });
+                    break;
+                case WebitelCommandTypes.Displace:
+                    if (!doSendFreeSWITCHCommand(execId, ws)) return;
+                    var _play = args['record'] == 'start'
+                        ? 'start'
+                        : 'stop';
+                    _play += ' silence_stream://0 3';
+                    eslConn.api('uuid_displace ' + args['channel-uuid'] + ' ' + _play, function (res) {
+                        getCommandResponseJSON(ws, execId, res);
+                    });
+                    break;
+
+                case WebitelCommandTypes.Dump:
+
+                    break;
                 // System Commands
+
+                // User status
+
 
                 // Domain
                 case WebitelCommandTypes.Domain.List:
+                    if (!doSendWebitelCommand(execId, ws)) return;
                     webitel.domainList(args['customerId'] || '', function(res) {
                         getCommandResponseJSON(ws, execId, res);
                     });
                     break;
                 case WebitelCommandTypes.Domain.Create:
+                    if (!doSendWebitelCommand(execId, ws)) return;
                     webitel.domainCreate(args['name'] || '', args['customerId'] || '', function(res) {
                         getCommandResponseJSON(ws, execId, res);
                     });
                     break;
                 case WebitelCommandTypes.Domain.Remove:
+                    if (!doSendWebitelCommand(execId, ws)) return;
                     webitel.domainRemove(args['name'] || '', function(res) {
                         getCommandResponseJSON(ws, execId, res);
                     });
@@ -390,47 +444,56 @@ wss.on('connection', function(ws) {
 
                 // User
                 case WebitelCommandTypes.Account.List:
+                    if (!doSendWebitelCommand(execId, ws)) return;
                     webitel.userList(args['domain'] || '', function(res) {
                         getCommandResponseJSON(ws, execId, res);
                     });
                     break;
                 case WebitelCommandTypes.Account.Create:
+                    if (!doSendWebitelCommand(execId, ws)) return;
                     webitel.userCreate(args['role'] || '', args['param'] || '', function(res) {
                         getCommandResponseJSON(ws, execId, res);
                     });
                     break;
                 case WebitelCommandTypes.Account.Change:
+                    if (!doSendWebitelCommand(execId, ws)) return;
                     webitel.userUpdate(args['user'] || '', args['param'] || '', args['value'] || '', function(res) {
                         getCommandResponseJSON(ws, execId, res);
                     });
                     break;
                 case WebitelCommandTypes.Account.Remove:
+                    if (!doSendWebitelCommand(execId, ws)) return;
                     webitel.userRemove(args['user'] || '', function(res) {
                         getCommandResponseJSON(ws, execId, res);
                     });
                     break;
                 // Device
                 case WebitelCommandTypes.Device.List:
+                    if (!doSendWebitelCommand(execId, ws)) return;
                     webitel.deviceList(args['domain'] || '', function(res) {
                         getCommandResponseJSON(ws, execId, res);
                     });
                     break;
                 case WebitelCommandTypes.Device.Create:
+                    if (!doSendWebitelCommand(execId, ws)) return;
                     webitel.deviceCreate(args['type'] || '', args['param'] || '', function(res) {
                         getCommandResponseJSON(ws, execId, res);
                     });
                     break;
                 case WebitelCommandTypes.Device.Change:
+                    if (!doSendWebitelCommand(execId, ws)) return;
                     webitel.deviceUpdate(args['device'] || '', args['param'] || '', args['value'] || '', function(res) {
                         getCommandResponseJSON(ws, execId, res);
                     });
                     break;
                 case WebitelCommandTypes.Device.Remove:
+                    if (!doSendWebitelCommand(execId, ws)) return;
                     webitel.deviceRemove(args['device'] || '', function(res) {
                         getCommandResponseJSON(ws, execId, res);
                     });
                     break;
                 case WebitelCommandTypes.ListUsers:
+                    if (!doSendWebitelCommand(execId, ws)) return;
                     webitel.list_users(args['domain'] || '', function(res) {
                         getCommandResponseJSON(ws, execId, res);
                     });
@@ -439,24 +502,72 @@ wss.on('connection', function(ws) {
                 // Favbet
                 case WebitelCommandTypes.Logout:
                     ws['upgradeReq']['logged'] = false;
-                    sendCommandResponseWebitel(ws, execId, {
-                        status: '+OK',
-                        body: 'Successfuly logged out.'
-                    });
+                    var jsonEvent,
+                        webitelId = ws['upgradeReq']['webitelId'] || '',
+                        _domain = webitelId.split('@')[1],
+                        _id = webitelId.split('@')[0],
+                        _user = Users.get(webitelId);
+                    if (_user) {
+                        try {
+                            _user.logged = false;
+                            jsonEvent = getJSONUserEvent(ACCOUNT_EVENTS.OFFLINE, _domain, _id);
+                            log.debug(jsonEvent['Event-Name'] + ' -> ' + webitelId);
+                            Domains.broadcast(_domain, JSON.stringify(jsonEvent));
+                        } catch (e) {
+                            log.warn('Broadcast account event: ', domain);
+                        };
+                        sendCommandResponseWebitel(ws, execId, {
+                            status: '+OK',
+                            body: 'Successfuly logged out.'
+                        });
+                    } else {
+                        sendCommandResponseWebitel(ws, execId, {
+                            status: '-ERR',
+                            body: 'Error logged out.'
+                        });
+                    }
                     break;
                 case WebitelCommandTypes.Login:
                     ws['upgradeReq']['logged'] = true;
-                    sendCommandResponseWebitel(ws, execId, {
-                        status: '+OK',
-                        body: 'Successfuly logged in.'
-                    });
+                    var jsonEvent,
+                        webitelId = ws['upgradeReq']['webitelId'] || '',
+                        _domain = webitelId.split('@')[1],
+                        _id = webitelId.split('@')[0],
+                        _user = Users.get(webitelId);
+                    if (_user) {
+                        try {
+                            _user.logged = true;
+                            jsonEvent = getJSONUserEvent(ACCOUNT_EVENTS.ONLINE, _domain, _id);
+                            log.debug(jsonEvent['Event-Name'] + ' -> ' + webitelId);
+                            Domains.broadcast(_domain, JSON.stringify(jsonEvent));
+                        } catch (e) {
+                            log.warn('Broadcast account event: ', domain);
+                        }
+                        ;
+                        sendCommandResponseWebitel(ws, execId, {
+                            status: '+OK',
+                            body: 'Successfuly logged in.'
+                        });
+                    } else {
+                        sendCommandResponseWebitel(ws, execId, {
+                            status: '-ERR',
+                            body: 'Error logged in.'
+                        });
+                    }
                     break;
                 case WebitelCommandTypes.ReloadAgents:
+                    if (!doSendWebitelCommand(execId, ws)) return;
                     webitel.reloadAgents(function(res) {
                         getCommandResponseJSON(ws, execId, res);
                     });
                     break;
 
+                case WebitelCommandTypes.Rawapi:
+                    if (!doSendFreeSWITCHCommand(execId, ws)) return;
+                    eslConn.api(args['command'], function(res) {
+                        getCommandResponseJSON(ws, execId, res);
+                    });
+                    break;
                 default :
                     ws.send(JSON.stringify({
                         'exec-uuid': execId,
@@ -479,7 +590,7 @@ wss.on('connection', function(ws) {
         try {
             _ws.send(JSON.stringify({
                 'exec-uuid': id,
-                'exec-complete': (res['body'].indexOf('-ERR') == 0) ? "-ERR" : "+OK",
+                'exec-complete': (res['body'].indexOf('-ERR') == 0 || res['body'].indexOf('-USAGE') == 0) ? "-ERR" : "+OK",
                 'exec-response': {
                     'response': res['body']
                 }
@@ -515,8 +626,8 @@ wss.on('connection', function(ws) {
                         user.ws.splice(key, 1);
                         if (user.ws.length == 0) {
                             Users.remove(agentId);
-                            log.info('disconnect: ', agentId);
-                            log.info('Users session: ', Users.length());
+                            log.trace('disconnect: ', agentId);
+                            log.debug('Users session: ', Users.length());
                         };
                     };
                 };
@@ -534,4 +645,16 @@ wss.on('connection', function(ws) {
 wss.broadcast = function(data) {
     for (var i in this.clients)
         this.clients[i].send(data);
+};
+
+var getJSONUserEvent = function (eventName, domainName, userId) {
+    return {
+        "Event-Name": eventName,
+        "Event-Domain": domainName,
+        "User-ID": userId,
+        "User-Domain": domainName,
+        "User-Scheme":"account",
+        "Content-Type":"text/event-json",
+        "webitel-event-name":"user"
+    };
 };

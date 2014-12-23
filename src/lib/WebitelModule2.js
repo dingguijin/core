@@ -14,6 +14,7 @@ var Webitel = module.exports = function (parameters) {
     this.port = parameters['port'];
     this.account = parameters['account'];
     this.password = parameters['secret'];
+    this.authed = false;
 
     this.reconnect = parameters['reconnect'] || -1;
     this._status = ConnectionStatus.Disconnected;
@@ -28,7 +29,7 @@ util.inherits(Webitel, EventEmitter2);
 Webitel.prototype.version = '3.0.1';
 
 Webitel.prototype.connect = function () {
-    log.info("Host: " + this.host);
+    log.trace("Host: " + this.host);
     var self = this;
     // TODO нужно тестировать будет ли ответ когда упадет соединение
     this.cmdCallbackQueue.length = 0;
@@ -83,7 +84,7 @@ Webitel.prototype.send = function(command, args) {
         for (var key in args) {
             _command.push(args[key])
         };
-        log.info('Execute: ' + _command.join(' '));
+        log.debug('Execute: ' + _command.join(' '));
         self.socket.write(_command.join(' ') + '\n\n');
     }
     catch(e) {
@@ -171,7 +172,7 @@ Webitel.prototype.subscribe = function (param) {
     try {
         this.sendRecv('event json ' + param, function (res) {
             if (res.getHeader('Webitel-Reply-OK')) {
-                log.info(res.getHeader('Reply-Text'));
+                log.debug(res.getHeader('Reply-Text'));
             } else if (res.getHeader('Webitel-Reply-ERR')) {
                 log.error(res.getHeader('Reply-Text'));
             } else {
@@ -202,7 +203,6 @@ Webitel.prototype._onEvent = function(event, headers, body) {
         case 'api/response':
             emit += '::api::response';
             break;
-
 
         case 'text/event-json':
         case 'text/event-plain':
@@ -279,13 +279,15 @@ Webitel.prototype.list_users = function(domain, cb) {
         _cb = cb;
         _domain = domain;
     };
-    this.api(WebitelCommandTypes.ListUsers,
+
+
+ /*   this.api(WebitelCommandTypes.ListUsers,
         [
                 _domain || ''
         ],
         _cb
-    );
-    /* FAVBET
+    ); */
+    // FAVBET
     this.api(WebitelCommandTypes.ListUsers, [
             _domain || ''
     ], function (res) {
@@ -306,7 +308,7 @@ Webitel.prototype.list_users = function(domain, cb) {
             })
         });
     });
-    */
+
     /*var cmd = new WebitelCommand(WebitelCommandTypes.ListUsers, {
         param: _domain
     }, _cb);
@@ -314,7 +316,8 @@ Webitel.prototype.list_users = function(domain, cb) {
 };
 
 Webitel.prototype.userList = function(domain, cb) {
-    var _cb, _domain;
+    var _cb, _domain,
+        self = this;
     if (typeof arguments[0] == "function") {
         _cb = arguments[0];
         _domain = null
@@ -322,9 +325,30 @@ Webitel.prototype.userList = function(domain, cb) {
         _cb = cb;
         _domain = domain;
     };
-    this.api(WebitelCommandTypes.Account.List, [
+    /*this.api(WebitelCommandTypes.Account.List, [
         _domain
-    ], _cb);
+    ], _cb); */
+    // FAVBET
+    this.api(WebitelCommandTypes.Account.List, [
+            _domain || ''
+    ], function (res) {
+        if (res['body'].indexOf('-ERR') == 0) {
+            _cb(res);
+            return;
+        };
+        self._parsePlainTableToJSON(res.getBody(), _domain, function (err, resJSON) {
+            if (err) {
+                log.error(err);
+                _cb({
+                    body: '-ERR ' + err.message
+                });
+                return;
+            }
+            _cb({
+                body: JSON.stringify(resJSON)
+            })
+        });
+    });
 /*
     var cmd = new WebitelCommand(WebitelCommandTypes.Account.List, {
         param: _domain
@@ -490,23 +514,29 @@ Webitel.prototype._parsePlainTableToJSON = function(data, domain, cb) {
         domain = domain || '_undef_';
         var _line,
             _head,
-            _json = {};
+            _json = {},
+            _id,
+            _user;
 
         _line = data.split('\n');
         _head = _line[0].split('\t');
         for (var i = 2; i < _line.length && _line[i] != const_DataSeparator; i++) {
+            _id = '';
             _line[i].split('\t').reduce(function (_json, line, index) {
                 if (index == 0) {
-                    _json[i] = {
-                        id: line.trim()
+                    _id = line.trim(); // + '@' + domain;
+                    _json[_id] = {
+                        id: _id
                     };
                 } else {
                     if (_head[index] === 'online') {
-                        _json[i][_head[index].trim()] = (Users.get(_json[i]['id'] + '@' + domain)
-                            ? "true"
-                            : "false");
+                        _user = Users.get(_json[_id]['id'] + '@' + domain);
+
+                        _json[_id]['online'] = ((_user && _user.logged)
+                            ? true
+                            : false);
                     } else {
-                        _json[i][_head[index].trim()] = line.trim();
+                        _json[_id][_head[index].trim()] = line.trim();
                     };
                 };
                 return _json;

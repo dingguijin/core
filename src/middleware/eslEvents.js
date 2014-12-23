@@ -3,12 +3,13 @@ module.exports.eventsHandle = function (event) {
     try {
         var jsonEvent = JSON.parse(event.serialize());
         if (jsonEvent['Channel-Presence-ID']) {
-            if (jsonEvent['Event-Name'] == 'CHANNEL_EXECUTE_COMPLETE') {
+            if ((jsonEvent['Event-Name'] == 'CHANNEL_EXECUTE_COMPLETE' && jsonEvent['Application'] != 'att_xfer')
+                || (jsonEvent['Event-Name'] == 'CHANNEL_EXECUTE' && jsonEvent['Application'] != 'att_xfer')) {
                 return;
             };
             var user = Users.get(jsonEvent['Channel-Presence-ID']);
             jsonEvent['webitel-event-name'] = 'call';
-            if (user) {
+            if (user && user['logged']) {
                 var jsonRequest = {
                     "webitel-event-name": 'call',
                     "Event-Name": jsonEvent['Event-Name'],
@@ -37,29 +38,31 @@ module.exports.eventsHandle = function (event) {
                     "Caller-Channel-Hangup-Time": jsonEvent["Caller-Channel-Hangup-Time"],
                     "DTMF-Digit": jsonEvent["DTMF-Digit"],
                     "Application": jsonEvent["Application"],
-                    "Application-Data": jsonEvent["Application-Data"]
+                    "Application-Data": jsonEvent["Application-Data"],
+                    "Bridge-A-Unique-ID": jsonEvent["Bridge-A-Unique-ID"],
+                    "Bridge-B-Unique-ID": jsonEvent["Bridge-B-Unique-ID"],
+                    "variable_webitel_att_xfer": jsonEvent["variable_webitel_att_xfer"]
                 };
 
                 for (var key in user.ws) {
                     try {
-                        //if (user.ws[key]['upgradeReq']['logged']) // FAVBET
-                            user.ws[key].send(JSON.stringify(jsonRequest));
+                        user.ws[key].send(JSON.stringify(jsonRequest));
                     } catch (e) {
                         if (user.ws[key].readyState == user.ws[key].CLOSED) {
                             user.ws.splice(key, 1);
                             if (user.ws.length == 0) {
                                 Users.remove(user.id);
-                                log.info('disconnect: ', user.id);
-                                log.info('Users session: ', Users.length());
+                                log.trace('disconnect: ', user.id);
+                                log.debug('Users session: ', Users.length());
                             };
                         };
                         log.warn(e.message);
                     };
                 };
             };
-            log.info(jsonEvent['Event-Name'] + ' -> ' + jsonEvent["Unique-ID"] || "Other ESL event.");
+            log.debug(jsonEvent['Event-Name'] + ' -> ' + (jsonEvent["Unique-ID"] || "Other ESL event.") + ' -> '
+                + jsonEvent['Channel-Presence-ID']);
         };
-//        log.info(jsonEvent);
     } catch (e) {
         log.error(e.message);
     }

@@ -12,20 +12,20 @@
         }
     },
     "webitelServer": {
-        "host": "wconsole",
+        "host": "pre.webitel.com",
         "port": "6873",
         "account": "root",
         "secret": "",
         "reconnect": 5
     },
     "freeSWITCH": {
-        "host": "freeswitch",
+        "host": "pre.webitel.com",
         "port": 8021,
         "pwd": "ClueCon",
         "reconnect": 5
     },
     "application": {
-        "loglevel": "info",
+        "loglevel": "trace",
         "socketTimeUnauthorized": 5,
         "sleepConnectToWebitel": 1000,
         "freeSWITCHEvents": [
@@ -34,6 +34,9 @@
             "CHANNEL_CALLSTATE",
             "CHANNEL_ANSWER",
             "CHANNEL_HANGUP_COMPLETE",
+            "CHANNEL_HANGUP",
+            "CHANNEL_EXECUTE",
+            "CHANNEL_EXECUTE_COMPLETE",
             "CHANNEL_HOLD",
             "CHANNEL_UNHOLD",
             "RECORD_START",
@@ -42,7 +45,8 @@
             "CHANNEL_UNBRIDGE",
             "CHANNEL_UUID",
             "CHANNEL_OUTGOING",
-            "DTMF"
+            "DTMF",
+            "CHANNEL_DATA"
         ]
     }
 }
