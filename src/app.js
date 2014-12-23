@@ -10,6 +10,8 @@ var webitel = global.webitel = null;
 var waitTimeReconnectWebitel = conf.get('webitelServer:reconnect') * 1000;
 var ACCOUNT_EVENTS = require('./consts').ACCOUNT_EVENTS;
 
+require('./middleware/logo')();
+
 var doConnectWebitel = function() {
     webitel = global.webitel = new Webitel({
         server: conf.get('webitelServer:host'),
@@ -204,7 +206,7 @@ wss.on('connection', function(ws) {
         }, socketTimeUnauthorized * 1000);
     }
     ws.on('message', function(message) {
-        log.info('received: %s', message);
+        log.trace('received: %s', message);
         try {
             var msg = JSON.parse(message);
             var execId = msg['exec-uuid'];
@@ -241,7 +243,7 @@ wss.on('connection', function(ws) {
                                 } else {
                                     user.ws.push(ws);
                                 };
-                                log.info('Users session: ', Users.length());
+                                log.debug('Users session: ', Users.length());
 
                                 ws.send(JSON.stringify({
                                     'exec-uuid': execId,
@@ -509,7 +511,7 @@ wss.on('connection', function(ws) {
                         try {
                             _user.logged = false;
                             jsonEvent = getJSONUserEvent(ACCOUNT_EVENTS.OFFLINE, _domain, _id);
-                            log.info(jsonEvent['Event-Name'] + ' -> ' + webitelId);
+                            log.debug(jsonEvent['Event-Name'] + ' -> ' + webitelId);
                             Domains.broadcast(_domain, JSON.stringify(jsonEvent));
                         } catch (e) {
                             log.warn('Broadcast account event: ', domain);
@@ -536,7 +538,7 @@ wss.on('connection', function(ws) {
                         try {
                             _user.logged = true;
                             jsonEvent = getJSONUserEvent(ACCOUNT_EVENTS.ONLINE, _domain, _id);
-                            log.info(jsonEvent['Event-Name'] + ' -> ' + webitelId);
+                            log.debug(jsonEvent['Event-Name'] + ' -> ' + webitelId);
                             Domains.broadcast(_domain, JSON.stringify(jsonEvent));
                         } catch (e) {
                             log.warn('Broadcast account event: ', domain);
@@ -624,8 +626,8 @@ wss.on('connection', function(ws) {
                         user.ws.splice(key, 1);
                         if (user.ws.length == 0) {
                             Users.remove(agentId);
-                            log.info('disconnect: ', agentId);
-                            log.info('Users session: ', Users.length());
+                            log.trace('disconnect: ', agentId);
+                            log.debug('Users session: ', Users.length());
                         };
                     };
                 };

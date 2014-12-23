@@ -29,7 +29,7 @@ util.inherits(Webitel, EventEmitter2);
 Webitel.prototype.version = '3.0.1';
 
 Webitel.prototype.connect = function () {
-    log.info("Host: " + this.host);
+    log.trace("Host: " + this.host);
     var self = this;
     // TODO нужно тестировать будет ли ответ когда упадет соединение
     this.cmdCallbackQueue.length = 0;
@@ -84,7 +84,7 @@ Webitel.prototype.send = function(command, args) {
         for (var key in args) {
             _command.push(args[key])
         };
-        log.info('Execute: ' + _command.join(' '));
+        log.debug('Execute: ' + _command.join(' '));
         self.socket.write(_command.join(' ') + '\n\n');
     }
     catch(e) {
@@ -172,7 +172,7 @@ Webitel.prototype.subscribe = function (param) {
     try {
         this.sendRecv('event json ' + param, function (res) {
             if (res.getHeader('Webitel-Reply-OK')) {
-                log.info(res.getHeader('Reply-Text'));
+                log.debug(res.getHeader('Reply-Text'));
             } else if (res.getHeader('Webitel-Reply-ERR')) {
                 log.error(res.getHeader('Reply-Text'));
             } else {

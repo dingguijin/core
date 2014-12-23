@@ -47,19 +47,19 @@ Users.on('added', function (evn) {
             _domain = _id[1] || _id[0],
             domain = Domains.get(_domain),
             jsonEvent;
-//        try {
-//            jsonEvent = getJSONUserEvent(ACCOUNT_EVENTS.ONLINE, _domain, _id[0]);
-//            log.info(jsonEvent['Event-Name'] + ' -> ' + evn.id);
-//            Domains.broadcast(_domain, JSON.stringify(jsonEvent));
-//        } catch (e) {
-//            log.warn('Broadcast account event: ', domain);
-//        }
+        try {
+            jsonEvent = getJSONUserEvent(ACCOUNT_EVENTS.ONLINE, _domain, _id[0]);
+            log.debug(jsonEvent['Event-Name'] + ' -> ' + evn.id);
+            Domains.broadcast(_domain, JSON.stringify(jsonEvent));
+        } catch (e) {
+            log.warn('Broadcast account event: ', domain);
+        }
         if (!domain) {
             Domains.add(_domain, {
                 id: _domain,
                 users: [evn.id]
             });
-            log.info('Domains session: ', Domains.length());
+            log.debug('Domains session: ', Domains.length());
         } else {
             if (domain.users.indexOf(evn.id) == -1) {
                 domain.users.push(evn.id);
@@ -78,7 +78,7 @@ Users.on('removed', function (evn) {
             jsonEvent;
         try {
             jsonEvent = getJSONUserEvent(ACCOUNT_EVENTS.OFFLINE, _domain, _id[0]);
-            log.info(jsonEvent['Event-Name'] + ' -> ' + evn.id);
+            log.debug(jsonEvent['Event-Name'] + ' -> ' + evn.id);
             Domains.broadcast(_domain, JSON.stringify(jsonEvent));
         } catch (e) {
             log.warn('Broadcast account event: ', domain);
@@ -89,7 +89,7 @@ Users.on('removed', function (evn) {
                 domain.users.splice(_index, 1);
                 if (domain.users.length == 0) {
                     Domains.remove(_domain);
-                    log.info('Domains session: ', Domains.length());
+                    log.debug('Domains session: ', Domains.length());
                 };
             };
         };

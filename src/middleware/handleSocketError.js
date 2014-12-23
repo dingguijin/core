@@ -9,8 +9,8 @@ module.exports = function (ws) {
                     user.ws.splice(key, 1);
                     if (user.ws.length == 0) {
                         Users.remove(user.id);
-                        log.info('disconnect: ', user.id);
-                        log.info('Users session: ', Users.length());
+                        log.trace('disconnect: ', user.id);
+                        log.debug('Users session: ', Users.length());
                     }
                     ;
                 };

@@ -25,7 +25,7 @@ module.exports.processRequest = function (req, res) {
                 } else {
                     try {
                         var resultObject = JSON.parse(responseString);
-                        log.info(resultObject);
+                        log.trace(resultObject);
                     } catch (e) {
                         log.warn('Parse error: ', e.message);
                         res.writeHead(400, {'Content-Type': 'text/plain'});
@@ -97,7 +97,7 @@ function handleRequest(req, res, resultObject) {
                 if (!doSendWebitelCommand(res)) return;
 
                 webitel.domainCreate(resultObject['domain_name'], resultObject['customer_id'], function (request) {
-                    res.writeHead(201,
+                    res.writeHead(200,
                         {'Content-Type': 'text/plain'});
                     res.write(request.body);
                     res.end();
@@ -120,7 +120,7 @@ function handleRequest(req, res, resultObject) {
                 _param.push('@' + resultObject['domain']);
 
                 webitel.userCreate(resultObject['role'], _param.join(''), function(request) {
-                    res.writeHead(201,
+                    res.writeHead(200,
                         {'Content-Type': 'text/plain'});
                     res.write(request.body);
                     res.end();
@@ -141,7 +141,7 @@ function handleRequest(req, res, resultObject) {
                 if (!doSendWebitelCommand(res)) return;
 
                 webitel.domainRemove(url[1], function(request) {
-                    res.writeHead(201, {'Content-Type': 'text/plain'});
+                    res.writeHead(200, {'Content-Type': 'text/plain'});
                     res.write(request.body);
                     res.end()
                 })

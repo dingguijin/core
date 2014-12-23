@@ -25,7 +25,7 @@
         "reconnect": 5
     },
     "application": {
-        "loglevel": "info",
+        "loglevel": "trace",
         "socketTimeUnauthorized": 5,
         "sleepConnectToWebitel": 1000,
         "freeSWITCHEvents": [
