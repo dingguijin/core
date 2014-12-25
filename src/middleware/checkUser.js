@@ -1,11 +1,33 @@
 var conf = require('../conf'),
     RootName = conf.get("webitelServer:account"),
     RootPassword = conf.get("webitelServer:secret"),
-    crypto = require('crypto');
-function md5(str) {
+    crypto = require('crypto'),
+    xml2js = require('xml2js'),
+    log = require('../lib/log')(module),
+    ACCOUNT_ROLE = require('../consts').ACCOUNT_ROLE;
+var md5 = function (str) {
     var hash = crypto.createHash('md5');
     hash.update(str);
     return hash.digest('hex');
+};
+
+var parseXmlBody = function (body) {
+    var parser = new xml2js.Parser({ explicitArray: false, explicitRoot: false }),
+        headers = {};
+
+    parser.parseString(body, function(err, data) {
+        if(err) {
+            log.error(err);
+            return;
+        };
+        var _attr = [].concat(data.params.param, data.variables.variable);
+        _attr.forEach(function(header) {
+            headers[header['$'].name] = header['$'].value;
+        });
+
+    });
+
+    return headers;
 };
 
 module.exports = function (login, password, cb) {
@@ -14,19 +36,28 @@ module.exports = function (login, password, cb) {
         password = password || '';
         if (login === RootName) {
             if (password === RootPassword) {
-                cb(null);
+                cb(null, {
+                    'role': ACCOUNT_ROLE.ROOT
+                });
             } else {
                 cb('auth error: secret incorrect');
-            }
-            ;
+            };
             return
         };
-        eslConn.api('user_data ' + login + ' param a1-hash', function (res) {
+
+        var _loginPlain = login.replace('@', ' ');
+
+        eslConn.api('find_user_xml id ' + _loginPlain, function (res) {
+            var _jsonParamUser = parseXmlBody(res['body']);
+
             var a1Hash = md5(login.replace('@', ':') + ':' + password);
-            var registered = (a1Hash == res.body);
+            var registered = (a1Hash == _jsonParamUser['a1-hash']);
 
             if (registered) {
-                cb(null);
+                cb(null, {
+                    'role': ACCOUNT_ROLE.getRoleFromName(_jsonParamUser['account_role']),
+                    'domain': login.split('@')[1]
+                });
             } else {
                 cb(((res.body && res.body.indexOf('-ERR no reply\n') == 0)
                     ? 'user not found'

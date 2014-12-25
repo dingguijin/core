@@ -2,7 +2,11 @@ var EventEmitter2 = require('eventemitter2').EventEmitter2,
     util = require('util'),
     Parser = require('./Parser'),
     log = require('./log')(module),
-    net = require('net');
+    net = require('net'),
+    PERMISSION_DENIED = '-ERR permission denied!',
+    PERMISSION_DENIED = '-ERR permission denied!',
+    ACCOUNT_ROLE = require('../consts').ACCOUNT_ROLE,
+    COMMAND_TYPES = require('../consts').WebitelCommandTypes;
 
 var Webitel = module.exports = function (parameters) {
     EventEmitter2.call(this, {
@@ -222,7 +226,7 @@ var ConnectionStatus = {
     Disconnected: 2
 };
 
-Webitel.prototype.domainCreate = function(name, customerId, cb) {
+Webitel.prototype.domainCreate = function(_caller, name, customerId, cb) {
     this.api(WebitelCommandTypes.Domain.Create, [
         '\"' + name + '\"',
         customerId || ''
@@ -234,7 +238,7 @@ Webitel.prototype.domainCreate = function(name, customerId, cb) {
     command.execute(); */
 };
 
-Webitel.prototype.domainList = function(customerId, cb) {
+Webitel.prototype.domainList = function(_caller, customerId, cb) {
     var _cb, _customerId;
     if (typeof arguments[0] == "function") {
         _cb = arguments[0];
@@ -254,7 +258,7 @@ Webitel.prototype.domainList = function(customerId, cb) {
     */
 };
 
-Webitel.prototype.domainRemove = function(name, cb) {
+Webitel.prototype.domainRemove = function(_caller, name, cb) {
     this.api(WebitelCommandTypes.Domain.Remove, [
         name || ''
     ], cb);
@@ -264,30 +268,36 @@ Webitel.prototype.domainRemove = function(name, cb) {
     command.execute(); */
 };
 
-Webitel.prototype.updateDomain = function() {
+Webitel.prototype.updateDomain = function(_caller) {
     // TODO
 };
 
-Webitel.prototype.list_users = function(domain, cb) {
+Webitel.prototype.list_users = function(_caller, domain, cb) {
     var _cb,
         _domain,
         self = this;
-    if (typeof arguments[0] == "function") {
-        _cb = arguments[0];
-        _domain = null
+    if (typeof arguments[1] == "function") {
+        _cb = arguments[1];
+        _domain = _caller['attr']['domain']
     } else {
         _cb = cb;
-        _domain = domain;
+        _domain = domain || _caller['attr']['domain'];
     };
 
-
+    if (!_caller || (_caller['attr']['role'].val < COMMAND_TYPES.ListUsers.perm ||
+        (_caller['attr']['domain'] != _domain && _caller['attr']['role'].val != ACCOUNT_ROLE.ROOT.val))) {
+        cb({
+            body: PERMISSION_DENIED
+        });
+        return;
+    }
  /*   this.api(WebitelCommandTypes.ListUsers,
         [
                 _domain || ''
         ],
         _cb
     ); */
-    // FAVBET
+    // Для ивентов, чтобы заполнить online
     this.api(WebitelCommandTypes.ListUsers, [
             _domain || ''
     ], function (res) {
@@ -315,20 +325,28 @@ Webitel.prototype.list_users = function(domain, cb) {
     cmd.execute();*/
 };
 
-Webitel.prototype.userList = function(domain, cb) {
+Webitel.prototype.userList = function(_caller, domain, cb) {
     var _cb, _domain,
         self = this;
-    if (typeof arguments[0] == "function") {
-        _cb = arguments[0];
-        _domain = null
+    if (typeof arguments[1] == "function") {
+        _cb = arguments[1];
+        _domain = _caller['attr']['domain']
     } else {
         _cb = cb;
-        _domain = domain;
+        _domain = domain || _caller['attr']['domain'];
     };
+
+    if (!_caller || (_caller['attr']['role'].val < COMMAND_TYPES.Account.List.perm ||
+        (_caller['attr']['domain'] != _domain && _caller['attr']['role'].val != ACCOUNT_ROLE.ROOT.val))) {
+        cb({
+            body: PERMISSION_DENIED
+        });
+        return;
+    }
     /*this.api(WebitelCommandTypes.Account.List, [
         _domain
     ], _cb); */
-    // FAVBET
+    // для статусов
     this.api(WebitelCommandTypes.Account.List, [
             _domain || ''
     ], function (res) {
@@ -356,7 +374,18 @@ Webitel.prototype.userList = function(domain, cb) {
     cmd.execute();*/
 };
 
-Webitel.prototype.userCreate = function(role, _param, cb) {
+Webitel.prototype.userCreate = function(_caller, role, _param, cb) {
+    _param = _param || '';
+    var _domain = _param.split('@')[1];
+
+    if (!_caller || (_caller['attr']['role'].val < COMMAND_TYPES.Account.Create.perm ||
+        (_caller['attr']['domain'] != _domain && _caller['attr']['role'].val != ACCOUNT_ROLE.ROOT.val))) {
+        cb({
+            body: PERMISSION_DENIED
+        });
+        return;
+    }
+
     this.api(WebitelCommandTypes.Account.Create, [
         role || '',
         _param || ''
@@ -368,7 +397,25 @@ Webitel.prototype.userCreate = function(role, _param, cb) {
     cmd.execute(); */
 };
 
-Webitel.prototype.userUpdate = function(user, paramName, paramValue, cb) {
+Webitel.prototype.userUpdate = function(_caller, user, paramName, paramValue, cb) {
+    var _domain = user.split('@')[1];
+
+    if (!_caller || (_caller['attr']['role'].val < COMMAND_TYPES.Account.Change.perm ||
+        ((_caller['attr']['domain'] != _domain || (_caller['attr']['role'].val == ACCOUNT_ROLE.USER.val &&
+            user != _caller['id']))&& _caller['attr']['role'].val != ACCOUNT_ROLE.ROOT.val))) {
+        cb({
+            body: PERMISSION_DENIED
+        });
+        return;
+    };
+
+    if (paramName == 'role' && user == _caller['id']) {
+        cb({
+            body: '-ERR Woow! Slow down!' // (c) srg
+        });
+        return
+    };
+
     this.api(WebitelCommandTypes.Account.Change, [
             user || '',
             paramName || '',
@@ -382,7 +429,23 @@ Webitel.prototype.userUpdate = function(user, paramName, paramValue, cb) {
     cmd.execute(); */
 };
 
-Webitel.prototype.userRemove = function(user, cb) {
+Webitel.prototype.userRemove = function(_caller, user, cb) {
+    var _domain = user.split('@')[1];
+    if (!_caller || (_caller['attr']['role'].val < COMMAND_TYPES.Account.Remove.perm ||
+        (_caller['attr']['domain'] != _domain && _caller['attr']['role'].val != ACCOUNT_ROLE.ROOT.val))) {
+        cb({
+            body: PERMISSION_DENIED
+        });
+        return;
+    };
+
+    if (user == _caller['id']) {
+        cb({
+            body: "-ERR Easy! it's YOU !!!" // (c) srg
+        });
+        return
+    };
+
     this.api(WebitelCommandTypes.Account.Remove, [
             user || ''
     ], cb);
@@ -393,15 +456,24 @@ Webitel.prototype.userRemove = function(user, cb) {
     cmd.execute();*/
 };
 
-Webitel.prototype.deviceList = function(domain, cb) {
+Webitel.prototype.deviceList = function(_caller, domain, cb) {
     var _cb, _domain;
-    if (typeof arguments[0] == "function") {
-        _cb = arguments[0];
+    if (typeof arguments[1] == "function") {
+        _cb = arguments[1];
         _domain = null
     } else {
         _cb = cb;
-        _domain = domain;
+        _domain = domain || _caller['attr']['domain'];
     };
+
+    if (!_caller || (_caller['attr']['role'].val < COMMAND_TYPES.Device.List.perm ||
+        (_caller['attr']['domain'] != _domain && _caller['attr']['role'].val != ACCOUNT_ROLE.ROOT.val))) {
+        cb({
+            body: PERMISSION_DENIED
+        });
+        return;
+    };
+
     this.api(WebitelCommandTypes.Device.List, [
             _domain || ''
     ], _cb);
@@ -412,10 +484,20 @@ Webitel.prototype.deviceList = function(domain, cb) {
     cmd.execute();*/
 };
 
-Webitel.prototype.deviceCreate = function(type, param, cb) {
+Webitel.prototype.deviceCreate = function(_caller, type, _param, cb) {
+    _param = _param || '';
+    var _domain = _param.split('@')[1];
+
+    if (!_caller || (_caller['attr']['role'].val < COMMAND_TYPES.Device.Create.perm ||
+        (_caller['attr']['domain'] != _domain && _caller['attr']['role'].val != ACCOUNT_ROLE.ROOT.val))) {
+        cb({
+            body: PERMISSION_DENIED
+        });
+        return;
+    }
     this.api(WebitelCommandTypes.Device.Create, [
-            type || '',
-            param || ''
+            type || type,
+            _param
     ], cb);
 
     /*
@@ -426,7 +508,17 @@ Webitel.prototype.deviceCreate = function(type, param, cb) {
     cmd.execute(); */
 };
 
-Webitel.prototype.deviceUpdate = function(device, paramName, paramValue, cb) {
+Webitel.prototype.deviceUpdate = function(_caller, device, paramName, paramValue, cb) {
+
+    var _domain = device.split('@')[1];
+    // TODO юзер можеть только себе параметры менять, админ в домене, рут у всех!!!!
+    if (!_caller || (_caller['attr']['role'].val < COMMAND_TYPES.Device.Change.perm ||
+        (_caller['attr']['domain'] != _domain && _caller['attr']['role'].val != ACCOUNT_ROLE.ROOT.val))) {
+        cb({
+            body: PERMISSION_DENIED
+        });
+        return;
+    };
     this.api(WebitelCommandTypes.Device.Change, [
             device || '',
             paramName || '',
@@ -442,7 +534,15 @@ Webitel.prototype.deviceUpdate = function(device, paramName, paramValue, cb) {
     cmd.execute();*/
 };
 
-Webitel.prototype.deviceRemove = function(device, cb) {
+Webitel.prototype.deviceRemove = function(_caller, device, cb) {
+    var _domain = device.split('@')[1];
+    if (!_caller || (_caller['attr']['role'].val < COMMAND_TYPES.Device.Remove.perm ||
+        (_caller['attr']['domain'] != _domain && _caller['attr']['role'].val != ACCOUNT_ROLE.ROOT.val))) {
+        cb({
+            body: PERMISSION_DENIED
+        });
+        return;
+    };
     this.api(WebitelCommandTypes.Device.Remove, [
             device || ''
     ], cb);
@@ -454,7 +554,8 @@ Webitel.prototype.deviceRemove = function(device, cb) {
     cmd.execute();*/
 };
 
-Webitel.prototype.whoami = function (cb) {
+Webitel.prototype.whoami = function (_caller, cb) {
+    // TODO вернуть _caller
     this.api(WebitelCommandTypes.Whoami, cb);
    /* var that = WebitelConnection;
     var cmd = new WebitelCommand(WebitelCommandTypes.Whoami, {
@@ -466,7 +567,7 @@ Webitel.prototype.whoami = function (cb) {
     cmd.execute(); */
 };
 
-Webitel.prototype.reloadAgents = function (cb) {
+Webitel.prototype.reloadAgents = function (_caller, cb) {
     this.api(WebitelCommandTypes.ReloadAgents, cb);
     /*
     var command = new WebitelCommand(WebitelCommandTypes.ReloadAgents, {}, cb);
@@ -503,7 +604,7 @@ var WebitelCommandTypes = {
     Whoami: 'whoami',
     ReloadAgents: 'favbet reload agents'
 };
-/* FAVBET */
+/* Parse table */
 var const_DataSeparator = '=================================================================================================';
 Webitel.prototype._parsePlainTableToJSON = function(data, domain, cb) {
     if (!data) {
@@ -547,4 +648,4 @@ Webitel.prototype._parsePlainTableToJSON = function(data, domain, cb) {
         cb(e);
     };
 };
-/* ENDFAVBET */
+/*  */

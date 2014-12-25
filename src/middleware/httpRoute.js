@@ -91,7 +91,7 @@ function handleRequest(req, res, resultObject) {
     };
 
     if (req.method == 'POST') {
-        if (req.url === '/api/v1/domains') {
+        if (req.url === '/api/v1/domain') {
             if (resultObject && resultObject['domain_name'] && resultObject['customer_id']) {
                 // Create domain
                 if (!doSendWebitelCommand(res)) return;
