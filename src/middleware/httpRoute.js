@@ -84,6 +84,13 @@ function handleRequest(req, res, resultObject) {
                 }));
                 res.end();
             }
+        } else if (req.url === '/api/v1/reloadxml') {
+            if (!doSendWebitelCommand(res)) return;
+            webitel.reloadXml(null, function () {
+                res.writeHead(200, {'Content-Type': 'text/plain'});
+                res.write('+OK');
+                res.end();
+            });
         } else {
             handleForbidden(res);
         };
@@ -91,7 +98,7 @@ function handleRequest(req, res, resultObject) {
     };
 
     if (req.method == 'POST') {
-        if (req.url === '/api/v1/domain') {
+        if (req.url === '/api/v1/domain' || req.url === '/api/v1/domains') {
             if (resultObject && resultObject['domain_name'] && resultObject['customer_id']) {
                 // Create domain
                 if (!doSendWebitelCommand(res)) return;
@@ -107,7 +114,7 @@ function handleRequest(req, res, resultObject) {
                 res.write('domain_name or customer_id undefined.');
                 res.end();
             };
-        } else if (req.url === '/api/v1/accounts') {
+        } else if (req.url === '/api/v1/account' || req.url === '/api/v1/accounts') {
             if (resultObject && resultObject['login'] && resultObject['role'] &&
                 resultObject['domain']) {
 
@@ -134,16 +141,6 @@ function handleRequest(req, res, resultObject) {
             handleForbidden(res);
         };
     } else if (req.method == 'DELETE') {
-        if (/^\/api\/v1\/reloadxml$/g.exec(req.url || '')) {
-            if (!doSendWebitelCommand(res)) return;
-            webitel.reloadXml(null, function () {
-                res.writeHead(200, {'Content-Type': 'text/plain'});
-                res.write('+OK');
-                res.end()
-            });
-            return;
-        };
-
         var url = /^\/api\/v1\/domain\/(.*)$/g.exec(req.url || '');
         if (url) {
             if (url[1]) {
