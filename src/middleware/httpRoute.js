@@ -91,7 +91,7 @@ function handleRequest(req, res, resultObject) {
     };
 
     if (req.method == 'POST') {
-        if (req.url === '/api/v1/domains') {
+        if (req.url === '/api/v1/domains' || req.url === '/api/v1/domain') {
             if (resultObject && resultObject['domain_name'] && resultObject['customer_id']) {
                 // Create domain
                 if (!doSendWebitelCommand(res)) return;
@@ -107,7 +107,7 @@ function handleRequest(req, res, resultObject) {
                 res.write('domain_name or customer_id undefined.');
                 res.end();
             };
-        } else if (req.url === '/api/v1/accounts') {
+        } else if (req.url === '/api/v1/accounts' || req.url === '/api/v1/account') {
             if (resultObject && resultObject['login'] && resultObject['role'] &&
                 resultObject['domain']) {
 
