@@ -596,20 +596,105 @@ wss.on('connection', function(ws) {
                     // Пока нету смысла делать поиск пользователя для всех команд freeSWITCH
                     var _user = Users.get(ws['upgradeReq']['webitelId']);
                     if (!_user || (_user['attr']['role'].val < WebitelCommandTypes.SipProfile.List.perm)) {
-                        socket.send(JSON.stringify({
-                            'exec-uuid': id,
+                        ws.send(JSON.stringify({
+                            'exec-uuid': execId,
                             'exec-complete': '+ERR',
                             'exec-response': {
                                 'response': '-ERR permission denied!'
                             }
                         }));
                         return null
-                    }
+                    };
 
                     eslConn.api('sofia status', function (res) {
-                        log.trace(res['body']);
+                        webitel._parsePlainTableToJSON(res['body'], null, function (err, resJSON) {
+                            if (err) {
+                                getCommandResponseJSON(ws, execId, {
+                                    'status': '-ERR',
+                                    'body': err
+                                });
+                                return;
+                            }
+                            sendCommandResponseWebitel(ws, execId, {
+                                'status': '+OK',
+                                'body': resJSON
+                            });
+                        })
                     });
                     break;
+
+                case WebitelCommandTypes.SipProfile.Rescan.name:
+                    // Пока нету смысла делать поиск пользователя для всех команд freeSWITCH
+                    var _user = Users.get(ws['upgradeReq']['webitelId']);
+                    if (!_user || (_user['attr']['role'].val < WebitelCommandTypes.SipProfile.List.perm)) {
+                        ws.send(JSON.stringify({
+                            'exec-uuid': execId,
+                            'exec-complete': '+ERR',
+                            'exec-response': {
+                                'response': '-ERR permission denied!'
+                            }
+                        }));
+                        return null
+                    };
+
+                    eslConn.api('sofia profile ' + (args['profile'] || '') + ' rescan', function (res) {
+                        if (res['body'].indexOf('Invalid ') == 0)
+                            res['body'] = '-ERR ' + res['body'];
+                        getCommandResponseJSON(ws, execId, res);
+                    });
+                    break;
+
+                case WebitelCommandTypes.Gateway.List.name:
+                    // Пока нету смысла делать поиск пользователя для всех команд freeSWITCH
+                    var _user = Users.get(ws['upgradeReq']['webitelId']);
+                    if (!_user || (_user['attr']['role'].val < WebitelCommandTypes.Gateway.List.perm)) {
+                        ws.send(JSON.stringify({
+                            'exec-uuid': execId,
+                            'exec-complete': '+ERR',
+                            'exec-response': {
+                                'response': '-ERR permission denied!'
+                            }
+                        }));
+                        return null
+                    };
+
+                    eslConn.api('sofia status gateway', function (res) {
+                        webitel._parsePlainTableToJSON(res['body'], null, function (err, resJSON) {
+                            if (err) {
+                                getCommandResponseJSON(ws, execId, {
+                                    'status': '-ERR',
+                                    'body': err
+                                });
+                                return;
+                            }
+                            sendCommandResponseWebitel(ws, execId, {
+                                'status': '+OK',
+                                'body': resJSON
+                            });
+                        })
+                    });
+                    break;
+
+                case WebitelCommandTypes.Gateway.Kill.name:
+                    // Пока нету смысла делать поиск пользователя для всех команд freeSWITCH
+                    var _user = Users.get(ws['upgradeReq']['webitelId']);
+                    if (!_user || (_user['attr']['role'].val < WebitelCommandTypes.Gateway.Kill.perm)) {
+                        ws.send(JSON.stringify({
+                            'exec-uuid': execId,
+                            'exec-complete': '+ERR',
+                            'exec-response': {
+                                'response': '-ERR permission denied!'
+                            }
+                        }));
+                        return null
+                    };
+
+                    eslConn.api('sofia profile ' + (args['profile'] || '') + ' killgw ' +
+                        (args['gateway'] || ''), function (res) {
+                        getCommandResponseJSON(ws, execId, res);
+                    });
+                    break;
+
                 default :
                     ws.send(JSON.stringify({
                         'exec-uuid': execId,

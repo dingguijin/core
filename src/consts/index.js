@@ -166,6 +166,21 @@ module.exports.WebitelCommandTypes = {
         List: {
             name: 'sip_profile_list',
             perm: 2
+        },
+        Rescan: {
+            name: 'sip_gateway_rescan',
+            perm: 2
+        }
+    },
+
+    Gateway: {
+        List: {
+            name: 'sip_gateway_list',
+            perm: 2
+        },
+        Kill: {
+            name: 'sip_gateway_kill',
+            perm: 2
         }
     }
 };

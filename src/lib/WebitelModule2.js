@@ -574,6 +574,10 @@ Webitel.prototype.reloadAgents = function (_caller, cb) {
     command.execute();*/
 };
 
+Webitel.prototype.reloadXml = function (_caller, cb) {
+    this.api(WebitelCommandTypes.ReloadXml, cb);
+};
+
 var WebitelCommandTypes = {
 
 // COMMANDS
@@ -602,6 +606,8 @@ var WebitelCommandTypes = {
     },
     ListUsers: 'list_users',
     Whoami: 'whoami',
+    ReloadXml: 'reloadxml',
+
     ReloadAgents: 'favbet reload agents'
 };
 /* Parse table */

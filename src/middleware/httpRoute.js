@@ -96,7 +96,7 @@ function handleRequest(req, res, resultObject) {
                 // Create domain
                 if (!doSendWebitelCommand(res)) return;
 
-                webitel.domainCreate(resultObject['domain_name'], resultObject['customer_id'], function (request) {
+                webitel.domainCreate(null, resultObject['domain_name'], resultObject['customer_id'], function (request) {
                     res.writeHead(200,
                         {'Content-Type': 'text/plain'});
                     res.write(request.body);
@@ -119,7 +119,7 @@ function handleRequest(req, res, resultObject) {
                     _param.push(':' + resultObject['password']);
                 _param.push('@' + resultObject['domain']);
 
-                webitel.userCreate(resultObject['role'], _param.join(''), function(request) {
+                webitel.userCreate(null, resultObject['role'], _param.join(''), function(request) {
                     res.writeHead(200,
                         {'Content-Type': 'text/plain'});
                     res.write(request.body);
@@ -134,13 +134,21 @@ function handleRequest(req, res, resultObject) {
             handleForbidden(res);
         };
     } else if (req.method == 'DELETE') {
+        if (/^\/api\/v1\/reloadxml$/g.exec(req.url || '')) {
+            if (!doSendWebitelCommand(res)) return;
+            webitel.reloadXml(null, function () {
+                res.writeHead(200, {'Content-Type': 'text/plain'});
+                res.write('+OK');
+                res.end()
+            });
+            return;
+        };
+
         var url = /^\/api\/v1\/domain\/(.*)$/g.exec(req.url || '');
         if (url) {
             if (url[1]) {
-
                 if (!doSendWebitelCommand(res)) return;
-
-                webitel.domainRemove(url[1], function(request) {
+                webitel.domainRemove(null, url[1], function(request) {
                     res.writeHead(200, {'Content-Type': 'text/plain'});
                     res.write(request.body);
                     res.end()
