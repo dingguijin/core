@@ -11,21 +11,27 @@ var md5 = function (str) {
     return hash.digest('hex');
 };
 
-var parseXmlBody = function (body) {
+var parseXmlBody = function (body, login) {
     var parser = new xml2js.Parser({ explicitArray: false, explicitRoot: false }),
-        headers = {};
+        headers = {},
+        _body = body;
 
-    parser.parseString(body, function(err, data) {
-        if(err) {
-            log.error(err);
-            return;
-        };
-        var _attr = [].concat(data.params.param, data.variables.variable);
-        _attr.forEach(function(header) {
-            headers[header['$'].name] = header['$'].value;
+    try {
+        parser.parseString(body, function (err, data) {
+            if (err) {
+                log.debug('Auth error: %s %s', login, _body.replace('\n', ''));
+                return;
+            }
+            ;
+            var _attr = [].concat(data.params.param, data.variables.variable);
+            _attr.forEach(function (header) {
+                headers[header['$'].name] = header['$'].value;
+            });
+
         });
-
-    });
+    } catch (e){
+        log.error(e.message);
+    }
 
     return headers;
 };
@@ -48,7 +54,7 @@ module.exports = function (login, password, cb) {
         var _loginPlain = login.replace('@', ' ');
 
         eslConn.api('find_user_xml id ' + _loginPlain, function (res) {
-            var _jsonParamUser = parseXmlBody(res['body']);
+            var _jsonParamUser = parseXmlBody(res['body'], _loginPlain);
 
             var a1Hash = md5(login.replace('@', ':') + ':' + password);
             var registered = (a1Hash == _jsonParamUser['a1-hash']);

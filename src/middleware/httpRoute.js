@@ -37,7 +37,7 @@ module.exports.processRequest = function (req, res) {
                 }
             });
         } else {
-            if (rootName !== username || rootPassword !== password) {
+            if (rootName != username || rootPassword != password) {
                 handleForbidden(res);
             } else {
                 handleRequest(req, res, {});
