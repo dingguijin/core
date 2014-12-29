@@ -109,7 +109,7 @@ module.exports = function (wss) {
                     case WebitelCommandTypes.Transfer.name:
                         if (!doSendFreeSWITCHCommand(execId, ws)) return;
                         eslConn.api('uuid_transfer ' + args['channel-uuid'] + ' ' +
-                        args['destination'], function (res) {
+                            args['destination'], function (res) {
                             getCommandResponseJSON(ws, execId, res);
                         });
                         break;
@@ -159,8 +159,8 @@ module.exports = function (wss) {
                         if (!doSendFreeSWITCHCommand(execId, ws)) return;
                         var _account = args['user'].split('@')[0];
                         eslConn.api(('uuid_broadcast ' + args['channel-uuid'] + ' att_xfer::{origination_cancel_key=#,origination_caller_id_name=' +
-                        _account + ',origination_caller_id_number=' + _account +
-                        ',webitel_att_xfer=true}user/' + args['destination'] + ''), function (res) {
+                            _account + ',origination_caller_id_number=' + _account +
+                            ',webitel_att_xfer=true}user/' + args['destination'] + ''), function (res) {
                             getCommandResponseJSON(ws, execId, res)
                         });
                         break;

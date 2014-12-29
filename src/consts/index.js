@@ -147,7 +147,7 @@ module.exports.WebitelCommandTypes = {
     },
     Rawapi: {
         name: 'rawapi',
-        perm: 0
+        perm: 2
     },
     Eavesdrop: {
         name: 'eavesdrop',
