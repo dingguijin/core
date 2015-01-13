@@ -169,9 +169,10 @@ module.exports = function (wss) {
                         var _originatorParam = new Array('w_jsclient_originate_number=' + args['extension'],
                                 'w_jsclient_xtransfer=' + args['parent_call_uuid']),
                             _autoAnswerParam = [].concat( args['auto_answer_param'] || []),
-                            _param = '[' + _originatorParam.concat(_autoAnswerParam).join(',') + ']';
+                            _param = '{' + _originatorParam.concat(_autoAnswerParam).join(',') + '}';
                         var dialString = ('originate ' + _param + 'user/' + args['user'] + ' ' + args['extension'].split('@')[0] +
                         ' xml default ' + args['user'].split('@')[0] + ' ' + args['user'].split('@')[0]);
+                        log.trace(dialString);
                         eslConn.bgapi(dialString, function (res) {
                             getCommandResponseJSON(ws, execId, res);
                         });
@@ -184,17 +185,8 @@ module.exports = function (wss) {
                         break;
                     case WebitelCommandTypes.AttXferCancel.name:
                         if (!doSendFreeSWITCHCommand(execId, ws)) return;
-                        var _play = 'start',
-                            killCn = args['kill-channel'] || true;
-                        _play += ' silence_stream://0 3';
-                        eslConn.api('uuid_displace ' + args['channel-uuid-leg-b'] + ' ' + _play, function (res) {
-                            if (killCn) {
-                                eslConn.api('uuid_kill ' + args['channel-uuid-leg-c'], function (res) {
-                                    getCommandResponseJSON(ws, execId, res);
-                                });
-                            } else {
-                                getCommandResponseJSON(ws, execId, res);
-                            };
+                        eslConn.api('uuid_kill ' + args['channel-uuid-leg-c'], function (res) {
+                            getCommandResponseJSON(ws, execId, res);
                         });
                         break;
 

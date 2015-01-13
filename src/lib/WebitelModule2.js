@@ -4,7 +4,6 @@ var EventEmitter2 = require('eventemitter2').EventEmitter2,
     log = require('./log')(module),
     net = require('net'),
     PERMISSION_DENIED = '-ERR permission denied!',
-    PERMISSION_DENIED = '-ERR permission denied!',
     ACCOUNT_ROLE = require('../consts').ACCOUNT_ROLE,
     COMMAND_TYPES = require('../consts').WebitelCommandTypes;
 
