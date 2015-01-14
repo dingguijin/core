@@ -368,17 +368,8 @@ wss.on('connection', function(ws) {
                     break;
                 case WebitelCommandTypes.AttXferCancel:
                     if (!doSendFreeSWITCHCommand(execId, ws)) return;
-                    var _play = 'start',
-                        killCn = (args['kill-channel'] || true);
-                    _play += ' silence_stream://0 3';
-                    eslConn.api('uuid_displace ' + args['channel-uuid-leg-b'] + ' ' + _play, function (res) {
-                        if (killCn) {
-                            eslConn.api('uuid_kill ' + args['channel-uuid-leg-c'], function (res) {
-                                getCommandResponseJSON(ws, execId, res);
-                            });
-                        } else {
-                            getCommandResponseJSON(ws, execId, res);
-                        };
+                    eslConn.api('uuid_kill ' + args['channel-uuid-leg-c'], function (res) {
+                        getCommandResponseJSON(ws, execId, res);
                     });
                     break;
 

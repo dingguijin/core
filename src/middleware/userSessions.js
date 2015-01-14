@@ -5,7 +5,6 @@ var HashCollection = require('../lib/HashCollection'),
     handleSocketError = require('../middleware/handleSocketError'),
     ACCOUNT_EVENTS = require('../consts').ACCOUNT_EVENTS;
 
-
 Domains.broadcast = function (domainName, event) {
     if (!domainName || !event) return;
     var _domain,

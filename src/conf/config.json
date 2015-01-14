@@ -19,8 +19,8 @@
         "reconnect": 5
     },
     "freeSWITCH": {
-        "host": "webitel-switch.bpmonline.com",
-        "port": 10021,
+        "host": "pre.webitel.com",
+        "port": 8021,
         "pwd": "ClueCon",
         "reconnect": 5
     },
@@ -35,8 +35,6 @@
             "CHANNEL_ANSWER",
             "CHANNEL_HANGUP_COMPLETE",
             "CHANNEL_HANGUP",
-            "CHANNEL_EXECUTE",
-            "CHANNEL_EXECUTE_COMPLETE",
             "CHANNEL_HOLD",
             "CHANNEL_UNHOLD",
             "RECORD_START",
