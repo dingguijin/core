@@ -147,7 +147,7 @@ app.all('/*', function(req, res, next) {
     }
 });
 
-app.all('/api/v1/*', [require('./middleware/validateRequest')]);
+app.all('/api/v2/*', [require('./middleware/validateRequest')]);
 
 require('./routes')(app);
 

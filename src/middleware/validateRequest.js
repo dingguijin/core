@@ -1,5 +1,5 @@
 var jwt = require('jwt-simple'),
-    validateUser = require('../routes/auth').validateUser,
+    validateUser = require('../routes/V2/auth').validateUser,
     config = require('../conf'),
     tokenSecretKey = config.get('application:auth:tokenSecretKey');
 

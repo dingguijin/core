@@ -1,10 +1,10 @@
 var jwt = require('jwt-simple'),
-    config = require('../conf/index'),
+    config = require('../../conf/index'),
     redis = require("redis"),
     DB_INDEX = config.get('redis:db_index'),
     client = redis.createClient(config.get('redis:port'), config.get('redis:host'), {}),
-    log = require('../lib/log')(module),
-    checkUser = require('./../middleware/checkUser'),
+    log = require('../../lib/log')(module),
+    checkUser = require('./../../middleware/checkUser'),
     crypto = require('crypto');
 
 client.on('error', function (err) {
