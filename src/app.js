@@ -128,16 +128,42 @@ var handleVerifyClient = function (req) {
    return true;
 };
 
-var app;
-var processRequest = require('./middleware/httpRoute').processRequest;
+var express = require('express'),
+    bodyParser = require('body-parser'),
+    app = express(),
+    srv;
+app.use(bodyParser.json());
+
+app.all('/*', function(req, res, next) {
+    // CORS headers
+    res.header("Access-Control-Allow-Origin", "*"); // restrict it to the required domain
+    res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
+    // Set custom headers for CORS
+    res.header('Access-Control-Allow-Headers', 'Content-type,Accept,X-Access-Token,X-Key');
+    if (req.method == 'OPTIONS') {
+        res.status(200).end();
+    } else {
+        next();
+    }
+});
+
+app.all('/api/v1/*', [require('./middleware/validateRequest')]);
+
+require('./routes')(app);
+
 try {
     if (conf.get('ssl:enabled')) {
-        app = httpServ.createServer({
+        var https_options = {
             key: fs.readFileSync(conf.get('ssl:ssl_key')),
             cert: fs.readFileSync(conf.get('ssl:ssl_cert'))
-        }, processRequest).listen(conf.get('server:port'), conf.get('server:host'));
+        };
+        srv = httpServ.createServer(https_options, app).listen(conf.get('server:port'), conf.get('server:host'), function() {
+            console.log('Express server (https) listening on port ' + this.address().port);
+        });
     } else {
-        app = httpServ.createServer(processRequest).listen(conf.get('server:port'), conf.get('server:host'));
+        srv = httpServ.createServer(app).listen(conf.get('server:port'), conf.get('server:host'), function() {
+            console.log('Express server (https) listening on port ' + this.address().port);
+        });
     };
 } catch (e) {
     log.error('Server create:' + e.message);
@@ -151,7 +177,7 @@ app.on('close', function () {
 
 var WebSocketServer = require('ws').Server
     , wss = new WebSocketServer({
-        server: app,
+        server: srv,
         verifyClient: handleVerifyClient
     });
 

@@ -1,7 +1,8 @@
 var log = require('../lib/log')(module),
     conf = require('../conf'),
     rootName = conf.get('webitelServer:account'),
-    rootPassword = conf.get('webitelServer:secret') || '';
+    rootPassword = conf.get('webitelServer:secret') || '',
+    auth = require('../middleware/auth');
 
 module.exports.processRequest = function (req, res) {
     try {
@@ -137,6 +138,8 @@ function handleRequest(req, res, resultObject) {
                 res.write('login, role or domain is undefined.');
                 res.end();
             }
+        } else if (req.url === '/api/v1/login') {
+            auth.login(req, res, resultObject);
         } else {
             handleForbidden(res);
         };

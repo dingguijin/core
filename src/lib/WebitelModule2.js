@@ -609,6 +609,22 @@ var WebitelCommandTypes = {
 
     ReloadAgents: 'favbet reload agents'
 };
+
+Webitel.prototype.doSendCommand = function (res) {
+    if (!webitel.authed) {
+        try {
+            res.writeHead(500, {'Content-Type': 'text/plain'});
+            res.write("Error: Webitel server disconnect!");
+            res.end();
+            return false;
+        } catch (e) {
+            log.warn('Write message:', e.message);
+            return false;
+        };
+    };
+    return true;
+};
+
 /* Parse table */
 var const_DataSeparator = '=================================================================================================';
 Webitel.prototype._parsePlainTableToJSON = function(data, domain, cb) {

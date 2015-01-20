@@ -4,6 +4,11 @@
         "ssl_key": "/core/cert/wss.key",
         "ssl_cert": "/core/cert/wss.crt"
     },
+    "redis": {
+        "host": "localhost",
+        "port": "6379",
+        "db_index": 15
+    },
     "server": {
         "host": "0.0.0.0",
         "port": 10022,
@@ -26,6 +31,16 @@
     },
     "application": {
         "loglevel": "trace",
+        "logstash": {
+            "enabled": false,
+            "host": "it-sfera.com.ua",
+            "port": 28777,
+            "node_name": "core"
+        },
+        "auth": {
+            "tokenSecretKey": "iuyIO!@uieywqi!@##uidosa",
+            "expiresDays": 7
+        },
         "socketTimeUnauthorized": 5,
         "sleepConnectToWebitel": 1000,
         "freeSWITCHEvents": [
@@ -35,8 +50,6 @@
             "CHANNEL_ANSWER",
             "CHANNEL_HANGUP_COMPLETE",
             "CHANNEL_HANGUP",
-            "CHANNEL_EXECUTE",
-            "CHANNEL_EXECUTE_COMPLETE",
             "CHANNEL_HOLD",
             "CHANNEL_UNHOLD",
             "RECORD_START",
