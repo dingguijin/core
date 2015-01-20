@@ -4,7 +4,8 @@ var WebitelCommandTypes = require('../consts').WebitelCommandTypes,
     socketTimeUnauthorized = conf.get('application:socketTimeUnauthorized'),
     log = require('../lib/log')(module),
     ACCOUNT_EVENTS = require('../consts').ACCOUNT_EVENTS,
-    handleSocketError = require('../middleware/handleSocketError');
+    handleSocketError = require('../middleware/handleSocketError'),
+    auth = require('../routes/V2/auth');
 
 
 module.exports = function (wss) {
@@ -493,6 +494,38 @@ module.exports = function (wss) {
                         eslConn.api('sofia profile ' + (args['profile'] || '') + ' killgw ' +
                         (args['gateway'] || ''), function (res) {
                             getCommandResponseJSON(ws, execId, res);
+                        });
+                        break;
+                    case WebitelCommandTypes.Token.Generate.name:
+                        var username = ws['upgradeReq']['webitelId'];
+                        if (!username) {
+                            ws.send(JSON.stringify({
+                                'exec-uuid': execId,
+                                'exec-complete': '+ERR',
+                                'exec-response': {
+                                    'response': '-ERR permission denied!'
+                                }
+                            }));
+                            return null
+                        };
+                        var _ip = ws['upgradeReq'].headers['x-forwarded-for'] ||
+                            ws['upgradeReq'].connection.remoteAddress ||
+                            ws['upgradeReq'].socket.remoteAddress ||
+                            ws['upgradeReq'].connection.socket.remoteAddress;
+                        auth.getTokenObject(username, args['password'], _ip, function (err, dbUser) {
+                            if (err) {
+                                ws.send(JSON.stringify({
+                                    'exec-uuid': execId,
+                                    'exec-complete': '+ERR',
+                                    'exec-response': {
+                                        'response': err
+                                    }
+                                }));
+                                return;
+                            }
+                            getCommandResponseJSON(ws, execId, {
+                                body: JSON.stringify(dbUser)
+                            });
                         });
                         break;
 

@@ -182,6 +182,13 @@ module.exports.WebitelCommandTypes = {
             name: 'sip_gateway_kill',
             perm: 2
         }
+    },
+
+    Token: {
+        Generate: {
+            name: 'token_generate',
+            perm: 0
+        }
     }
 };
 
