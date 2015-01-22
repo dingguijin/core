@@ -4,17 +4,17 @@
         "ssl_key": "/core/cert/wss.key",
         "ssl_cert": "/core/cert/wss.crt"
     },
-    "redis": {
-        "host": "localhost",
-        "port": "6379",
-        "db_index": 15
-    },
     "server": {
         "host": "0.0.0.0",
         "port": 10022,
         "socket": {
             "originHost": false
         }
+    },
+    "redis": {
+        "host": "it-sfera.com.ua",
+        "port": "6379",
+        "db_index": 51
     },
     "webitelServer": {
         "host": "pre.webitel.com",

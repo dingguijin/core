@@ -5,6 +5,7 @@ var conf = require('../conf'),
     xml2js = require('xml2js'),
     log = require('../lib/log')(module),
     ACCOUNT_ROLE = require('../consts').ACCOUNT_ROLE;
+
 var md5 = function (str) {
     var hash = crypto.createHash('md5');
     hash.update(str);
@@ -53,7 +54,9 @@ module.exports = function (login, password, cb) {
 
         var _loginPlain = login.replace('@', ' ');
 
-        eslConn.api('find_user_xml id ' + _loginPlain, function (res) {
+
+        // TODO Нужна оптимизация, при большых нагрузках ивенты свича залипают. !!!
+        eslConn.bgapi('find_user_xml id ' + _loginPlain, function (res) {
             var _jsonParamUser = parseXmlBody(res['body'], _loginPlain);
 
             var a1Hash = md5(login.replace('@', ':') + ':' + password);

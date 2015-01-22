@@ -4,6 +4,8 @@
     "private": true,
     "dependencies": {
         "ws": "*",
-        "nconf": "*"
+        "nconf": "*",
+        "redis": "",
+        "hiredis": ""
     }
 }

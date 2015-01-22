@@ -5,6 +5,7 @@ var log = require('../lib/log')(module),
 module.exports = function (app) {
     app.all('/*', function(req, res, next) {
         // CORS headers
+        res.header("X-Powered-By", "Webitel");
         res.header("Access-Control-Allow-Origin", "*"); // restrict it to the required domain
         res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
         // Set custom headers for CORS

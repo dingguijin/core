@@ -109,38 +109,38 @@ module.exports = function (wss) {
                         break;
                     case WebitelCommandTypes.Transfer.name:
                         if (!doSendFreeSWITCHCommand(execId, ws)) return;
-                        eslConn.api('uuid_transfer ' + args['channel-uuid'] + ' ' +
+                        eslConn.bgapi('uuid_transfer ' + args['channel-uuid'] + ' ' +
                             args['destination'], function (res) {
                             getCommandResponseJSON(ws, execId, res);
                         });
                         break;
                     case WebitelCommandTypes.Bridge.name:
                         if (!doSendFreeSWITCHCommand(execId, ws)) return;
-                        eslConn.api('uuid_bridge ' + args['channel_uuid_A'] + ' ' + args['channel_uuid_B'], function (res) {
+                        eslConn.bgapi('uuid_bridge ' + args['channel_uuid_A'] + ' ' + args['channel_uuid_B'], function (res) {
                             getCommandResponseJSON(ws, execId, res)
                         });
                         break;
                     case WebitelCommandTypes.Hangup.name:
                         if (!doSendFreeSWITCHCommand(execId, ws)) return;
-                        eslConn.api('uuid_kill ' + args['channel-uuid'], function (res) {
+                        eslConn.bgapi('uuid_kill ' + args['channel-uuid'], function (res) {
                             getCommandResponseJSON(ws, execId, res)
                         });
                         break;
                     case WebitelCommandTypes.ToggleHold.name:
                         if (!doSendFreeSWITCHCommand(execId, ws)) return;
-                        eslConn.api('uuid_hold toggle ' + args['channel-uuid'], function (res) {
+                        eslConn.bgapi('uuid_hold toggle ' + args['channel-uuid'], function (res) {
                             getCommandResponseJSON(ws, execId, res)
                         });
                         break;
                     case WebitelCommandTypes.Hold.name:
                         if (!doSendFreeSWITCHCommand(execId, ws)) return;
-                        eslConn.api(('uuid_hold ' + args['channel-uuid']), function (res) {
+                        eslConn.bgapi(('uuid_hold ' + args['channel-uuid']), function (res) {
                             getCommandResponseJSON(ws, execId, res)
                         });
                         break;
                     case WebitelCommandTypes.UnHold.name:
                         if (!doSendFreeSWITCHCommand(execId, ws)) return;
-                        eslConn.api(('uuid_hold off ' + args['channel-uuid']), function (res) {
+                        eslConn.bgapi(('uuid_hold off ' + args['channel-uuid']), function (res) {
                             getCommandResponseJSON(ws, execId, res)
                         });
                         break;
@@ -152,14 +152,14 @@ module.exports = function (wss) {
                         break;
                     case WebitelCommandTypes.Broadcast.name:
                         if (!doSendFreeSWITCHCommand(execId, ws)) return;
-                        eslConn.api(('uuid_broadcast ' + args['application']), function (res) {
+                        eslConn.bgapi(('uuid_broadcast ' + args['application']), function (res) {
                             getCommandResponseJSON(ws, execId, res)
                         });
                         break;
                     case WebitelCommandTypes.AttXfer.name:
                         if (!doSendFreeSWITCHCommand(execId, ws)) return;
                         var _account = args['user'].split('@')[0];
-                        eslConn.api(('uuid_broadcast ' + args['channel-uuid'] + ' att_xfer::{origination_cancel_key=#,origination_caller_id_name=' +
+                        eslConn.bgapi(('uuid_broadcast ' + args['channel-uuid'] + ' att_xfer::{origination_cancel_key=#,origination_caller_id_name=' +
                             _account + ',origination_caller_id_number=' + _account +
                             ',webitel_att_xfer=true}user/' + args['destination'] + ''), function (res) {
                             getCommandResponseJSON(ws, execId, res)
@@ -180,34 +180,34 @@ module.exports = function (wss) {
                         break;
                     case WebitelCommandTypes.AttXferBridge.name:
                         if (!doSendFreeSWITCHCommand(execId, ws)) return;
-                        eslConn.api('uuid_bridge ' + args['channel-uuid-leg-c'] + ' ' + args['channel-uuid-leg-b'], function (res) {
+                        eslConn.bgapi('uuid_bridge ' + args['channel-uuid-leg-c'] + ' ' + args['channel-uuid-leg-b'], function (res) {
                             getCommandResponseJSON(ws, execId, res);
                         });
                         break;
                     case WebitelCommandTypes.AttXferCancel.name:
                         if (!doSendFreeSWITCHCommand(execId, ws)) return;
-                        eslConn.api('uuid_kill ' + args['channel-uuid-leg-c'], function (res) {
+                        eslConn.bgapi('uuid_kill ' + args['channel-uuid-leg-c'], function (res) {
                             getCommandResponseJSON(ws, execId, res);
                         });
                         break;
 
                     case WebitelCommandTypes.Dump.name:
                         if (!doSendFreeSWITCHCommand(execId, ws)) return;
-                        eslConn.api('uuid_dump ' + args['channel-uuid'], function (res) {
+                        eslConn.bgapi('uuid_dump ' + args['channel-uuid'], function (res) {
                             getCommandResponseJSON(ws, execId, res);
                         });
                         break;
 
                     case WebitelCommandTypes.GetVar.name:
                         if (!doSendFreeSWITCHCommand(execId, ws)) return;
-                        eslConn.api('uuid_getvar ' + args['channel-uuid'] + ' ' + args['variable'] + ' ' +
+                        eslConn.bgapi('uuid_getvar ' + args['channel-uuid'] + ' ' + args['variable'] + ' ' +
                         (args['inleg'] || ''), function (res) {
                             getCommandResponseJSON(ws, execId, res);
                         });
                         break;
                     case WebitelCommandTypes.SetVar.name:
                         if (!doSendFreeSWITCHCommand(execId, ws)) return;
-                        eslConn.api('uuid_setvar ' + args['channel-uuid'] + ' ' + args['variable'] + ' ' + args['value'] + ' ' +
+                        eslConn.bgapi('uuid_setvar ' + args['channel-uuid'] + ' ' + args['variable'] + ' ' + args['value'] + ' ' +
                         (args['inleg'] || ''), function (res) {
                             getCommandResponseJSON(ws, execId, res);
                         });
@@ -225,7 +225,7 @@ module.exports = function (wss) {
                             ? 'start'
                             : 'stop';
                         _play += ' silence_stream://0 3';
-                        eslConn.api('uuid_displace ' + args['channel-uuid'] + ' ' + _play, function (res) {
+                        eslConn.bgapi('uuid_displace ' + args['channel-uuid'] + ' ' + _play, function (res) {
                             getCommandResponseJSON(ws, execId, res);
                         });
                         break;
@@ -408,7 +408,7 @@ module.exports = function (wss) {
                             return null
                         };
 
-                        eslConn.api('sofia status', function (res) {
+                        eslConn.bgapi('sofia status', function (res) {
                             webitel._parsePlainTableToJSON(res['body'], null, function (err, resJSON) {
                                 if (err) {
                                     getCommandResponseJSON(ws, execId, {
@@ -439,7 +439,7 @@ module.exports = function (wss) {
                             return null
                         };
 
-                        eslConn.api('sofia profile ' + (args['profile'] || '') + ' rescan', function (res) {
+                        eslConn.bgapi('sofia profile ' + (args['profile'] || '') + ' rescan', function (res) {
                             if (res['body'].indexOf('Invalid ') == 0)
                                 res['body'] = '-ERR ' + res['body'];
                             getCommandResponseJSON(ws, execId, res);
@@ -460,7 +460,7 @@ module.exports = function (wss) {
                             return null
                         };
 
-                        eslConn.api('sofia status gateway', function (res) {
+                        eslConn.bgapi('sofia status gateway', function (res) {
                             webitel._parsePlainTableToJSON(res['body'], null, function (err, resJSON) {
                                 if (err) {
                                     getCommandResponseJSON(ws, execId, {
@@ -491,7 +491,7 @@ module.exports = function (wss) {
                             return null
                         };
 
-                        eslConn.api('sofia profile ' + (args['profile'] || '') + ' killgw ' +
+                        eslConn.bgapi('sofia profile ' + (args['profile'] || '') + ' killgw ' +
                         (args['gateway'] || ''), function (res) {
                             getCommandResponseJSON(ws, execId, res);
                         });
