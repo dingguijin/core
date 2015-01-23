@@ -184,6 +184,12 @@ module.exports.WebitelCommandTypes = {
         }
     },
 
+    Show: {
+        Channel: {
+            name: 'show_channel',
+            perm: 0
+        }
+    },
     Token: {
         Generate: {
             name: 'token_generate',

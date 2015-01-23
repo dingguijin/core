@@ -529,6 +529,35 @@ module.exports = function (wss) {
                         });
                         break;
 
+                    case WebitelCommandTypes.Show.Channel.name:
+                        var username = ws['upgradeReq']['webitelId'];
+                        if (!username) {
+                            ws.send(JSON.stringify({
+                                'exec-uuid': execId,
+                                'exec-complete': '+ERR',
+                                'exec-response': {
+                                    'response': '-ERR permission denied!'
+                                }
+                            }));
+                            return null
+                        };
+
+                        var _domain = username.split('@')[1] || args['domain'],
+                            _item = '';
+                        if (_domain) {
+                            _item = ' like ' + _domain;
+                        }
+                        eslConn.show('channels' + _item, 'json', function (err, parsed, data) {
+                            var _res= {};
+                            if (err) {
+                                _res['body'] = '-ERR'
+                            } else {
+                                _res['body'] = data;
+                            };
+                            getCommandResponseJSON(ws, execId, _res);
+                        });
+                        break;
+
                     default :
                         ws.send(JSON.stringify({
                             'exec-uuid': execId,

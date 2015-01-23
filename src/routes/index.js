@@ -1,6 +1,7 @@
 var log = require('../lib/log')(module),
     conf = require('../conf'),
-    auth = require('./V2/auth');
+    auth = require('./V2/auth'),
+    calls = require('./V2/calls');
 
 module.exports = function (app) {
     app.all('/*', function(req, res, next) {
@@ -43,4 +44,7 @@ module.exports = function (app) {
 
     /* CONFIGURE */
     app.get('/api/v2/reloadxml', require('./V2/configure').ReloadXml);
+
+    /* CALLS */
+    app.get('/api/v2/channels', calls.getChannels);
 };

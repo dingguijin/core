@@ -25,6 +25,7 @@ module.exports = function(req, res, next) {
 
             validateUser(key, function (err, dbUser) {
                 if (dbUser && dbUser.token == token) {
+                    req.webitelDomain = dbUser['domain'];
                     next(); // To move to next middleware
                 } else {
                     // No user with this name exists, respond back with a 401
