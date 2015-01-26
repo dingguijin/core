@@ -1,7 +1,8 @@
 var log = require('../lib/log')(module),
     conf = require('../conf'),
     auth = require('./V2/auth'),
-    calls = require('./V2/calls');
+    calls = require('./V2/calls'),
+    dialplan = require('./V2/dialplan');
 
 module.exports = function (app) {
     app.all('/*', function(req, res, next) {
@@ -47,4 +48,7 @@ module.exports = function (app) {
 
     /* CALLS */
     app.get('/api/v2/channels', calls.getChannels);
+
+    /* DIALPLAN */
+    app.post('/api/v2/dialplan', dialplan.Create)
 };

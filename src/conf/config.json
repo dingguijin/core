@@ -16,6 +16,10 @@
         "port": "6379",
         "db_index": 51
     },
+    "mongodb": {
+        "uri": "mongodb://localhost:27017/webitel",
+        "collectionDialplan": "dialplan"
+    },
     "webitelServer": {
         "host": "pre.webitel.com",
         "port": "6873",
