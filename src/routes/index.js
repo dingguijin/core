@@ -2,7 +2,7 @@ var log = require('../lib/log')(module),
     conf = require('../conf'),
     auth = require('./V2/auth'),
     calls = require('./V2/calls'),
-    dialplan = require('./V2/dialplan');
+    dialplan = require('../mod/dialplan');
 
 module.exports = function (app) {
     app.all('/*', function(req, res, next) {

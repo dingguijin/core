@@ -10,6 +10,8 @@ var waitTimeReconnectWebitel = conf.get('webitelServer:reconnect') * 1000;
 
 require('./middleware/logo')();
 
+var mod_dialplan = require('./mod/dialplan');
+
 var doConnectWebitel = function() {
     webitel = global.webitel = new Webitel({
         server: conf.get('webitelServer:host'),
@@ -77,6 +79,10 @@ var doConnectFreeSWITCH = function() {
             log.info('Connect freeSWITCH - OK');
             this.apiCallbackQueue.length = 0;
             eslConnected = true;
+            
+            eslConn.bgapi('global_getvar', function (res) {
+                mod_dialplan.setupGlobalVariable(res);
+            })
         });
 
     eslConn.on('error', function(e) {

@@ -12,7 +12,7 @@ var Calls = {
             };
             if (_domain) {
                 _item = ' like %@' + _domain;
-            }
+            };
             eslConn.show('channels' + _item, 'json', function (err, parsed) {
                 if (err)
                     return res.status(500).json(err.message);

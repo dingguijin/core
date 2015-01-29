@@ -12,13 +12,14 @@
         }
     },
     "redis": {
-        "host": "it-sfera.com.ua",
+        "host": "10.10.10.160",
         "port": "6379",
-        "db_index": 51
+        "db_index": 0
     },
     "mongodb": {
-        "uri": "mongodb://localhost:27017/webitel",
-        "collectionDialplan": "dialplan"
+        "uri": "mongodb://10.10.10.160:27017/webitel",
+        "collectionDialplan": "dialplan",
+        "collectionSystem": "global"
     },
     "webitelServer": {
         "host": "pre.webitel.com",
@@ -42,7 +43,7 @@
             "node_name": "core"
         },
         "auth": {
-            "tokenSecretKey": "iuyIO!@uieywqi!@##uidosa",
+            "tokenSecretKey": "test",
             "expiresDays": 7
         },
         "socketTimeUnauthorized": 5,

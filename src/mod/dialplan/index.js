@@ -2,8 +2,8 @@
  * Created by i.navrotskyj on 26.01.2015.
  */
 
-var db = require('../../../lib/mongoDrv'),
-    log = require('../../../lib/log')(module);
+var db = require('../../lib/mongoDrv'),
+    log = require('../../lib/log')(module);
 
 var Dialplan = {
     Create: function (req, res, next) {
@@ -60,6 +60,37 @@ var Dialplan = {
                     }
                 }
             ], cb);
+    },
+    setupGlobalVariable: function (globalVarObject) {
+        try {
+            var systemCollection = db.globalCollection;
+            var _json = {},
+                _param;
+            var _body = globalVarObject['body'];
+            if (_body) {
+                _body.split('\n').forEach(function (str) {
+                    _param = str.split('=');
+                    if (_param[0] == '') return;
+                    _json[_param[0]] = _param[1];
+                });
+            };
+            globalVarObject.headers.forEach(function (param) {
+                if (param.name == '') return;
+                _json[param.name] = param.value;
+            });
+            systemCollection.insert(_json, function (err, res) {
+                if (err) {
+                    log.error(err.message);
+                    setTimeout(Dialplan.setupGlobalVariable(_jsonGlobalVarObject), 5000);
+                    return;
+                };
+                log.info('setup global variable mongodb = OK');
+            });
+        } catch (e) {
+            log.error(e.message);
+            setTimeout(Dialplan.setupGlobalVariable(_jsonGlobalVarObject), 5000);
+        }
+
     }
 };
 

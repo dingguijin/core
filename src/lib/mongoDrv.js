@@ -21,6 +21,7 @@ mongoClient.connect(config.get('mongodb:uri') ,function(err, db) {
         throw err;
     };
     drv.dialplanCollection = db.collection(config.get("mongodb:collectionDialplan"));
+    drv.globalCollection = db.collection(config.get("mongodb:collectionSystem"));
     log.info('Connected db %s ', config.get('mongodb:uri'));
     db.on('close', function () {
         log.error('close mongo');
