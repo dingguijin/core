@@ -1,24 +1,10 @@
 var jwt = require('jwt-simple'),
     config = require('../../conf/index'),
-    redis = require("redis"),
-    DB_INDEX = config.get('redis:db_index'),
-    client = redis.createClient(config.get('redis:port'), config.get('redis:host'), {}),
+    AUTH_DB_NAME = config.get("mongodb:collectionAuth"),
     log = require('../../lib/log')(module),
     checkUser = require('./../../middleware/checkUser'),
-    crypto = require('crypto');
-
-client.on('error', function (err) {
-    log.error(err.message || 'Redis server ERROR!');
-});
-
-client.select(DB_INDEX, function (err) {
-    if (err) throw err;
-    log.info('Select database: ', DB_INDEX);
-});
-
-client.on('connect', function () {
-    log.info('Connected db redis: ' + this.address);
-});
+    crypto = require('crypto'),
+    mongoDb = require('../../lib/mongoDrv');
 
 var auth = {
 
@@ -60,6 +46,16 @@ var auth = {
     logout: function (req, res, next) {
 
     },
+
+    insertDb: function (data, cb) {
+        var _db = mongoDb.getCollection(AUTH_DB_NAME);
+        _db.findAndModify({"key": data['key']}, [], data, {"upsert": true}, cb);
+    },
+
+    selectDbUser: function (key, cb) {
+        var _db = mongoDb.getCollection(AUTH_DB_NAME);
+        _db.findOne({"key": key}, cb);
+    },
     
     validate: function (username, password, _id, cb) {
         checkUser(username, password, function (err, user) {
@@ -70,25 +66,21 @@ var auth = {
             };
             var tokenObj = genToken(username),
                 userObj = {
+                    "key": _id,
                     "domain": user.domain,
                     "expires": tokenObj.expires,
                     "token": tokenObj.token,
                     "role": user.role.val
                 };
 
-            if (client.connected) {
-                client.set('session:' + _id, JSON.stringify(userObj), function (err) {
-                    if (err) {
-                        log.error(err);
-                        cb(err);
-                        return;
-                    };
-                    userObj['key'] = _id;
-                    cb(null, userObj);
-                });
-            } else {
-                cb('Connected redis error.');
-            }
+            auth.insertDb(userObj, function (err) {
+                if (err) {
+                    log.error(err);
+                    cb(err);
+                    return;
+                };
+                cb(null, userObj);
+            });
         });
     },
 
@@ -99,19 +91,16 @@ var auth = {
 
     validateUser: function (key, cb) {
         try {
-            if (client.connected) {
-                client.get('session:' + key, function (err, dbUser) {
-                    if (err) {
-                        log.error(err.message);
-                        cb(err);
-                        return;
-                    }
-                    ;
-                    cb(null, JSON.parse(dbUser));
-                });
-            } else {
-                cb('Connected redis error.');
-            }
+
+            auth.selectDbUser(key, function (err, dbUser) {
+                if (err) {
+                    log.error(err.message);
+                    cb(err);
+                    return;
+                };
+                cb(null, dbUser);
+            });
+
         } catch (e){
             cb(e);
         }

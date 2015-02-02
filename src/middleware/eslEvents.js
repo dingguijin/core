@@ -2,6 +2,7 @@ var log = require('../lib/log')(module);
 module.exports.eventsHandle = function (event) {
     try {
         var jsonEvent = JSON.parse(event.serialize());
+        //console.log(jsonEvent['Event-Name'], '->', jsonEvent['variable_IGOR'] );
         if (jsonEvent['Channel-Presence-ID']) {
             if ((jsonEvent['Event-Name'] == 'CHANNEL_EXECUTE_COMPLETE' && jsonEvent['Application'] != 'att_xfer')
                 || (jsonEvent['Event-Name'] == 'CHANNEL_EXECUTE' && jsonEvent['Application'] != 'att_xfer')) {

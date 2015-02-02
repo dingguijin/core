@@ -3,7 +3,7 @@
  */
 
 var db = require('../../lib/mongoDrv'),
-    log = require('../../lib/log')(module);
+    log = require('../../lib/log')(module)
 
 var Dialplan = {
     Create: function (req, res, next) {
@@ -61,9 +61,22 @@ var Dialplan = {
                 }
             ], cb);
     },
+    
+    setupIndex: function () {
+        var systemCollection = db.globalCollection;
+        systemCollection.ensureIndex({"Core-UUID": -1}, function (err, res) {
+            if (err) {
+                log.error('Ensure index mongoDB: ' + err.message);
+                return;
+            };
+            log.info('Ensure index %s mongoDB: OK', res)
+        });
+    },
     setupGlobalVariable: function (globalVarObject) {
         try {
             var systemCollection = db.globalCollection;
+            Dialplan.setupIndex();
+            //systemCollection.
             var _json = {},
                 _param;
             var _body = globalVarObject['body'];
@@ -78,17 +91,26 @@ var Dialplan = {
                 if (param.name == '') return;
                 _json[param.name] = param.value;
             });
-            systemCollection.insert(_json, function (err, res) {
+
+            systemCollection.remove({"Core-UUID": _json['Core-UUID']}, function (err) {
                 if (err) {
                     log.error(err.message);
-                    setTimeout(Dialplan.setupGlobalVariable(_jsonGlobalVarObject), 5000);
+                    setTimeout(Dialplan.setupGlobalVariable(_json), 5000);
                     return;
                 };
-                log.info('setup global variable mongodb = OK');
+                systemCollection.insert(_json, function (err, res) {
+                    if (err) {
+                        log.error(err.message);
+                        setTimeout(Dialplan.setupGlobalVariable(_json), 5000);
+                        return;
+                    };
+                    log.info('setup global variable mongodb = OK');
+                });
             });
+
         } catch (e) {
             log.error(e.message);
-            setTimeout(Dialplan.setupGlobalVariable(_jsonGlobalVarObject), 5000);
+            setTimeout(Dialplan.setupGlobalVariable(_json), 5000);
         }
 
     }
