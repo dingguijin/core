@@ -20,7 +20,7 @@ var Calls = {
             });
         } catch (e) {
             next(e);
-        }
+        };
     }
 };
 

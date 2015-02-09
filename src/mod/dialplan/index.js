@@ -7,9 +7,16 @@ var db = require('../../lib/mongoDrv'),
     conf = require('../../conf'),
     PUBLIC_DIALPLAN_NAME = conf.get("mongodb:collectionPublic"),
     DEFAULT_DIALPLAN_NAME = conf.get("mongodb:collectionDefault"),
-    expVal = require('./expressionValidator');
+    expVal = require('./expressionValidator'),
+    url = require("url"),
+    ObjectID = require('mongodb').ObjectID;
 
 var Dialplan = {
+
+    /*
+     * Public dialplan.
+     */
+
     CreatePublic: function (req, res, next) {
         var dialCollection = db.getCollection(PUBLIC_DIALPLAN_NAME);
         var dialplan = req.body;
@@ -45,6 +52,25 @@ var Dialplan = {
             res.status(500).send(e.message)
         }
     },
+
+    GetPublicDialplan: function (req, res, next) {
+        var dialCollection = db.getCollection(PUBLIC_DIALPLAN_NAME);
+        Dialplan.getDialplan(req, res, next, dialCollection);
+    },
+
+    DeletePublicDialplan: function (req, res, next) {
+        var dialCollection = db.getCollection(PUBLIC_DIALPLAN_NAME);
+        Dialplan.removeDialplan(req, res, next, dialCollection);
+    },
+
+    UpdatePublicDialplan: function (req, res, next) {
+        var dialCollection = db.getCollection(PUBLIC_DIALPLAN_NAME);
+        Dialplan.updateDialplan(req, res, next, dialCollection);
+    },
+
+    /*
+     * Default dialplan.
+     */
     
     CreateDefault: function (req, res, next) {
         var dialCollection = db.getCollection(DEFAULT_DIALPLAN_NAME);
@@ -76,6 +102,21 @@ var Dialplan = {
         } catch (e) {
             res.status(500).send(e.message)
         };
+    },
+    
+    GetDefaultDialplan: function (req, res, next) {
+        var dialCollection = db.getCollection(DEFAULT_DIALPLAN_NAME);
+        Dialplan.getDialplan(req, res, next, dialCollection);
+    },
+
+    DeleteDefaultDialplan: function (req, res, next) {
+        var dialCollection = db.getCollection(DEFAULT_DIALPLAN_NAME);
+        Dialplan.removeDialplan(req, res, next, dialCollection);
+    },
+
+    UpdateDefaultDialplan: function (req, res, next) {
+        var dialCollection = db.getCollection(DEFAULT_DIALPLAN_NAME);
+        Dialplan.updateDialplan(req, res, next, dialCollection);
     },
 
     replaceExpression: function (obj) {
@@ -161,6 +202,63 @@ var Dialplan = {
             log.error(e.message);
             setTimeout(Dialplan.setupGlobalVariable(globalVarObject), 5000);
         };
+    },
+    
+    getDialplan: function (req, res, next, dialCollection) {
+        var parts = url.parse(req.url, true, true),
+            query = parts.query,
+            _domain = query.domain,
+            dbQuery = {
+                "domain": _domain
+            };
+        if (req['webitelDomain']) {
+            dbQuery['domain'] = req['webitelDomain'];
+        };
+
+        dialCollection.find(dbQuery)
+            .toArray(function (err, collection) {
+                if (err) {
+                    next(err);
+                    return;
+                };
+                res.json(collection);
+            });
+    },
+    
+    removeDialplan: function (req, res, next, dialCollection) {
+        var parts = url.parse(req.url, true, true),
+            query = parts.query,
+            _id = query.id;
+        if (!_id) {
+            res.status(400).send('id is undefined');
+            return;
+        };
+        dialCollection.remove({"_id": new ObjectID(_id)}, function (err, result) {
+            if (err) {
+                res.status(500).send(err.message);
+                return;
+            };
+            res.status(200).send('Deleted');
+        });
+    },
+
+    updateDialplan: function (req, res, next, dialCollection) {
+        var parts = url.parse(req.url, true, true),
+            query = parts.query,
+            _id = query.id,
+            dialplan = req.body;
+        if (!_id) {
+            res.status(400).send('id is undefined');
+            return;
+        };
+        Dialplan.replaceExpression(dialplan);
+        dialCollection.findAndModify({"_id": new ObjectID(_id)}, [], dialplan, function (err, result) {
+            if (err) {
+                res.status(500).send(err.message);
+                return;
+            };
+            res.status(200).json(result);
+        });
     }
 };
 
