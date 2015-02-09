@@ -50,5 +50,6 @@ module.exports = function (app) {
     app.get('/api/v2/channels', calls.getChannels);
 
     /* DIALPLAN */
-    app.post('/api/v2/dialplan', dialplan.Create)
+    app.post('/api/v2/route/public', dialplan.CreatePublic);
+    app.post('/api/v2/route/default', dialplan.CreateDefault);
 };

@@ -13,7 +13,8 @@
     },
     "mongodb": {
         "uri": "mongodb://10.10.10.160:27017/webitel",
-        "collectionDialplan": "dialplan",
+        "collectionPublic": "public",
+        "collectionDefault": "default",
         "collectionSystem": "global",
         "collectionAuth": "authToken"
     },
