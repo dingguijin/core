@@ -8,7 +8,6 @@ COPY src /core
 VOLUME ["/core/cert"]
 
 WORKDIR /core
-RUN npm install && npm cache clear
 
 EXPOSE 10022
 ENTRYPOINT ["/docker-entrypoint.sh"]
