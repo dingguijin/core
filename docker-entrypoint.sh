@@ -21,6 +21,8 @@ fi
 
 if [ "$CONSOLE_PASSWORD" ]; then
 	sed -i 's/CONSOLE_PASSWORD/'$CONSOLE_PASSWORD'/g' /core/config/config.json
+else
+	sed -i 's/CONSOLE_PASSWORD//g' /core/config/config.json
 fi
 
 if [ "$LOGLEVEL" ]; then
