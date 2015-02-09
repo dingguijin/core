@@ -1,8 +1,8 @@
 {
     "ssl": {
-        "enabled": false,
-        "ssl_key": "/core/cert/wss.key",
-        "ssl_cert": "/core/cert/wss.crt"
+        "enabled": SSL,
+        "ssl_key": "/core/cert/wss.pem",
+        "ssl_cert": "/core/cert/wss.pem"
     },
     "server": {
         "host": "0.0.0.0",
@@ -12,35 +12,35 @@
         }
     },
     "mongodb": {
-        "uri": "mongodb://10.10.10.160:27017/webitel",
+        "uri": "mongodb://MONGODB_HOST:27017/webitel",
         "collectionPublic": "public",
         "collectionDefault": "default",
         "collectionSystem": "global",
         "collectionAuth": "authToken"
     },
     "webitelServer": {
-        "host": "10.10.10.160",
+        "host": "CONSOLE_HOST",
         "port": "6873",
         "account": "root",
-        "secret": "",
+        "secret": "CONSOLE_PASSWORD",
         "reconnect": 5
     },
     "freeSWITCH": {
-        "host": "10.10.10.160",
+        "host": "FS_HOST",
         "port": 8021,
         "pwd": "ClueCon",
         "reconnect": 5
     },
     "application": {
-        "loglevel": "trace",
+        "loglevel": "LOGLEVEL",
         "logstash": {
-            "enabled": false,
-            "host": "it-sfera.com.ua",
-            "port": 28777,
-            "node_name": "core"
+                "enabled": LOGSTASH_ENABLE,
+                "host": "LOGSTASH_HOST",
+                "port": 28777,
+                "node_name": "core"
         },
         "auth": {
-            "tokenSecretKey": "test",
+            "tokenSecretKey": "TOKEN_KEY",
             "expiresDays": 7
         },
         "socketTimeUnauthorized": 5,
