@@ -9,7 +9,8 @@ var db = require('../../lib/mongoDrv'),
     DEFAULT_DIALPLAN_NAME = conf.get("mongodb:collectionDefault"),
     expVal = require('./expressionValidator'),
     url = require("url"),
-    ObjectID = require('mongodb').ObjectID;
+    ObjectID = require('mongodb').ObjectID,
+    SYSTEM_COLLECTION_NAME = conf.get("mongodb:collectionSystem");
 
 var Dialplan = {
 
@@ -152,7 +153,7 @@ var Dialplan = {
     },
     
     setupIndex: function () {
-        var systemCollection = db.globalCollection;
+        var systemCollection = db.getCollection(SYSTEM_COLLECTION_NAME);
         systemCollection.ensureIndex({"Core-UUID": -1}, function (err, res) {
             if (err) {
                 log.error('Ensure index mongoDB: ' + err.message);
@@ -185,13 +186,13 @@ var Dialplan = {
             systemCollection.remove({"Core-UUID": _json['Core-UUID']}, function (err) {
                 if (err) {
                     log.error(err.message);
-                    setTimeout(Dialplan.setupGlobalVariable(globalVarObject), 5000);
+                    setTimeout(function() {Dialplan.setupGlobalVariable(globalVarObject)}, 5000);
                     return;
                 };
                 systemCollection.insert(_json, function (err, res) {
                     if (err) {
                         log.error(err.message);
-                        setTimeout(Dialplan.setupGlobalVariable(globalVarObject), 5000);
+                        setTimeout(function() {Dialplan.setupGlobalVariable(globalVarObject)}, 5000);
                         return;
                     };
                     log.info('setup global variable mongodb = OK');
@@ -199,8 +200,8 @@ var Dialplan = {
             });
 
         } catch (e) {
-            log.error(e.message);
-            setTimeout(Dialplan.setupGlobalVariable(globalVarObject), 5000);
+            log.info(e.message);
+            setTimeout(function() {Dialplan.setupGlobalVariable(globalVarObject)}, 5000);
         };
     },
     

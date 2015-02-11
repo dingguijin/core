@@ -546,7 +546,7 @@ module.exports = function (wss) {
                             _item = '';
                         if (_domain) {
                             _item = ' like ' + _domain;
-                        }
+                        };
                         eslConn.show('channels' + _item, 'json', function (err, parsed, data) {
                             var _res= {};
                             if (err) {

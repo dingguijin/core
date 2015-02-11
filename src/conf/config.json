@@ -34,10 +34,10 @@
     "application": {
         "loglevel": "LOGLEVEL",
         "logstash": {
-                "enabled": LOGSTASH_ENABLE,
-                "host": "LOGSTASH_HOST",
-                "port": 28777,
-                "node_name": "core"
+            "enabled": LOGSTASH_ENABLE,
+            "host": "LOGSTASH_HOST",
+            "port": 28777,
+            "node_name": "core"
         },
         "auth": {
             "tokenSecretKey": "TOKEN_KEY",

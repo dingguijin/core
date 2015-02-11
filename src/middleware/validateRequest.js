@@ -19,7 +19,7 @@ module.exports = function(req, res, next) {
                     "message": "Token Expired"
                 });
                 return;
-            }
+            };
 
             // Authorize the user to see if s/he can access our resources
 
@@ -45,7 +45,7 @@ module.exports = function(req, res, next) {
                 "message": "Oops something went wrong",
                 "error": err
             });
-        }
+        };
     } else {
         res.status(401);
         res.json({
@@ -53,5 +53,5 @@ module.exports = function(req, res, next) {
             "message": "Invalid Token or Key"
         });
         return;
-    }
+    };
 };
