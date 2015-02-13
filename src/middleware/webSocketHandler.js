@@ -394,6 +394,74 @@ module.exports = function (wss) {
                         });
                         break;
 
+                    case WebitelCommandTypes.Gateway.List.name:
+                        var _caller = doSendWebitelCommand(execId, ws, WebitelCommandTypes.Gateway.List);
+                        if (!_caller) return;
+                        webitel.showSipGateway(_caller, args['domain'], function(res) {
+                            getCommandResponseJSON(ws, execId, res);
+                        });
+                        break;
+
+                    case WebitelCommandTypes.Gateway.Create.name:
+                        var _caller = doSendWebitelCommand(execId, ws, WebitelCommandTypes.Gateway.Create);
+                        if (!_caller) return;
+                        webitel.createSipGateway(_caller, args, function (res) {
+                            getCommandResponseJSON(ws, execId, res);
+                        });
+                        break;
+
+                    case WebitelCommandTypes.Gateway.Change.name:
+                        var _caller = doSendWebitelCommand(execId, ws, WebitelCommandTypes.Gateway.Create);
+                        if (!_caller) return;
+                        webitel.changeSipGateway(_caller, args['name'], args['type'], args['params'], function (res) {
+                            getCommandResponseJSON(ws, execId, res);
+                        });
+                        break;
+
+                    case WebitelCommandTypes.Gateway.Remove.name:
+                        var _caller = doSendWebitelCommand(execId, ws, WebitelCommandTypes.Gateway.Remove);
+                        if (!_caller) return;
+                        webitel.removeSipGateway(_caller, args['name'], function (res) {
+                            getCommandResponseJSON(ws, execId, res);
+                        });
+                        break;
+
+                    case WebitelCommandTypes.Gateway.Up.name:
+                        var _caller = doSendWebitelCommand(execId, ws, WebitelCommandTypes.Gateway.Up);
+                        if (!_caller) return;
+                        webitel.upSipGateway(_caller, args['name'], args['profile'], function (res) {
+                            getCommandResponseJSON(ws, execId, res);
+                        });
+                        break;
+
+                    case WebitelCommandTypes.Gateway.Down.name:
+                        var _caller = doSendWebitelCommand(execId, ws, WebitelCommandTypes.Gateway.Down);
+                        if (!_caller) return;
+                        webitel.downSipGateway(_caller, args['name'], function (res) {
+                            getCommandResponseJSON(ws, execId, res);
+                        });
+                        break;
+
+                    case WebitelCommandTypes.Gateway.Kill.name:
+                        // Пока нету смысла делать поиск пользователя для всех команд freeSWITCH
+                        var _user = Users.get(ws['upgradeReq']['webitelId']);
+                        if (!_user || (_user['attr']['role'].val < WebitelCommandTypes.Gateway.Kill.perm)) {
+                            ws.send(JSON.stringify({
+                                'exec-uuid': execId,
+                                'exec-complete': '+ERR',
+                                'exec-response': {
+                                    'response': '-ERR permission denied!'
+                                }
+                            }));
+                            return null
+                        };
+
+                        eslConn.bgapi('sofia profile ' + (args['profile'] || '') + ' killgw ' +
+                        (args['gateway'] || ''), function (res) {
+                            getCommandResponseJSON(ws, execId, res);
+                        });
+                        break;
+
                     case WebitelCommandTypes.SipProfile.List.name:
                         // Пока нету смысла делать поиск пользователя для всех команд freeSWITCH
                         var _user = Users.get(ws['upgradeReq']['webitelId']);
@@ -446,56 +514,7 @@ module.exports = function (wss) {
                         });
                         break;
 
-                    case WebitelCommandTypes.Gateway.List.name:
-                        // Пока нету смысла делать поиск пользователя для всех команд freeSWITCH
-                        var _user = Users.get(ws['upgradeReq']['webitelId']);
-                        if (!_user || (_user['attr']['role'].val < WebitelCommandTypes.Gateway.List.perm)) {
-                            ws.send(JSON.stringify({
-                                'exec-uuid': execId,
-                                'exec-complete': '+ERR',
-                                'exec-response': {
-                                    'response': '-ERR permission denied!'
-                                }
-                            }));
-                            return null
-                        };
 
-                        eslConn.bgapi('sofia status gateway', function (res) {
-                            webitel._parsePlainTableToJSON(res['body'], null, function (err, resJSON) {
-                                if (err) {
-                                    getCommandResponseJSON(ws, execId, {
-                                        'status': '-ERR',
-                                        'body': err
-                                    });
-                                    return;
-                                }
-                                sendCommandResponseWebitel(ws, execId, {
-                                    'status': '+OK',
-                                    'body': resJSON
-                                });
-                            })
-                        });
-                        break;
-
-                    case WebitelCommandTypes.Gateway.Kill.name:
-                        // Пока нету смысла делать поиск пользователя для всех команд freeSWITCH
-                        var _user = Users.get(ws['upgradeReq']['webitelId']);
-                        if (!_user || (_user['attr']['role'].val < WebitelCommandTypes.Gateway.Kill.perm)) {
-                            ws.send(JSON.stringify({
-                                'exec-uuid': execId,
-                                'exec-complete': '+ERR',
-                                'exec-response': {
-                                    'response': '-ERR permission denied!'
-                                }
-                            }));
-                            return null
-                        };
-
-                        eslConn.bgapi('sofia profile ' + (args['profile'] || '') + ' killgw ' +
-                        (args['gateway'] || ''), function (res) {
-                            getCommandResponseJSON(ws, execId, res);
-                        });
-                        break;
                     case WebitelCommandTypes.Token.Generate.name:
                         var username = ws['upgradeReq']['webitelId'];
                         if (!username) {

@@ -28,11 +28,11 @@ module.exports = function (app) {
     /* DIALPLAN */
     app.post('/api/v2/route/public', dialplan.CreatePublic);
     app.get('/api/v2/route/public', dialplan.GetPublicDialplan);
-    app.del('/api/v2/route/public', dialplan.DeletePublicDialplan);
+    app.delete('/api/v2/route/public', dialplan.DeletePublicDialplan);
     app.put('/api/v2/route/public', dialplan.UpdatePublicDialplan);
 
     app.post('/api/v2/route/default', dialplan.CreateDefault);
     app.get('/api/v2/route/default', dialplan.GetDefaultDialplan);
-    app.del('/api/v2/route/default', dialplan.DeleteDefaultDialplan);
+    app.delete('/api/v2/route/default', dialplan.DeleteDefaultDialplan);
     app.put('/api/v2/route/default', dialplan.UpdateDefaultDialplan);
 };

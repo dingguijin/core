@@ -176,11 +176,31 @@ module.exports.WebitelCommandTypes = {
     Gateway: {
         List: {
             name: 'sip_gateway_list',
-            perm: 2
+            perm: 1
+        },
+        Create: {
+            name: 'sip_gateway_create',
+            perm: 1
+        },
+        Change: {
+            name: 'sip_gateway_change',
+            perm: 1
+        },
+        Remove: {
+            name: 'sip_gateway_remove',
+            perm: 1
+        },
+        Up: {
+            name: 'sip_gateway_up',
+            perm: 1
+        },
+        Down: {
+            name: 'sip_gateway_down',
+            perm: 1
         },
         Kill: {
             name: 'sip_gateway_kill',
-            perm: 2
+            perm: 1
         }
     },
 

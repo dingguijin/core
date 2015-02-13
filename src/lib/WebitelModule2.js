@@ -577,6 +577,185 @@ Webitel.prototype.reloadXml = function (_caller, cb) {
     this.api(WebitelCommandTypes.ReloadXml, cb);
 };
 
+Webitel.prototype.showSipGateway = function (_caller, domain, cb) {
+    // api sip_gateway
+    var _cb, _domain;
+    if (typeof arguments[1] == "function") {
+        _cb = arguments[1];
+        _domain = '';
+    } else {
+        _cb = cb;
+        _domain = domain || _caller['attr']['domain'];
+    };
+    if (!_caller || (_caller['attr']['role'].val < COMMAND_TYPES.Gateway.List.perm ||
+        (_caller['attr']['domain'] != _domain && _caller['attr']['role'].val != ACCOUNT_ROLE.ROOT.val))) {
+        cb({
+            body: PERMISSION_DENIED
+        });
+        return;
+    };
+
+    this.api(WebitelCommandTypes.Gateway.Index, [
+        _domain
+    ], _cb);
+};
+
+Webitel.prototype.createSipGateway = function (_caller, gateway, cb) {
+    if (typeof gateway !== 'object' || !gateway['name'] || !gateway['login']) {
+        cb(new Error("Invalid arguments"));
+        return;
+    };
+
+    if (!_caller || (_caller['attr']['role'].val < COMMAND_TYPES.Gateway.Create.perm )) {
+        cb({
+            body: PERMISSION_DENIED
+        });
+        return;
+    };
+
+    var _domain = _caller['attr']['domain'] || gateway['domain'],
+        _params = gateway['params'],
+        _var = gateway['var'],
+        _ivar = gateway['ivar'],
+        _ovar = gateway['ovar'],
+        _commandsLine = 'create ';
+
+    if (_params instanceof Array) {
+        _commandsLine = _commandsLine.concat('[');
+        _commandsLine = parseArrayToCommandLine(_params, _commandsLine);
+        _commandsLine = _commandsLine.concat(']');
+    };
+
+    _commandsLine = _commandsLine.concat('{');
+
+    if (_var instanceof Array) {
+        _commandsLine = parseArrayToCommandLine(_var, _commandsLine);
+    };
+
+    if (_ivar instanceof Array) {
+        _commandsLine = parseArrayToCommandLine(_ivar, _commandsLine, 'inbound');
+    };
+
+    if (_ovar instanceof Array) {
+        _commandsLine = parseArrayToCommandLine(_ovar, _commandsLine, 'outbound');
+    };
+    _commandsLine = _commandsLine.concat('}');
+
+    if (typeof gateway['template'] == 'string' && gateway['template'] != '') {
+        _commandsLine = _commandsLine.concat(gateway['template'], "::");
+    };
+
+    _commandsLine = _commandsLine.concat(gateway['name']);
+    if (_domain) {
+        _commandsLine = _commandsLine.concat('@',_domain);
+    };
+    _commandsLine = _commandsLine.concat(' ', gateway['login']);
+
+    if (typeof gateway['password'] == 'string' && gateway['password'] != '') {
+        _commandsLine = _commandsLine.concat(':', gateway['password']);
+    };
+
+    if (typeof gateway['realm'] == 'string' && gateway['realm'] != '') {
+        _commandsLine = _commandsLine.concat('@', gateway['realm']);
+    };
+
+    if (typeof gateway['profile'] == 'string') {
+        _commandsLine = _commandsLine.concat(' ', 'up external');
+    };
+
+    this.api(WebitelCommandTypes.Gateway.Index, [
+        _commandsLine
+    ], cb);
+};
+
+Webitel.prototype.changeSipGateway = function (_caller, gateway_id, type, params, cb) {
+    if (!_caller || _caller['attr']['role'].val < COMMAND_TYPES.Gateway.Change.perm) {
+        cb({
+            body: PERMISSION_DENIED
+        });
+        return;
+    };
+    var _cl = gateway_id + ' ';
+    switch (type) {
+        case WebitelGatevayTypeAttribute.VAR:
+            _cl = _cl.concat(WebitelGatevayTypeAttribute.VAR);
+            break;
+
+        case WebitelGatevayTypeAttribute.IVAR:
+            _cl = _cl.concat(WebitelGatevayTypeAttribute.IVAR);
+            break;
+        case WebitelGatevayTypeAttribute.OVAR:
+            _cl = _cl.concat(WebitelGatevayTypeAttribute.OVAR);
+            break;
+    };
+
+    if (params instanceof Array) {
+        _cl = _cl.concat(' ');
+        for (var i = 0, len = params.length; i < len; i++) {
+            if (params[i]['name'])
+                _cl = _cl.concat(params[i]['name'], '=');
+            if (params[i]['value'])
+                _cl = _cl.concat(params[i]['value']);
+            _cl = _cl.concat(',');
+        };
+    };
+    this.api(WebitelCommandTypes.Gateway.Index, [
+        _cl
+    ], cb);
+};
+
+Webitel.prototype.removeSipGateway = function (_caller, gateway_id, cb) {
+    if (!_caller || _caller['attr']['role'].val < COMMAND_TYPES.Gateway.Remove.perm) {
+        cb({
+            body: PERMISSION_DENIED
+        });
+        return;
+    };
+    this.api(WebitelCommandTypes.Gateway.Index, [
+        'remove ' + gateway_id
+    ], cb);
+};
+
+Webitel.prototype.upSipGateway = function (_caller, gateway_id, profile, cb) {
+    if (!_caller || _caller['attr']['role'].val < COMMAND_TYPES.Gateway.Remove.perm) {
+        cb({
+            body: PERMISSION_DENIED
+        });
+        return;
+    };
+    this.api(WebitelCommandTypes.Gateway.Index, [
+        gateway_id + ' up ' + profile
+    ], cb);
+};
+
+Webitel.prototype.downSipGateway = function (_caller, gateway_id, cb) {
+    if (!_caller || _caller['attr']['role'].val < COMMAND_TYPES.Gateway.Remove.perm) {
+        cb({
+            body: PERMISSION_DENIED
+        });
+        return;
+    };
+    this.api(WebitelCommandTypes.Gateway.Index, [
+        gateway_id + ' down'
+    ], cb);
+};
+
+function parseArrayToCommandLine (_arr, _cl, direction) {
+    var _d = direction
+        ? '[direction=' + direction + ']'
+        : '';
+
+    for (var i = 0, len = _arr.length; i < len; i++) {
+        if (!_arr[i]['name']) continue;
+
+        _cl = _cl.concat(_arr[i]['name'] + _d + '=');
+        if (_arr[i]['value'])
+            _cl = _cl.concat(_arr[i]['value']);
+        _cl = _cl.concat(',');
+    };
+    return _cl;
+};
+
 var WebitelCommandTypes = {
 
 // COMMANDS
@@ -607,7 +786,18 @@ var WebitelCommandTypes = {
     Whoami: 'whoami',
     ReloadXml: 'reloadxml',
 
-    ReloadAgents: 'favbet reload agents'
+    ReloadAgents: 'favbet reload agents',
+
+    Gateway: {
+        Index: "sip_gateway"
+    }
+};
+
+var WebitelGatevayTypeAttribute = {
+    PARAM: 'param',
+    VAR: 'var',
+    OVAR: 'ovar',
+    IVAR: 'ivar'
 };
 
 Webitel.prototype.doSendCommand = function (res) {
