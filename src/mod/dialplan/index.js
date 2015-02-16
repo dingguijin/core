@@ -32,22 +32,20 @@ var Dialplan = {
                 res.status(400).send('domain is undefined');
                 return;
             };
-            Dialplan.findMaxVersion(dialplan['destination_number'], dialplan['domain'], dialCollection, function (err, result) {
+
+            if (err) {
+                res.status(500).send(err.message);
+                return;
+            };
+
+            dialplan['version'] = 2;
+
+            dialCollection.insert(dialplan, function (err) {
                 if (err) {
                     res.status(500).send(err.message);
                     return;
                 };
-
-                dialplan['version'] = (result && result[0])
-                    ? result[0].maxVersion + 1
-                    : 0;
-                dialCollection.insert(dialplan, function (err) {
-                    if (err) {
-                        res.status(500).send(err.message);
-                        return;
-                    };
-                    res.status(201).end();
-                });
+                res.status(201).end();
             });
         } catch (e) {
             res.status(500).send(e.message)
@@ -84,6 +82,7 @@ var Dialplan = {
         if (!dialplan['order']) {
             dialplan['order'] = 0;
         };
+        dialplan['version'] = 2;
 
         try {
             if (!dialplan['domain']) {
@@ -253,6 +252,7 @@ var Dialplan = {
             return;
         };
         Dialplan.replaceExpression(dialplan);
+        dialplan['version'] = 2;
         dialCollection.findAndModify({"_id": new ObjectID(_id)}, [], dialplan, function (err, result) {
             if (err) {
                 res.status(500).send(err.message);
