@@ -23,6 +23,13 @@ var Dialplan = {
         var dialplan = req.body;
         Dialplan.replaceExpression(dialplan);
         dialplan['createdOn'] = new Date().toString();
+
+        // TODO проверка на номер
+        /**
+         ALPHA / DIGIT / "-" / "_" / "." / "+" / "="
+         The US-ASCII coded character set
+         is defined by ANSI X3.4-1986.
+         **/
         if (req['webitelDomain']) {
             dialplan['domain'] = req['webitelDomain'];
         };
@@ -30,11 +37,6 @@ var Dialplan = {
         try {
             if (!dialplan['domain']) {
                 res.status(400).send('domain is undefined');
-                return;
-            };
-
-            if (err) {
-                res.status(500).send(err.message);
                 return;
             };
 

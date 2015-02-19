@@ -215,6 +215,17 @@ module.exports.WebitelCommandTypes = {
             name: 'token_generate',
             perm: 0
         }
+    },
+
+    Event: {
+        On: {
+            name: "subscribe",
+            perm: 0
+        },
+        Off: {
+            name: "unsubscribe",
+            perm: 0
+        }
     }
 };
 

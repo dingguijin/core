@@ -324,6 +324,20 @@ module.exports = function (wss) {
                         });
                         break;
 
+                    case WebitelCommandTypes.Event.On:
+                        var webitelId = ws['upgradeReq']['webitelId'] || '',
+                            _user = Users.get(webitelId);
+                        if (_user) {
+                            var indexEvent = args['event'];
+                            if (indexEvent ) {
+
+                            }
+                        };
+                        break;
+
+                    case WebitelCommandTypes.Event.Off:
+                        break;
+
                     case WebitelCommandTypes.Logout.name:
                         ws['upgradeReq']['logged'] = false;
                         var jsonEvent,

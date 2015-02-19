@@ -30,7 +30,7 @@ Domains.broadcast = function (domainName, event) {
                                 log.warn('Error send response:', e.message);
                             }
                         });
-                    }
+                    };
                 } catch (e) {
                     log.error(e.message);
                 }

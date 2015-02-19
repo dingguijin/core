@@ -1,13 +1,26 @@
-var log = require('../lib/log')(module);
+var log = require('../lib/log')(module),
+    CallHandler = require('../mod/call'),
+    callHandler = new CallHandler();
+
 module.exports.eventsHandle = function (event) {
     try {
         var jsonEvent = JSON.parse(event.serialize());
+
+        // mod call
+        if (jsonEvent['Event-Name'] == 'CHANNEL_DESTROY') {
+            callHandler.onHandleCallDestroy(jsonEvent);
+        } else {
+            callHandler.onHandleCallCreate(jsonEvent);
+        };
+
+        //console.dir(jsonEvent);
         //console.log(jsonEvent['Event-Name'], '->', jsonEvent['variable_IGOR'] );
         if (jsonEvent['Channel-Presence-ID']) {
             if ((jsonEvent['Event-Name'] == 'CHANNEL_EXECUTE_COMPLETE' && jsonEvent['Application'] != 'att_xfer')
                 || (jsonEvent['Event-Name'] == 'CHANNEL_EXECUTE' && jsonEvent['Application'] != 'att_xfer')) {
                 return;
             };
+
             var user = Users.get(jsonEvent['Channel-Presence-ID']);
             jsonEvent['webitel-event-name'] = 'call';
             if (user && user['logged']) {
@@ -67,5 +80,5 @@ module.exports.eventsHandle = function (event) {
         };
     } catch (e) {
         log.error(e.message);
-    }
-}
+    };
+};
