@@ -3,11 +3,15 @@
  */
 
 var log = require('../../lib/log')(module),
-    HashCollection = require('../../lib/HashCollection');
+    HashCollection = require('../../lib/HashCollection'),
+    webitelEvent = require('../../middleware/EventsCollection'),
+    CALL_EVENT_NAME = 'SERVER::CALL-INFO';
 
 var CallHandler = function () {
     var calls = new HashCollection('uuid');
     var domains = new HashCollection('id');
+
+    webitelEvent.register(CALL_EVENT_NAME);
     
     this.onHandleCallCreate = function (e) {
         var callId = getCallIdFromEvent(e),
@@ -17,11 +21,14 @@ var CallHandler = function () {
             call = {
                 "domain": e["variable_domain_name"],
                 "callerId": e["Caller-Caller-ID-Number"],
-                "destination_number": e["Caller-Destination-Number"]
+                "destination_number": e["Caller-Destination-Number"],
+                "Event-Name": CALL_EVENT_NAME
             };
             calls.add(callId, call);
             var domain = domains.get(e["variable_domain_name"]);
-            log.info('ON NEW CALL ON %s, all call %s', e["variable_domain_name"], domain['countCall']);
+            call['countCall'] = domain['countCall'];
+            webitelEvent.fire(CALL_EVENT_NAME, e["variable_domain_name"], call);
+            log.debug('ON NEW CALL %s, all call %s', e["variable_domain_name"], call['countCall']);
         };
     };
 
@@ -31,9 +38,6 @@ var CallHandler = function () {
 
         if (call)
             calls.remove(callId);
-
-        var domain = domains.get(e['variable_domain_name']) || {};
-        log.info('ON END CALL ON %s, all call %s', e['variable_domain_name'], domain['countCall'] || 0);
     };
 
     calls.on('added', function (e) {

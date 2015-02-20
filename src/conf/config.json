@@ -1,6 +1,6 @@
 {
     "ssl": {
-        "enabled": false,
+        "enabled": SSL,
         "ssl_key": "/core/cert/wss.pem",
         "ssl_cert": "/core/cert/wss.pem"
     },
@@ -12,35 +12,35 @@
         }
     },
     "mongodb": {
-        "uri": "mongodb://10.10.10.157:27017/webitel",
+        "uri": "mongodb://MONGODB_HOST:27017/webitel",
         "collectionPublic": "public",
         "collectionDefault": "default",
         "collectionSystem": "global",
         "collectionAuth": "authToken"
     },
     "webitelServer": {
-        "host": "pre.webitel.com",
+        "host": "CONSOLE_HOST",
         "port": "6873",
         "account": "root",
-        "secret": "",
+        "secret": "CONSOLE_PASSWORD",
         "reconnect": 5
     },
     "freeSWITCH": {
-        "host": "pre.webitel.com",
+        "host": "FS_HOST",
         "port": 8021,
         "pwd": "ClueCon",
         "reconnect": 5
     },
     "application": {
-        "loglevel": "trace",
+        "loglevel": "LOGLEVEL",
         "logstash": {
-            "enabled": false,
+            "enabled": LOGSTASH_ENABLE,
             "host": "LOGSTASH_HOST",
             "port": 28777,
             "node_name": "core"
         },
         "auth": {
-            "tokenSecretKey": "vagrant_key",
+            "tokenSecretKey": "TOKEN_KEY",
             "expiresDays": 7
         },
         "socketTimeUnauthorized": 5,
@@ -59,7 +59,6 @@
             "CHANNEL_BRIDGE",
             "CHANNEL_UNBRIDGE",
             "CHANNEL_UUID",
-            "CHANNEL_OUTGOING",
             "DTMF",
             "CHANNEL_DATA"
         ]

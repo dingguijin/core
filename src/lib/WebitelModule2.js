@@ -742,6 +742,11 @@ Webitel.prototype.downSipGateway = function (_caller, gateway_id, cb) {
     ], cb);
 };
 
+
+Webitel.prototype.userDara = function (userId, type, paramsArray, cb) {
+    this.api(WebitelCommandTypes.UserData, [].concat(userId, type || 'global', paramsArray.join(','), 'as json'), cb);
+};
+
 function parseArrayToCommandLine (_arr, _cl, direction) {
     var _d = direction
         ? '[direction=' + direction + ']'
@@ -792,7 +797,8 @@ var WebitelCommandTypes = {
 
     Gateway: {
         Index: "sip_gateway"
-    }
+    },
+    UserData: 'user_data'
 };
 
 var WebitelGatevayTypeAttribute = {

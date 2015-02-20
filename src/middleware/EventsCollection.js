@@ -6,17 +6,21 @@ var HashCollection = require('../lib/HashCollection'),
     eventsCollection = new HashCollection('id'),
     log = require('../lib/log')(module);
 
-module.exports = {
+var _eventsModule = {
     register: function (eventName) {
+        if (!eventName || eventName == '')
+            return;
         eventsCollection.add(eventName, {
             domains: new HashCollection('id')
         });
+        log.info('Register event %s', eventName);
     },
     unRegister: function (eventName) {
         eventsCollection.remove(eventName);
+        log.trace('Unregister event %s', eventName);
     },
 
-    addListener: function (eventName, userId, cb) {
+    addListener: function (eventName, userId, sessionId, cb) {
         if (typeof eventName != 'string' || !userId ) {
             if (cb)
                 cb(new Error('Bad parameters.'));
@@ -33,26 +37,28 @@ module.exports = {
         var _user = userId.split('@'),
             _domainId = _user[1] || 'root';
 
-        var domainSubscribes = _event.domains.get(_domainId);
+        var domainSubscribes = _event.domains.get(_domainId),
+            _userId = (userId + ':' + sessionId);
 
         if (!domainSubscribes) {
             _event.domains.add(_domainId, {
-                subscribes: [userId]
+                subscribes: [_userId]
             });
         } else {
-            if (domainSubscribes.subscribes.indexOf(userId) == -1) {
-                domainSubscribes.subscribes.push(userId);
+            if (domainSubscribes.subscribes.indexOf(_userId) == -1) {
+                domainSubscribes.subscribes.push(_userId);
             } else {
-                // TODO юзер уже подписан...
+                if (cb)
+                    cb(new Error('event subscribed!'));
                 return;
             };
         };
 
         if (cb)
-            cb();
+            cb(null, '+OK: subscribe ' + eventName);
     },
 
-    removeListener: function (eventName, userId, cb) {
+    removeListener: function (eventName, userId, sessionId, cb) {
         if (typeof userId != 'string' || typeof eventName != 'string') {
             if (cb)
                 cb(new Error('Bad parameters'));
@@ -67,23 +73,24 @@ module.exports = {
         };
 
         var _user = userId.split('@'),
-            _domainId = _user[1] || 'root';
+            _domainId = _user[1] || 'root',
+            _userId = (userId + ':' + sessionId);
 
         var domainSubscribes = _event.domains.get(_domainId);
 
         if (domainSubscribes) {
-            var _id = domainSubscribes.subscribes.indexOf(userId);
+            var _id = domainSubscribes.subscribes.indexOf(_userId);
             if (_id != -1) {
                 domainSubscribes.subscribes.splice(_id, 1);
             };
         };
 
         if (cb)
-            cb();
+            cb(null, '+OK: unsubscribe ' + eventName);
     }, 
     
     fire: function (eventName, domainId, event, cb) {
-        if (typeof eventName != 'string' || !event) {
+        if (typeof eventName != 'string' || !(event instanceof Object)) {
             if (cb)
                 cb(new Error('Bad parameters'));
             return;
@@ -102,13 +109,22 @@ module.exports = {
                 cb(new Error('Not subscribes'));
             return;
         };
-
+        event['webitel-event-name'] = 'server';
         _domain.subscribes.forEach(function (userId) {
-            var user = Users.get(userId);
-            for (var key in user.ws) {
+            // TODO
+            var _userId = userId.split(':')[0],
+                sessionId = userId.split(':')[1];
+            var user = Users.get(_userId);
+
+            if (!user) return;
+
+            for (var key = 0, len = user.ws.length; key < len; key ++ ) {
                 try {
+                    if (user.ws[key]['webitelSessionId'] !== sessionId) continue;
                     user.ws[key].send(JSON.stringify(event));
+                    log.debug('Emit server event %s --> %s', eventName, userId);
                 } catch (e) {
+                    _eventsModule.removeListener(eventName, userId);
                     if (user.ws[key].readyState == user.ws[key].CLOSED) {
                         user.ws.splice(key, 1);
                         if (user.ws.length == 0) {
@@ -121,5 +137,29 @@ module.exports = {
                 };
             };
         });
+    },
+
+    removeUserSubscribe: function (userName, domainName) {
+        var eventsKeys = eventsCollection.getKeys(),
+            event,
+            _domain;
+        eventsKeys.forEach(function (key) {
+            event = eventsCollection.get(key);
+            if (event) {
+                //  /([^@]+)@([^:]+):/
+                _domain = event.domains.get(domainName);
+                if (!_domain)
+                    return;
+
+                for (var i = 0, len = _domain.subscribes.length; i < len; i++) {
+                    if (_domain.subscribes[i].indexOf(userName) == 0) {
+                        _domain.subscribes.splice(i, 1);
+                        log.trace('Event %s remove subscriber %s in %s', key, userName, domainName);
+                    };
+                };
+            };
+        });
     }
 };
+
+module.exports = _eventsModule;

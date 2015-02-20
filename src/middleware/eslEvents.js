@@ -59,21 +59,7 @@ module.exports.eventsHandle = function (event) {
                     "variable_webitel_att_xfer": jsonEvent["variable_webitel_att_xfer"]
                 };
 
-                for (var key in user.ws) {
-                    try {
-                        user.ws[key].send(JSON.stringify(jsonRequest));
-                    } catch (e) {
-                        if (user.ws[key].readyState == user.ws[key].CLOSED) {
-                            user.ws.splice(key, 1);
-                            if (user.ws.length == 0) {
-                                Users.remove(user.id);
-                                log.trace('disconnect: ', user.id);
-                                log.debug('Users session: ', Users.length());
-                            };
-                        };
-                        log.warn(e.message);
-                    };
-                };
+                Users.sendObject(user, jsonRequest);
             };
             log.debug(jsonEvent['Event-Name'] + ' -> ' + (jsonEvent["Unique-ID"] || "Other ESL event.") + ' -> '
                 + jsonEvent['Channel-Presence-ID']);

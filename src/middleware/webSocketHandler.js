@@ -5,11 +5,16 @@ var WebitelCommandTypes = require('../consts').WebitelCommandTypes,
     log = require('../lib/log')(module),
     ACCOUNT_EVENTS = require('../consts').ACCOUNT_EVENTS,
     handleSocketError = require('../middleware/handleSocketError'),
-    auth = require('../routes/V2/auth');
+    auth = require('../routes/V2/auth'),
+    eventCollection = require('./EventsCollection'),
+    generateUuid = require('node-uuid');
 
 
 module.exports = function (wss) {
     wss.on('connection', function(ws) {
+
+        ws['webitelSessionId'] = generateUuid.v4();
+
         if (socketTimeUnauthorized > 0) {
             setTimeout(function () {
                 if (!ws['upgradeReq']['webitelId']) {
@@ -324,18 +329,32 @@ module.exports = function (wss) {
                         });
                         break;
 
-                    case WebitelCommandTypes.Event.On:
-                        var webitelId = ws['upgradeReq']['webitelId'] || '',
-                            _user = Users.get(webitelId);
-                        if (_user) {
-                            var indexEvent = args['event'];
-                            if (indexEvent ) {
-
-                            }
-                        };
+                    case WebitelCommandTypes.Event.On.name:
+                        var _caller = doSendWebitelCommand(execId, ws, WebitelCommandTypes.Event.On);
+                        if (!_caller) return;
+                        eventCollection.addListener(args['event'], ws['upgradeReq']['webitelId'], ws['webitelSessionId'],
+                            function (err, resStr) {
+                                var res = {
+                                    "body": err
+                                        ? "-ERR: " + err.message
+                                        : resStr
+                                };
+                                getCommandResponseJSON(ws, execId, res);
+                            });
                         break;
 
-                    case WebitelCommandTypes.Event.Off:
+                    case WebitelCommandTypes.Event.Off.name:
+                        var _caller = doSendWebitelCommand(execId, ws, WebitelCommandTypes.Event.Off);
+                        if (!_caller) return;
+                        eventCollection.removeListener(args['event'], ws['upgradeReq']['webitelId'], ws['webitelSessionId'],
+                            function (err, resStr) {
+                                var res = {
+                                    "body": err
+                                        ? "-ERR: " + err.message
+                                        : resStr
+                                };
+                                getCommandResponseJSON(ws, execId, res);
+                            });
                         break;
 
                     case WebitelCommandTypes.Logout.name:
@@ -350,7 +369,7 @@ module.exports = function (wss) {
                                 _user.logged = false;
                                 jsonEvent = getJSONUserEvent(ACCOUNT_EVENTS.OFFLINE, _domain, _id);
                                 log.debug(jsonEvent['Event-Name'] + ' -> ' + webitelId);
-                                Domains.broadcast(_domain, JSON.stringify(jsonEvent));
+                                Domains.broadcast(_domain, jsonEvent);
                             } catch (e) {
                                 log.warn('Broadcast account event: ', domain);
                             };
@@ -378,7 +397,7 @@ module.exports = function (wss) {
                                 _user.logged = true;
                                 jsonEvent = getJSONUserEvent(ACCOUNT_EVENTS.ONLINE, _domain, _id);
                                 log.debug(jsonEvent['Event-Name'] + ' -> ' + webitelId);
-                                Domains.broadcast(_domain, JSON.stringify(jsonEvent));
+                                Domains.broadcast(_domain, jsonEvent);
                             } catch (e) {
                                 log.warn('Broadcast account event: ', domain);
                             };

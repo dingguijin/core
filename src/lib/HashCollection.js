@@ -37,6 +37,10 @@ var HashCollection = module.exports = function() {
             this.emit('removed', removedElement);
         };
     };
+
+    this.getKeys = function () {
+        return Object.keys(this.collection);
+    };
 };
 
 util.inherits(HashCollection, EventEmitter2);
