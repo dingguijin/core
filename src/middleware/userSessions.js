@@ -2,14 +2,13 @@ var HashCollection = require('../lib/HashCollection'),
     log = require('../lib/log')(module),
     Domains = global.Domains = new HashCollection('id'),
     Users = global.Users = new HashCollection('id'),
-    handleSocketError = require('../middleware/handleSocketError'),
     ACCOUNT_EVENTS = require('../consts').ACCOUNT_EVENTS;
+
 
 Domains.broadcast = function (domainName, event) {
     if (!domainName || !event) return;
     var _domain,
         _usersKeys,
-        _userWS,
         _user;
     try {
         _domain = this.get(domainName);
@@ -19,22 +18,12 @@ Domains.broadcast = function (domainName, event) {
                 try {
                     _user = Users.get(_usersKeys[key]);
                     if (!_user) continue;
-                    _userWS = _user['ws'];
-                    if(_userWS instanceof Array) {
-                        _userWS.forEach(function (_ws) {
-                            try {
-                                _ws.send(event);
-                            } catch (e) {
-                                handleSocketError(_ws);
-                                log.warn('Error send response:', e.message);
-                            }
-                        });
-                    }
+                    Users.sendObject(_user, event);
                 } catch (e) {
                     log.error(e.message);
                 }
-            }
-        }
+            };
+        };
     } catch (e) {
         log.error(e.message);
     }
@@ -46,15 +35,15 @@ Users.on('added', function (evn) {
             _domain = _id[1] || _id[0],
             domain = Domains.get(_domain),
             jsonEvent;
-        /* TODO сделано для стаусов
+        /*
         try {
             jsonEvent = getJSONUserEvent(ACCOUNT_EVENTS.ONLINE, _domain, _id[0]);
-            log.info(jsonEvent['Event-Name'] + ' -> ' + evn.id);
-            Domains.broadcast(_domain, JSON.stringify(jsonEvent));
+            log.debug(jsonEvent['Event-Name'] + ' -> ' + evn.id);
+            Domains.broadcast(_domain, jsonEvent);
         } catch (e) {
             log.warn('Broadcast account event: ', domain);
-        }
-        */
+        }*/
+
         if (!domain) {
             Domains.add(_domain, {
                 id: _domain,
@@ -77,11 +66,11 @@ Users.on('removed', function (evn) {
             _domain = _id[1] || _id[0],
             domain = Domains.get(_domain),
             jsonEvent;
-        /* TODO сделано для стаусов
+        /*
         try {
             jsonEvent = getJSONUserEvent(ACCOUNT_EVENTS.OFFLINE, _domain, _id[0]);
             log.debug(jsonEvent['Event-Name'] + ' -> ' + evn.id);
-            Domains.broadcast(_domain, JSON.stringify(jsonEvent));
+            Domains.broadcast(_domain, jsonEvent);
         } catch (e) {
             log.warn('Broadcast account event: ', domain);
         };
@@ -100,6 +89,28 @@ Users.on('removed', function (evn) {
         log.warn('On remove domain error: ', e.message);
     }
 });
+
+Users.sendObject = function (user, evObj) {
+    if (!user || !user.ws || !evObj) {
+        log.error("Send user error: bad parameters!");
+        return;
+    };
+    for (var key = 0, len = user.ws.length; key < len; key++) {
+        try {
+            user.ws[key].send(JSON.stringify(evObj));
+        } catch (e) {
+            if (user.ws[key].readyState == user.ws[key].CLOSED) {
+                user.ws.splice(key, 1);
+                if (user.ws.length == 0) {
+                    Users.remove(user.id);
+                    log.trace('disconnect: ', user.id);
+                    log.debug('Users session: ', Users.length());
+                };
+            };
+            log.warn(e.message);
+        };
+    };
+};
 
 var getJSONUserEvent = function (eventName, domainName, userId) {
     return {

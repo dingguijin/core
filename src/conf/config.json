@@ -37,14 +37,10 @@
             "CHANNEL_HANGUP",
             "CHANNEL_HOLD",
             "CHANNEL_UNHOLD",
-            "RECORD_START",
-            "RECORD_STOP",
             "CHANNEL_BRIDGE",
             "CHANNEL_UNBRIDGE",
             "CHANNEL_UUID",
-            "CHANNEL_OUTGOING",
-            "DTMF",
-            "CHANNEL_DATA"
+            "DTMF"
         ]
     }
 }

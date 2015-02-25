@@ -1,15 +1,20 @@
 var log = require('../lib/log')(module);
+
 module.exports.eventsHandle = function (event) {
     try {
         var jsonEvent = JSON.parse(event.serialize());
+
+        //console.dir(jsonEvent);
+
         if (jsonEvent['Channel-Presence-ID']) {
             if ((jsonEvent['Event-Name'] == 'CHANNEL_EXECUTE_COMPLETE' && jsonEvent['Application'] != 'att_xfer')
                 || (jsonEvent['Event-Name'] == 'CHANNEL_EXECUTE' && jsonEvent['Application'] != 'att_xfer')) {
                 return;
             };
+
             var user = Users.get(jsonEvent['Channel-Presence-ID']);
             jsonEvent['webitel-event-name'] = 'call';
-            // TODO для статусов добавить && user['logged']
+
             if (user) {
                 var jsonRequest = {
                     "webitel-event-name": 'call',
@@ -42,29 +47,16 @@ module.exports.eventsHandle = function (event) {
                     "Application-Data": jsonEvent["Application-Data"],
                     "Bridge-A-Unique-ID": jsonEvent["Bridge-A-Unique-ID"],
                     "Bridge-B-Unique-ID": jsonEvent["Bridge-B-Unique-ID"],
+                    "variable_originating_leg_uuid": jsonEvent["variable_originating_leg_uuid"],
                     "variable_webitel_att_xfer": jsonEvent["variable_webitel_att_xfer"]
                 };
 
-                for (var key in user.ws) {
-                    try {
-                        user.ws[key].send(JSON.stringify(jsonRequest));
-                    } catch (e) {
-                        if (user.ws[key].readyState == user.ws[key].CLOSED) {
-                            user.ws.splice(key, 1);
-                            if (user.ws.length == 0) {
-                                Users.remove(user.id);
-                                log.trace('disconnect: ', user.id);
-                                log.debug('Users session: ', Users.length());
-                            };
-                        };
-                        log.warn(e.message);
-                    };
-                };
+                Users.sendObject(user, jsonRequest);
             };
             log.debug(jsonEvent['Event-Name'] + ' -> ' + (jsonEvent["Unique-ID"] || "Other ESL event.") + ' -> '
                 + jsonEvent['Channel-Presence-ID']);
         };
     } catch (e) {
         log.error(e.message);
-    }
-}
+    };
+};
