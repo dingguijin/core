@@ -1,6 +1,6 @@
 {
     "ssl": {
-        "enabled": false,
+        "enabled": SSL,
         "ssl_key": "/core/cert/wss.key",
         "ssl_cert": "/core/cert/wss.crt"
     },
@@ -12,20 +12,20 @@
         }
     },
     "webitelServer": {
-        "host": "pre.webitel.com",
+        "host": "CONSOLE_HOST",
         "port": "6873",
         "account": "root",
-        "secret": "",
+        "secret": "CONSOLE_PASSWORD",
         "reconnect": 5
     },
     "freeSWITCH": {
-        "host": "pre.webitel.com",
+        "host": "FS_HOST",
         "port": 8021,
         "pwd": "ClueCon",
         "reconnect": 5
     },
     "application": {
-        "loglevel": "trace",
+        "loglevel": "LOGLEVEL",
         "socketTimeUnauthorized": 5,
         "sleepConnectToWebitel": 1000,
         "freeSWITCHEvents": [
