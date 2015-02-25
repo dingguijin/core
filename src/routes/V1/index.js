@@ -10,6 +10,7 @@ module.exports = function (app) {
     app.delete('/api/v1/domains?/:name', require('./domain').Delete);
     /* ACCOUNT */
     app.post('/api/v1/accounts?', require('./account').Create);
+    app.delete('/api/v1/accounts?/:id', require('./account').Delete);
     /* CONFIGURE */
     app.get('/api/v1/reloadxml', require('./configure').ReloadXml);
 
@@ -19,6 +20,5 @@ module.exports = function (app) {
     app.post('/api/v1/channels', require('./call').Originate);
     app.delete('/api/v1/channels', require('./call').HupAll);
     app.delete('/api/v1/channels/:id', require('./call').KillUuid);
-
     app.put('/api/v1/channels/:id', require('./call').ChangeState);
 };
