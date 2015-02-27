@@ -151,8 +151,18 @@ module.exports = function (wss) {
                         break;
                     case WebitelCommandTypes.Dtmf.name:
                         if (!doSendFreeSWITCHCommand(execId, ws)) return;
+                        var _digits = args['digits'];
                         eslConn.api(('uuid_recv_dtmf ' + args['channel-uuid'] + ' ' + args['digits']), function (res) {
-                            getCommandResponseJSON(ws, execId, res)
+                            try {
+                                if (res['body'] && res['body'].indexOf('-ERR no reply') == 0) {
+                                    res['body'] = '+OK ' + _digits;
+                                    getCommandResponseJSON(ws, execId, res)
+                                } else {
+                                    getCommandResponseJSON(ws, execId, res)
+                                }
+                            } catch (e) {
+                                log.error('Command DTMF: %s', e);
+                            };
                         });
                         break;
                     case WebitelCommandTypes.Broadcast.name:

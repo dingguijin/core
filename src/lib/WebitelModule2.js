@@ -271,7 +271,7 @@ Webitel.prototype.updateDomain = function(_caller) {
     // TODO
 };
 
-Webitel.prototype.list_users = function(_caller, domain, cb) {
+Webitel.prototype.list_users = function(_caller, domain, cb, format) {
     var _cb,
         _domain,
         self = this;
@@ -311,7 +311,13 @@ Webitel.prototype.list_users = function(_caller, domain, cb) {
                     body: '-ERR ' + err.message
                 });
                 return;
-            }
+            };
+            if (format && format == 'json') {
+                _cb({
+                    body: resJSON
+                });
+                return;
+            };
             _cb({
                 body: JSON.stringify(resJSON)
             })
@@ -814,6 +820,22 @@ Webitel.prototype.doSendCommand = function (res) {
             res.writeHead(500, {'Content-Type': 'text/plain'});
             res.write("Error: Webitel server disconnect!");
             res.end();
+            return false;
+        } catch (e) {
+            log.warn('Write message:', e.message);
+            return false;
+        };
+    };
+    return true;
+};
+
+Webitel.prototype.doSendCommandV2 = function (res) {
+    if (!webitel.authed) {
+        try {
+            res.status(500).json({
+                "status": "error",
+                "info": "Error: Webitel server disconnect!"
+            });
             return false;
         } catch (e) {
             log.warn('Write message:', e.message);

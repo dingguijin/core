@@ -12,6 +12,18 @@ var db = require('../../lib/mongoDrv'),
     ObjectID = require('mongodb').ObjectID,
     SYSTEM_COLLECTION_NAME = conf.get("mongodb:collectionSystem");
 
+function getDomainFromRequest (request, defDomain) {
+    try {
+        if (request['webitelUser'] && request['webitelUser']['domain']) {
+            return request['webitelUser']['domain'];
+        } else {
+            return defDomain;
+        };
+    } catch (e) {
+        log.error(e.message);
+    };
+};
+
 var Dialplan = {
 
     /*
@@ -30,9 +42,8 @@ var Dialplan = {
          The US-ASCII coded character set
          is defined by ANSI X3.4-1986.
          **/
-        if (req['webitelDomain']) {
-            dialplan['domain'] = req['webitelDomain'];
-        };
+
+        dialplan['domain'] =  getDomainFromRequest(req, dialplan['domain']);
 
         try {
             if (!dialplan['domain']) {
@@ -78,9 +89,9 @@ var Dialplan = {
         var dialplan = req.body;
         Dialplan.replaceExpression(dialplan);
         dialplan['createdOn'] = new Date().toString();
-        if (req['webitelDomain']) {
-            dialplan['domain'] = req['webitelDomain'];
-        };
+
+        dialplan['domain'] = getDomainFromRequest(req, dialplan['domain']);
+
         if (!dialplan['order']) {
             dialplan['order'] = 0;
         };
@@ -213,9 +224,8 @@ var Dialplan = {
             dbQuery = {
                 "domain": _domain
             };
-        if (req['webitelDomain']) {
-            dbQuery['domain'] = req['webitelDomain'];
-        };
+
+        dbQuery['domain'] = getDomainFromRequest(req, dbQuery['domain']);
 
         dialCollection.find(dbQuery)
             .toArray(function (err, collection) {

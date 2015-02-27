@@ -13,17 +13,22 @@ module.exports = function (app) {
     app.get('/api/v2/status', require('./status'));
 
     /* DOMAIN */
-    app.post('/api/v2/domain', require('./domain').Create);
-    app.delete('/api/v2/domain/:name', require('./domain').Delete);
+    app.post('/api/v2/domains', require('./domain').Create);
+    app.get('/api/v2/domains', require('./domain').Get);
+    app.delete('/api/v2/domains/:name', require('./domain').Delete);
 
     /* ACCOUNT */
-    app.post('/api/v2/account', require('./account').Create);
+    app.get('/api/v2/accounts?:domain', require('./account').Get);
+    app.post('/api/v2/accounts', require('./account').Create);
 
     /* CONFIGURE */
     app.get('/api/v2/reloadxml', require('./configure').ReloadXml);
 
     /* CALLS */
-    app.get('/api/v2/channels', calls.getChannels);
+    app.get('/api/v2/channels?:domain', calls.getChannels);
+    app.post('/api/v2/channels', calls.Originate);
+    app.delete('/api/v2/channels/:id', calls.KillUuid);
+    app.put('/api/v2/channels/:id', calls.ChangeState);
 
     /* DIALPLAN */
     app.post('/api/v2/route/public', dialplan.CreatePublic);
