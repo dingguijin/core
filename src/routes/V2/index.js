@@ -31,13 +31,15 @@ module.exports = function (app) {
     app.put('/api/v2/channels/:id', calls.ChangeState);
 
     /* DIALPLAN */
-    app.post('/api/v2/route/public', dialplan.CreatePublic);
-    app.get('/api/v2/route/public', dialplan.GetPublicDialplan);
-    app.delete('/api/v2/route/public', dialplan.DeletePublicDialplan);
-    app.put('/api/v2/route/public', dialplan.UpdatePublicDialplan);
+    app.post('/api/v2/routes/public', dialplan.CreatePublic);
+    app.get('/api/v2/routes/public', dialplan.GetPublicDialplan);
+    app.delete('/api/v2/routes/public/:id', dialplan.DeletePublicDialplan);
+    app.put('/api/v2/routes/public/:id', dialplan.UpdatePublicDialplan);
 
-    app.post('/api/v2/route/default', dialplan.CreateDefault);
-    app.get('/api/v2/route/default', dialplan.GetDefaultDialplan);
-    app.delete('/api/v2/route/default', dialplan.DeleteDefaultDialplan);
-    app.put('/api/v2/route/default', dialplan.UpdateDefaultDialplan);
+    app.post('/api/v2/routes/default', dialplan.CreateDefault);
+    app.get('/api/v2/routes/default', dialplan.GetDefaultDialplan);
+    app.delete('/api/v2/routes/default/:id', dialplan.DeleteDefaultDialplan);
+    app.put('/api/v2/routes/default/:id', dialplan.UpdateDefaultDialplan);
+    app.put('/api/v2/routes/default/:id/setOrder', dialplan.setOrderDefault);
+    app.put('/api/v2/routes/default/:domainName/incOrder', dialplan.incOrderDefault);
 };

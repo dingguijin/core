@@ -602,7 +602,7 @@ Webitel.prototype.showSipGateway = function (_caller, domain, cb) {
     };
 
     this.api(WebitelCommandTypes.Gateway.Index, [
-        _domain
+        '@' + _domain
     ], _cb);
 };
 
