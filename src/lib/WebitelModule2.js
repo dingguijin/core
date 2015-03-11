@@ -290,32 +290,38 @@ Webitel.prototype.list_users = function(_caller, domain, cb) {
         });
         return;
     }
- /*   this.api(WebitelCommandTypes.ListUsers,
-        [
-                _domain || ''
-        ],
-        _cb
-    ); */
+    /*   this.api(WebitelCommandTypes.ListUsers,
+     [
+     _domain || ''
+     ],
+     _cb
+     ); */
     // Для ивентов, чтобы заполнить online
     this.api(WebitelCommandTypes.ListUsers, [
-            _domain || ''
+        _domain || ''
     ], function (res) {
         if (res['body'].indexOf('-ERR') == 0) {
             _cb(res);
             return;
         };
-        this.api(WebitelCommandTypes.ListUsers,
-            [
-                _domain || ''
-            ],
-            _cb
-        );
+        self._parsePlainTableToJSON(res.getBody(), _domain, function (err, resJSON) {
+            if (err) {
+                log.error(err);
+                _cb({
+                    body: '-ERR ' + err.message
+                });
+                return;
+            }
+            _cb({
+                body: JSON.stringify(resJSON)
+            })
+        });
     });
 
     /*var cmd = new WebitelCommand(WebitelCommandTypes.ListUsers, {
-        param: _domain
-    }, _cb);
-    cmd.execute();*/
+     param: _domain
+     }, _cb);
+     cmd.execute();*/
 };
 
 Webitel.prototype.userList = function(_caller, domain, cb) {
@@ -336,10 +342,35 @@ Webitel.prototype.userList = function(_caller, domain, cb) {
         });
         return;
     }
+    /*this.api(WebitelCommandTypes.Account.List, [
+     _domain
+     ], _cb); */
+    // для статусов
     this.api(WebitelCommandTypes.Account.List, [
-        _domain
-    ], _cb);
-
+        _domain || ''
+    ], function (res) {
+        if (res['body'].indexOf('-ERR') == 0) {
+            _cb(res);
+            return;
+        };
+        self._parsePlainTableToJSON(res.getBody(), _domain, function (err, resJSON) {
+            if (err) {
+                log.error(err);
+                _cb({
+                    body: '-ERR ' + err.message
+                });
+                return;
+            }
+            _cb({
+                body: JSON.stringify(resJSON)
+            })
+        });
+    });
+    /*
+     var cmd = new WebitelCommand(WebitelCommandTypes.Account.List, {
+     param: _domain
+     }, _cb);
+     cmd.execute();*/
 };
 
 Webitel.prototype.userCreate = function(_caller, role, _param, cb) {

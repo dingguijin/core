@@ -38,6 +38,8 @@ var doConnectWebitel = function() {
             "USER_CREATE",
             "USER_REMOVE",
             "USER_DESTROY",
+            "USER_STATE",
+            "ACCOUNT_STATUS",
             "USER_CHANGE"].join(' '));
     });
 

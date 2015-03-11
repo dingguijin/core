@@ -15,7 +15,7 @@ module.exports.eventsHandle = function (event) {
             var user = Users.get(jsonEvent['Channel-Presence-ID']);
             jsonEvent['webitel-event-name'] = 'call';
 
-            if (user) {
+            if (user && user['logged']) {
                 var jsonRequest = {
                     "webitel-event-name": 'call',
                     "Event-Name": jsonEvent['Event-Name'],
@@ -23,11 +23,11 @@ module.exports.eventsHandle = function (event) {
                     "Unique-ID": jsonEvent["Unique-ID"],
                     "Channel-Call-UUID": jsonEvent["Channel-Call-UUID"],
                     "Channel-Call-State": jsonEvent["Channel-Call-State"],
-                    "Channel-State-Number": jsonEvent["Channel-State-Number"],
+                    //"Channel-State-Number": jsonEvent["Channel-State-Number"],
                     "Channel-State": jsonEvent["Channel-State"],
-                    "Answer-State": jsonEvent["Answer-State"],
+                    //"Answer-State": jsonEvent["Answer-State"],
                     "Call-Direction": jsonEvent["Call-Direction"],
-                    "variable_sip_call_id": jsonEvent["variable_sip_call_id"],
+                    //"variable_sip_call_id": jsonEvent["variable_sip_call_id"],
                     "Caller-Callee-ID-Name": jsonEvent["Caller-Callee-ID-Name"],
                     "Caller-Callee-ID-Number": jsonEvent["Caller-Callee-ID-Number"],
                     "Caller-Caller-ID-Name": jsonEvent["Caller-Caller-ID-Name"],
@@ -39,12 +39,12 @@ module.exports.eventsHandle = function (event) {
                     "Call-Info": jsonEvent["Call-Info"],
                     "Other-Leg-Unique-ID": jsonEvent["Other-Leg-Unique-ID"],
                     "variable_hangup_cause": jsonEvent["variable_hangup_cause"],
-                    "Caller-Channel-Created-Time": jsonEvent["Caller-Channel-Created-Time"],
-                    "Caller-Channel-Answered-Time": jsonEvent["Caller-Channel-Answered-Time"],
-                    "Caller-Channel-Hangup-Time": jsonEvent["Caller-Channel-Hangup-Time"],
+                    //"Caller-Channel-Created-Time": jsonEvent["Caller-Channel-Created-Time"],
+                    //"Caller-Channel-Answered-Time": jsonEvent["Caller-Channel-Answered-Time"],
+                    //"Caller-Channel-Hangup-Time": jsonEvent["Caller-Channel-Hangup-Time"],
                     "DTMF-Digit": jsonEvent["DTMF-Digit"],
-                    "Application": jsonEvent["Application"],
-                    "Application-Data": jsonEvent["Application-Data"],
+                    //"Application": jsonEvent["Application"],
+                    //"Application-Data": jsonEvent["Application-Data"],
                     "Bridge-A-Unique-ID": jsonEvent["Bridge-A-Unique-ID"],
                     "Bridge-B-Unique-ID": jsonEvent["Bridge-B-Unique-ID"],
                     "variable_originating_leg_uuid": jsonEvent["variable_originating_leg_uuid"],
