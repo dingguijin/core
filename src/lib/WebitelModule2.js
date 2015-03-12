@@ -600,15 +600,22 @@ Webitel.prototype.showSipGateway = function (_caller, domain, cb) {
         });
         return;
     };
+    var _t = '';
+    if (domain) {
+        _t = '@' + domain
+    }
+
 
     this.api(WebitelCommandTypes.Gateway.Index, [
-        '@' + _domain
+        _t
     ], _cb);
 };
 
 Webitel.prototype.createSipGateway = function (_caller, gateway, cb) {
-    if (typeof gateway !== 'object' || !gateway['name'] || !gateway['login']) {
-        cb(new Error("Invalid arguments"));
+    if (typeof gateway !== 'object' || !gateway['name'] || typeof gateway['username'] !== 'string') {
+        cb({
+            'body': '-ERR Invalid arguments'
+        });
         return;
     };
 
@@ -655,7 +662,7 @@ Webitel.prototype.createSipGateway = function (_caller, gateway, cb) {
     if (_domain) {
         _commandsLine = _commandsLine.concat('@',_domain);
     };
-    _commandsLine = _commandsLine.concat(' ', gateway['login']);
+    _commandsLine = _commandsLine.concat(' ', gateway['username']);
 
     if (typeof gateway['password'] == 'string' && gateway['password'] != '') {
         _commandsLine = _commandsLine.concat(':', gateway['password']);
@@ -762,7 +769,7 @@ function parseArrayToCommandLine (_arr, _cl, direction) {
         if (!_arr[i]['name']) continue;
 
         _cl = _cl.concat(_arr[i]['name'] + _d + '=');
-        if (_arr[i]['value'])
+        if (_arr[i]['value'] || typeof _arr[i]['value'] == "boolean")
             _cl = _cl.concat(_arr[i]['value']);
         _cl = _cl.concat(',');
     };

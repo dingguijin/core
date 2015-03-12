@@ -268,7 +268,7 @@ var Dialplan = {
             return;
         };
         Dialplan.replaceExpression(dialplan);
-        //dialplan['version'] = 2;
+        dialplan['version'] = 2;
         dialCollection.findAndModify({"_id": new ObjectID(_id)}, [], dialplan, function (err, result) {
             if (err) {
                 res.status(500).send(err.message);
