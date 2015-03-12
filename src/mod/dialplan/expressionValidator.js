@@ -24,9 +24,8 @@ module.exports = function (expression) {
         .replace(/(\/(\\\/|[^\/\n])*\/[gim]{0,3})|(([^\\])((?:'(?:\\'|[^'])*')|(?:"(?:\\"|[^"])*")))/g, function(m, r, d1, d2, f, s, b, bb)
         {
             if (r != null && r != '') {
-                s = r;
+                s = r.replace(/\\/g, '\u0001');
                 m = '\0B';
-
             } else {
                 s = s;
                 m = f + '\0B';

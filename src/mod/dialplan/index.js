@@ -12,6 +12,18 @@ var db = require('../../lib/mongoDrv'),
     ObjectID = require('mongodb').ObjectID,
     SYSTEM_COLLECTION_NAME = conf.get("mongodb:collectionSystem");
 
+function getDomainFromRequest (request, defDomain) {
+    try {
+        if (request['webitelUser'] && request['webitelUser']['domain']) {
+            return request['webitelUser']['domain'];
+        } else {
+            return defDomain;
+        };
+    } catch (e) {
+        log.error(e.message);
+    };
+};
+
 var Dialplan = {
 
     /*
@@ -30,9 +42,8 @@ var Dialplan = {
          The US-ASCII coded character set
          is defined by ANSI X3.4-1986.
          **/
-        if (req['webitelDomain']) {
-            dialplan['domain'] = req['webitelDomain'];
-        };
+
+        dialplan['domain'] =  getDomainFromRequest(req, dialplan['domain']);
 
         try {
             if (!dialplan['domain']) {
@@ -42,12 +53,15 @@ var Dialplan = {
 
             dialplan['version'] = 2;
 
-            dialCollection.insert(dialplan, function (err) {
+            dialCollection.insert(dialplan, function (err, result) {
                 if (err) {
                     res.status(500).send(err.message);
                     return;
                 };
-                res.status(201).end();
+                res.status(200).json({
+                    "status": "OK",
+                    "info": result[0]['_id'].toString()
+                });
             });
         } catch (e) {
             res.status(500).send(e.message)
@@ -78,9 +92,9 @@ var Dialplan = {
         var dialplan = req.body;
         Dialplan.replaceExpression(dialplan);
         dialplan['createdOn'] = new Date().toString();
-        if (req['webitelDomain']) {
-            dialplan['domain'] = req['webitelDomain'];
-        };
+
+        dialplan['domain'] = getDomainFromRequest(req, dialplan['domain']);
+
         if (!dialplan['order']) {
             dialplan['order'] = 0;
         };
@@ -92,12 +106,16 @@ var Dialplan = {
                 return;
             };
 
-            dialCollection.insert(dialplan, function (err) {
+            dialCollection.insert(dialplan, function (err, result) {
                 if (err) {
                     res.status(500).send(err.message);
                     return;
                 };
-                res.status(201).end();
+                // TODO
+                res.status(200).json({
+                    "status": "OK",
+                    "info": result[0]['_id'].toString()
+                });
             });
 
 
@@ -213,11 +231,11 @@ var Dialplan = {
             dbQuery = {
                 "domain": _domain
             };
-        if (req['webitelDomain']) {
-            dbQuery['domain'] = req['webitelDomain'];
-        };
+
+        dbQuery['domain'] = getDomainFromRequest(req, dbQuery['domain']);
 
         dialCollection.find(dbQuery)
+            .sort({"order": 1})
             .toArray(function (err, collection) {
                 if (err) {
                     next(err);
@@ -228,9 +246,7 @@ var Dialplan = {
     },
     
     removeDialplan: function (req, res, next, dialCollection) {
-        var parts = url.parse(req.url, true, true),
-            query = parts.query,
-            _id = query.id;
+        var _id = req.params['id'];
         if (!_id) {
             res.status(400).send('id is undefined');
             return;
@@ -245,9 +261,7 @@ var Dialplan = {
     },
 
     updateDialplan: function (req, res, next, dialCollection) {
-        var parts = url.parse(req.url, true, true),
-            query = parts.query,
-            _id = query.id,
+        var _id = req.params['id'],
             dialplan = req.body;
         if (!_id) {
             res.status(400).send('id is undefined');
@@ -256,6 +270,55 @@ var Dialplan = {
         Dialplan.replaceExpression(dialplan);
         dialplan['version'] = 2;
         dialCollection.findAndModify({"_id": new ObjectID(_id)}, [], dialplan, function (err, result) {
+            if (err) {
+                res.status(500).send(err.message);
+                return;
+            };
+            res.status(200).json(result);
+        });
+    },
+
+    incOrderDefault: function (req, res, next) {
+        var domainName = req.params['domainName'],
+            _body = req.body,
+            inc = parseInt(_body['inc']),
+            start = parseInt(_body['start']);
+        if (!domainName || isNaN(inc) || isNaN(start)) {
+            next(new Error('Bad request'));
+            return ;
+        };
+        var dialCollection = db.getCollection(DEFAULT_DIALPLAN_NAME);
+
+        dialCollection.update({
+            "domain": domainName,
+            "order": {
+                "$gt": start
+            }
+        }, {$inc: {"order": inc}}, {multi: true}, function (err, result) {
+            if (err) {
+                next(err);
+                return;
+            };
+            res.status(200).json({
+                "status": 'OK',
+                "info": result
+            });
+        });
+    },
+    
+    setOrderDefault: function (req, res, next) {
+        var _id = req.params['id'],
+            order = parseInt(req.body['order']);
+
+        if (isNaN(order)) {
+            res.status(400).json({
+                "status": "error",
+                "info": "Bad order parameters"
+            });
+            return;
+        };
+        var dialCollection = db.getCollection(DEFAULT_DIALPLAN_NAME);
+        dialCollection.update({"_id": new ObjectID(_id)}, {"$set": {"order": order}}, function (err, result) {
             if (err) {
                 res.status(500).send(err.message);
                 return;

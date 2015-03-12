@@ -271,7 +271,7 @@ Webitel.prototype.updateDomain = function(_caller) {
     // TODO
 };
 
-Webitel.prototype.list_users = function(_caller, domain, cb) {
+Webitel.prototype.list_users = function(_caller, domain, cb, format) {
     var _cb,
         _domain,
         self = this;
@@ -311,7 +311,13 @@ Webitel.prototype.list_users = function(_caller, domain, cb) {
                     body: '-ERR ' + err.message
                 });
                 return;
-            }
+            };
+            if (format && format == 'json') {
+                _cb({
+                    body: resJSON
+                });
+                return;
+            };
             _cb({
                 body: JSON.stringify(resJSON)
             })
@@ -594,15 +600,22 @@ Webitel.prototype.showSipGateway = function (_caller, domain, cb) {
         });
         return;
     };
+    var _t = '';
+    if (domain) {
+        _t = '@' + domain
+    }
+
 
     this.api(WebitelCommandTypes.Gateway.Index, [
-        _domain
+        _t
     ], _cb);
 };
 
 Webitel.prototype.createSipGateway = function (_caller, gateway, cb) {
-    if (typeof gateway !== 'object' || !gateway['name'] || !gateway['login']) {
-        cb(new Error("Invalid arguments"));
+    if (typeof gateway !== 'object' || !gateway['name'] || typeof gateway['username'] !== 'string') {
+        cb({
+            'body': '-ERR Invalid arguments'
+        });
         return;
     };
 
@@ -649,7 +662,7 @@ Webitel.prototype.createSipGateway = function (_caller, gateway, cb) {
     if (_domain) {
         _commandsLine = _commandsLine.concat('@',_domain);
     };
-    _commandsLine = _commandsLine.concat(' ', gateway['login']);
+    _commandsLine = _commandsLine.concat(' ', gateway['username']);
 
     if (typeof gateway['password'] == 'string' && gateway['password'] != '') {
         _commandsLine = _commandsLine.concat(':', gateway['password']);
@@ -756,7 +769,7 @@ function parseArrayToCommandLine (_arr, _cl, direction) {
         if (!_arr[i]['name']) continue;
 
         _cl = _cl.concat(_arr[i]['name'] + _d + '=');
-        if (_arr[i]['value'])
+        if (_arr[i]['value'] || typeof _arr[i]['value'] == "boolean")
             _cl = _cl.concat(_arr[i]['value']);
         _cl = _cl.concat(',');
     };
@@ -814,6 +827,22 @@ Webitel.prototype.doSendCommand = function (res) {
             res.writeHead(500, {'Content-Type': 'text/plain'});
             res.write("Error: Webitel server disconnect!");
             res.end();
+            return false;
+        } catch (e) {
+            log.warn('Write message:', e.message);
+            return false;
+        };
+    };
+    return true;
+};
+
+Webitel.prototype.doSendCommandV2 = function (res) {
+    if (!webitel.authed) {
+        try {
+            res.status(500).json({
+                "status": "error",
+                "info": "Error: Webitel server disconnect!"
+            });
             return false;
         } catch (e) {
             log.warn('Write message:', e.message);
