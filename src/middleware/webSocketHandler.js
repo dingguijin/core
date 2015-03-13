@@ -570,11 +570,8 @@ module.exports = function (wss) {
                             }));
                             return null
                         };
-                        var _ip = ws['upgradeReq'].headers['x-forwarded-for'] ||
-                            ws['upgradeReq'].connection.remoteAddress ||
-                            ws['upgradeReq'].socket.remoteAddress ||
-                            ws['upgradeReq'].connection.socket.remoteAddress;
-                        auth.getTokenObject(username, args['password'], _ip, function (err, dbUser) {
+
+                        auth.getTokenObject(username, args['password'], function (err, dbUser) {
                             if (err) {
                                 ws.send(JSON.stringify({
                                     'exec-uuid': execId,

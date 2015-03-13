@@ -4,7 +4,8 @@ var jwt = require('jwt-simple'),
     log = require('../../lib/log')(module),
     checkUser = require('./../../middleware/checkUser'),
     crypto = require('crypto'),
-    mongoDb = require('../../lib/mongoDrv');
+    mongoDb = require('../../lib/mongoDrv'),
+    generateUuid = require('node-uuid');
 
 var auth = {
 
@@ -12,11 +13,6 @@ var auth = {
 
         var username = req.body.username || '';
         var password = req.body.password || '';
-
-        var ip = req.headers['x-forwarded-for'] ||
-            req.connection.remoteAddress ||
-            req.socket.remoteAddress ||
-            req.connection.socket.remoteAddress;
 
         if (username == '') {
             res.status(401);
@@ -28,7 +24,7 @@ var auth = {
         };
 
         // Fire a query to your DB and check if the credentials are valid
-        auth.getTokenObject(username, password, ip, function (err, dbUserObj) {
+        auth.getTokenObject(username, password, function (err, dbUserObj) {
             if (err) {
                 res.status(401);
                 res.json({
@@ -44,7 +40,45 @@ var auth = {
     },
 
     logout: function (req, res, next) {
-
+        try {
+            var key = (req.body && req.body.x_key) || (req.query && req.query.x_key) || req.headers['x-key'];
+            var token = (req.body && req.body.access_token) || (req.query && req.query.access_token) || req.headers['x-access-token'];
+            if (!key || !token) {
+                res.status(401);
+                res.json({
+                    "status": 401,
+                    "message": "Invalid credentials"
+                });
+                return;
+            };
+            auth.validateUser(key, function (err, user) {
+                if (err) {
+                    next(err);
+                    return;
+                };
+                if (user && user['token'] == token) {
+                    auth.removeKey(key, function (err, result) {
+                        if (err) {
+                            next(err);
+                            return;
+                        };
+                        res.status(200).json({
+                            "status": "OK",
+                            "info": "Successful logout."
+                        });
+                    });
+                } else {
+                    res.status(401);
+                    res.json({
+                        "status": 401,
+                        "message": "Invalid credentials"
+                    });
+                    return;
+                };
+            });
+        } catch (e) {
+            next(e);
+        }
     },
 
     insertDb: function (data, cb) {
@@ -84,14 +118,13 @@ var auth = {
         });
     },
 
-    getTokenObject: function(username, password, ip, cb) {
-        var _id = md5(username + ':' + ip);
+    getTokenObject: function(username, password, cb) {
+        var _id = generateUuid.v4();
         auth.validate(username, password, _id, cb);
     },
 
     validateUser: function (key, cb) {
         try {
-
             auth.selectDbUser(key, function (err, dbUser) {
                 if (err) {
                     log.error(err.message);
@@ -100,8 +133,26 @@ var auth = {
                 };
                 cb(null, dbUser);
             });
-
         } catch (e){
+            cb(e);
+        }
+    },
+    
+    removeKey: function (key, cb) {
+        try {
+            var _db = mongoDb.getCollection(AUTH_DB_NAME);
+            _db.remove({
+                "$or": [{
+                    "expires": {
+                        "$lt": new Date().getTime()
+                    }
+                },
+                    {
+                        "key": key
+                    }
+                ]
+            }, cb);
+        } catch (e) {
             cb(e);
         }
     }

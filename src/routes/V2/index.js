@@ -9,6 +9,7 @@ module.exports = function (app) {
     // REST V2
     app.all('/api/v2/*', [require('../../middleware/validateRequest')]);
     app.post('/login', auth.login);
+    app.post('/logout', auth.logout);
 
     app.get('/api/v2/status', require('./status'));
 
