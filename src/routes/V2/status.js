@@ -4,6 +4,7 @@ module.exports = function (req, res, next) {
             res.json({
                 "Users_Session": Users.length(),
                 "Domain_Session": Domains.length(),
+                "CRASH_WORKER_COUNT": process.env['CRASH_WORKER_COUNT'] || 0,
                 "freeSWITCH": response['body'],
                 "Webitel": {
                     "Status": webitel._status == 1 ? "Connected": "Offline",
@@ -15,7 +16,9 @@ module.exports = function (req, res, next) {
         });
     } else {
         res.json({
-            "Users": Users.length(),
+            "Users_Session": Users.length(),
+            "Domain_Session": Domains.length(),
+            "CRASH_WORKER_COUNT": process.env['CRASH_WORKER_COUNT'] || 0,
             "freeSWITCH": 'Connect server error.',
             "Webitel": {
                 "Status": webitel._status == 1 ? "Connected": "Offline",

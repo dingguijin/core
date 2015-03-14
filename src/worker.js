@@ -28,7 +28,8 @@ var doConnectWebitel = function() {
 
     webitel.on('error', function (err) {
         log.warn('Webitel warn:', err);
-    })
+    });
+
     webitel.on('webitel::event::auth::success', function () {
         log.info('Connect Webitel - OK');
         webitel.subscribe('all');

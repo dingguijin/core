@@ -85,7 +85,7 @@ Webitel.prototype.send = function(command, args) {
     try {
         _command.push(command);
         for (var key in args) {
-            _command.push(args[key])
+            _command.push(args[key]);
         };
         log.debug('Execute: ' + _command.join(' '));
         self.socket.write(_command.join(' ') + '\n\n');

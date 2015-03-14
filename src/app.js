@@ -1,6 +1,7 @@
 // Include the cluster module
 var cluster = require('cluster'),
-    log = require('./lib/log')(module);
+    log = require('./lib/log')(module),
+    crashCount = 1;
 
 // Code to run if we're in the master process
 if (cluster.isMaster) {
@@ -10,9 +11,11 @@ if (cluster.isMaster) {
     // Listen for dying workers
     cluster.on('exit', function (worker) {
 
-        // Replace the dead worker, we're not sentimental
+        // Replace the dead worker, we're not sentiment
         log.error('Worker ' + worker.id + ' died.');
-        cluster.fork();
+        cluster.fork({
+            "CRASH_WORKER_COUNT": (crashCount++)
+        });
     });
 
 // Code to run if we're in a worker process
