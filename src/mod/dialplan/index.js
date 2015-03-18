@@ -202,7 +202,7 @@ var Dialplan = {
                 _json[param.name] = param.value;
             });
 
-            systemCollection.remove({"Core-UUID": _json['Core-UUID']}, function (err) {
+            systemCollection.remove({"FreeSWITCH-Switchname": _json['FreeSWITCH-Switchname']}, function (err) {
                 if (err) {
                     log.error(err.message);
                     setTimeout(function() {Dialplan.setupGlobalVariable(globalVarObject)}, 5000);
