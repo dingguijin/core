@@ -53,12 +53,13 @@ module.exports = function (wss) {
                                 try {
                                     var webitelId = msg['exec-args']['account'];
                                     ws['upgradeReq']['webitelId'] = webitelId;
+                                    ws['upgradeReq']['logged'] = true;
                                     var user = Users.get(webitelId);
                                     if (!user) {
                                         Users.add(webitelId, {
                                             ws: [ws],
                                             id: msg['exec-args']['account'],
-                                            logged: false,
+                                            logged: true,
                                             attr: userParam
                                         });
                                     } else {
