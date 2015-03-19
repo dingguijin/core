@@ -19,6 +19,8 @@ The CDR image uses several environment variables
 
 `CONSOLE_PASSWORD` - Webitel Console password
 
+`CDR_SERVER` - CDR Server URL
+
 `MONGODB_HOST` - MongoDB host or IP
 
 `FS_HOST` - FreeSWITCH host or IP

@@ -32,7 +32,7 @@
         "reconnect": 5
     },
     "cdrServer": {
-        "host": "CDR_HTTP://CDR_SERVER"
+        "host": "CDR_SERVER"
     },
     "application": {
         "loglevel": "LOGLEVEL",
