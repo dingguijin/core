@@ -14,7 +14,7 @@ module.exports.eventsHandle = function (event) {
         };
 
         //console.dir(jsonEvent);
-        //console.log(jsonEvent['Event-Name'], '->', jsonEvent['variable_IGOR'] );
+
         if (jsonEvent['Channel-Presence-ID']) {
             if ((jsonEvent['Event-Name'] == 'CHANNEL_EXECUTE_COMPLETE' && jsonEvent['Application'] != 'att_xfer')
                 || (jsonEvent['Event-Name'] == 'CHANNEL_EXECUTE' && jsonEvent['Application'] != 'att_xfer')) {
