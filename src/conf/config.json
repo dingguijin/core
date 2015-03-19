@@ -1,8 +1,8 @@
 {
     "ssl": {
         "enabled": SSL,
-        "ssl_key": "/core/cert/wss.key",
-        "ssl_cert": "/core/cert/wss.crt"
+        "ssl_key": "/core/cert/wss.pem",
+        "ssl_cert": "/core/cert/wss.pem"
     },
     "server": {
         "host": "0.0.0.0",
@@ -10,6 +10,13 @@
         "socket": {
             "originHost": false
         }
+    },
+    "mongodb": {
+        "uri": "mongodb://MONGODB_HOST:27017/webitel",
+        "collectionPublic": "public",
+        "collectionDefault": "default",
+        "collectionSystem": "global",
+        "collectionAuth": "authToken"
     },
     "webitelServer": {
         "host": "CONSOLE_HOST",
@@ -24,18 +31,21 @@
         "pwd": "ClueCon",
         "reconnect": 5
     },
-    "mongodb": {
-        "uri": "mongodb://MONGODB_HOST:27017/webitel",
-        "collectionPublic": "public",
-        "collectionDefault": "default",
-        "collectionSystem": "global",
-        "collectionAuth": "authToken"
-    },
     "cdrServer": {
         "host": "CDR_HTTP://CDR_SERVER"
     },
     "application": {
         "loglevel": "LOGLEVEL",
+        "logstash": {
+            "enabled": LOGSTASH_ENABLE,
+            "host": "LOGSTASH_HOST",
+            "port": 28777,
+            "node_name": "core"
+        },
+        "auth": {
+            "tokenSecretKey": "TOKEN_KEY",
+            "expiresDays": 7
+        },
         "socketTimeUnauthorized": 5,
         "sleepConnectToWebitel": 1000,
         "freeSWITCHEvents": [
@@ -50,7 +60,8 @@
             "CHANNEL_BRIDGE",
             "CHANNEL_UNBRIDGE",
             "CHANNEL_UUID",
-            "DTMF"
+            "DTMF",
+            "CHANNEL_DATA"
         ]
     }
 }
