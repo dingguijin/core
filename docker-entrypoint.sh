@@ -11,6 +11,10 @@ if [ "$FS_HOST" ]; then
 	sed -i 's/FS_HOST/'$FS_HOST'/g' /core/conf/config.json
 fi
 
+if [ "$CDR_SERVER" ]; then
+	sed -i 's/CDR_SERVER/'$CDR_SERVER'/g' /core/conf/config.json
+fi
+
 if [ "$MONGODB_HOST" ]; then
 	sed -i 's/MONGODB_HOST/'$MONGODB_HOST'/g' /core/conf/config.json
 fi
@@ -23,12 +27,6 @@ if [ "$CONSOLE_PASSWORD" ]; then
 	sed -i 's/CONSOLE_PASSWORD/'$CONSOLE_PASSWORD'/g' /core/conf/config.json
 else
 	sed -i 's/CONSOLE_PASSWORD//g' /core/conf/config.json
-fi
-
-if [ "$CDR_SERVER" ]; then
-	sed -i 's/CDR_SERVER/'$CDR_SERVER'/g' /core/conf/config.json
-else
-	sed -i 's/CDR_SERVER/http:\/\/CDR_SERVER:10023\/'/g' /core/conf/config.json
 fi
 
 if [ "$LOGLEVEL" ]; then
