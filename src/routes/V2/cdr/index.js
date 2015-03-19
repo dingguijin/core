@@ -5,6 +5,10 @@
 var conf = require('../../../conf'),
     CDR_SERVER_HOST = conf.get('cdrServer:host');
 
+if (CDR_SERVER_HOST) {
+    CDR_SERVER_HOST = CDR_SERVER_HOST.replace(/\/$/g, '');
+};
+
 module.exports = function (req, res, next) {
     if (!CDR_SERVER_HOST) {
         return res.status(500).json({
