@@ -15,6 +15,12 @@ if [ "$CDR_SERVER" ]; then
 	sed -i 's/CDR_SERVER/'$CDR_SERVER'/g' /core/conf/config.json
 fi
 
+if [ "$CDR_HTTP" ]; then
+	sed -i 's/CDR_HTTP/'$CDR_HTTP'/g' /core/conf/config.json
+else
+	sed -i 's/CDR_HTTP/http/g' /core/conf/config.json
+fi
+
 if [ "$MONGODB_HOST" ]; then
 	sed -i 's/MONGODB_HOST/'$MONGODB_HOST'/g' /core/conf/config.json
 fi

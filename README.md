@@ -21,6 +21,8 @@ The CDR image uses several environment variables
 
 `CDR_SERVER` - CDR Server URL
 
+`CDR_HTTP` - https or http (default: http)
+
 `MONGODB_HOST` - MongoDB host or IP
 
 `FS_HOST` - FreeSWITCH host or IP
