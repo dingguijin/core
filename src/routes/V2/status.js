@@ -2,6 +2,7 @@ module.exports = function (req, res, next) {
     if (eslConn && !eslConn['connecting']) {
         eslConn.api('status', function(response) {
             res.json({
+                "Version": process.env['VERSION'] || '',
                 "Users_Session": Users.length(),
                 "Domain_Session": Domains.length(),
                 "CRASH_WORKER_COUNT": process.env['CRASH_WORKER_COUNT'] || 0,
@@ -16,6 +17,7 @@ module.exports = function (req, res, next) {
         });
     } else {
         res.json({
+            "Version": process.env['VERSION'] || '',
             "Users_Session": Users.length(),
             "Domain_Session": Domains.length(),
             "CRASH_WORKER_COUNT": process.env['CRASH_WORKER_COUNT'] || 0,
