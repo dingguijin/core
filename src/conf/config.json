@@ -24,6 +24,13 @@
         "pwd": "ClueCon",
         "reconnect": 5
     },
+    "mongodb": {
+        "uri": "mongodb://MONGODB_HOST:27017/webitel",
+        "collectionPublic": "public",
+        "collectionDefault": "default",
+        "collectionSystem": "global",
+        "collectionAuth": "authToken"
+    },
     "cdrServer": {
         "host": "CDR_HTTP://CDR_SERVER"
     },
