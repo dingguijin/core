@@ -19,7 +19,7 @@ The CDR image uses several environment variables
 
 `CONSOLE_PASSWORD` - Webitel Console password
 
-`CDR_SERVER` - CDR Server URL
+`CDR_SERVER` - CDR Server host or IP
 
 `CDR_HTTP` - https or http (default: http)
 
