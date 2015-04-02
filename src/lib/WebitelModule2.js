@@ -612,7 +612,8 @@ Webitel.prototype.showSipGateway = function (_caller, domain, cb) {
 };
 
 Webitel.prototype.createSipGateway = function (_caller, gateway, cb) {
-    if (typeof gateway !== 'object' || !gateway['name'] || typeof gateway['username'] !== 'string') {
+    if (typeof gateway !== 'object' || !gateway['name'] || typeof gateway['username'] !== 'string' ||
+        /\s/g.test(gateway['username'])) {
         cb({
             'body': '-ERR Invalid arguments'
         });
@@ -655,21 +656,21 @@ Webitel.prototype.createSipGateway = function (_caller, gateway, cb) {
     _commandsLine = _commandsLine.concat('}');
 
     if (typeof gateway['template'] == 'string' && gateway['template'] != '') {
-        _commandsLine = _commandsLine.concat(gateway['template'], "::");
+        _commandsLine = _commandsLine.concat(gateway['template'].replace(/\s/g,''), "::");
     };
 
     _commandsLine = _commandsLine.concat(gateway['name']);
     if (_domain) {
-        _commandsLine = _commandsLine.concat('@',_domain);
+        _commandsLine = _commandsLine.concat('@',_domain.replace(/\s/g,''));
     };
     _commandsLine = _commandsLine.concat(' ', gateway['username']);
 
     if (typeof gateway['password'] == 'string' && gateway['password'] != '') {
-        _commandsLine = _commandsLine.concat(':', gateway['password']);
+        _commandsLine = _commandsLine.concat(':', gateway['password'].replace(/\s/g,''));
     };
 
     if (typeof gateway['realm'] == 'string' && gateway['realm'] != '') {
-        _commandsLine = _commandsLine.concat('@', gateway['realm']);
+        _commandsLine = _commandsLine.concat('@', gateway['realm'].replace(/\s/g,''));
     };
 
     if (typeof gateway['profile'] == 'string') {

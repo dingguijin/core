@@ -31,10 +31,10 @@ module.exports.Delete = function (req, res, next) {
         if (domain_name != '') {
             if (!webitel.doSendCommandV2(res)) return;
             webitel.domainRemove(null, domain_name, function(request) {
-                res.status(200).send(request.body);
+                res.status(200).json(rUtil.getRequestObject('OK', request.body, DOCS_LINK_DOMAIN));
             });
         } else {
-            res.status(400).send('domain_name undefined.');
+            res.status(400).json(rUtil.getRequestObject('error', 'domain_name undefined.', DOCS_LINK_DOMAIN));
         }
     } catch (e) {
         next(e)
