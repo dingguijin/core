@@ -10,8 +10,7 @@ module.exports = function (req, res, next) {
                 "Webitel": {
                     "Status": webitel._status == 1 ? "Connected": "Offline",
                     "ApiQueue": webitel.apiCallbackQueue.length,
-                    "CmdQueue": webitel.cmdCallbackQueue.length,
-                    "Version": webitel.version || ''
+                    "CmdQueue": webitel.cmdCallbackQueue.length
                 }
             });
         });
@@ -25,8 +24,7 @@ module.exports = function (req, res, next) {
             "Webitel": {
                 "Status": webitel._status == 1 ? "Connected": "Offline",
                 "ApiQueue": webitel.apiCallbackQueue.length,
-                "CmdQueue": webitel.cmdCallbackQueue.length,
-                "Version": webitel.version || ''
+                "CmdQueue": webitel.cmdCallbackQueue.length
             }
         });
     };

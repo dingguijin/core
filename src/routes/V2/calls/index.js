@@ -43,7 +43,7 @@ var Calls = {
             _param = '[' + _originatorParam.concat(_autoAnswerParam).join(',') + ']';
 
         var dialString = ('originate ' + _param + 'user/' + user + ' ' + extension +
-        ' xml default ' + user + ' ' + user);
+        ' xml default ' + user.split('@')[0] + ' ' + user.split('@')[0]);
         log.trace(dialString);
 
         eslConn.bgapi(dialString, function (result) {
