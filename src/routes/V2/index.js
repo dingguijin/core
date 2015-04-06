@@ -3,7 +3,9 @@
  */
 var auth = require('./auth'),
     calls = require('./calls'),
-    dialplan = require('../../mod/dialplan');
+    dialplan = require('../../mod/dialplan'),
+    calendar = require('../../mod/calendar')
+    ;
 
 module.exports = function (app) {
     // REST V2
@@ -43,6 +45,8 @@ module.exports = function (app) {
     app.put('/api/v2/routes/default/:id', dialplan.UpdateDefaultDialplan);
     app.put('/api/v2/routes/default/:id/setOrder', dialplan.setOrderDefault);
     app.put('/api/v2/routes/default/:domainName/incOrder', dialplan.incOrderDefault);
+
+    app.post('/api/v2/calendar', calendar.post);
 
     app.all('/api/v2/cdr|files|media*', require('./cdr'));
 };

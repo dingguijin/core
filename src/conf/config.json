@@ -16,7 +16,8 @@
         "collectionPublic": "public",
         "collectionDefault": "default",
         "collectionSystem": "global",
-        "collectionAuth": "authToken"
+        "collectionAuth": "authToken",
+        "collectionCalendar": "calendar"
     },
     "webitelServer": {
         "host": "CONSOLE_HOST",
