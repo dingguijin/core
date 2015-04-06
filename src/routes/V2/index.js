@@ -30,6 +30,7 @@ module.exports = function (app) {
     /* CALLS */
     app.get('/api/v2/channels?:domain', calls.getChannels);
     app.post('/api/v2/channels', calls.Originate);
+    app.post('/api/v2/fake', calls.FakeCall);
     app.delete('/api/v2/channels/:id', calls.KillUuid);
     app.put('/api/v2/channels/:id', calls.ChangeState);
 
