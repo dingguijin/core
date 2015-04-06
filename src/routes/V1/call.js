@@ -39,7 +39,8 @@ module.exports.Originate = function (req, res, next) {
 
 module.exports.fakeCall = function (req, res, next) {
     var number = req.body.number || '',
-        dialString =  ''.concat('originate user/', number, ' &echo()')
+        displayNumber = req.body.displayNumber || '00000',
+        dialString =  ''.concat('originate ', '[origination_caller_id_number=', displayNumber, ']', 'user/', number, ' &echo()')
         ;
     eslConn.bgapi(dialString, function (result) {
         sendResponse(result, res, "https://docs.webitel.com/display/SDKRU/REST+API+v1#RESTAPIv1-Создатьканал.");
