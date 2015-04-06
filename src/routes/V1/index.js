@@ -18,6 +18,7 @@ module.exports = function (app) {
 
     /* CALL */
     app.post('/api/v1/channels', require('./call').Originate);
+    app.post('/api/v1/fake', require('./call').fakeCall);
     app.delete('/api/v1/channels', require('./call').HupAll);
     app.delete('/api/v1/channels/:id', require('./call').KillUuid);
     app.put('/api/v1/channels/:id', require('./call').ChangeState);

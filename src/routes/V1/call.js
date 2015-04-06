@@ -16,21 +16,35 @@ module.exports.Originate = function (req, res, next) {
 
     var extension = req.body.calledId, // CALLE
         user = req.body.callerId || '', //CALLER
-        auto_answer_param = req.body.auto_answer_param
+        auto_answer_param = req.body.auto_answer_param,
+        dialString = '',
+        _dialstring = req.dialstring
         ;
+    if (_dialstring) {
+        dialString = _dialstring;
+    } else {
+        var _originatorParam = new Array('w_jsclient_originate_number=' + extension),
+            _autoAnswerParam = [].concat(auto_answer_param || []),
+            _param = '[' + _originatorParam.concat(_autoAnswerParam).join(',') + ']';
 
-    var _originatorParam = new Array('w_jsclient_originate_number=' + extension),
-        _autoAnswerParam = [].concat( auto_answer_param || []),
-        _param = '[' + _originatorParam.concat(_autoAnswerParam).join(',') + ']';
-
-    var dialString = ('originate ' + _param + 'user/' + user + ' ' + extension +
-    ' xml default ' + user.split('@')[0] + ' ' + user.split('@')[0]);
-    log.trace(dialString);
+        dialString = ('originate ' + _param + 'user/' + user + ' ' + extension +
+        ' xml default ' + user.split('@')[0] + ' ' + user.split('@')[0]);
+        log.trace(dialString);
+    };
 
     eslConn.bgapi(dialString, function (result) {
         sendResponse(result, res, "https://docs.webitel.com/display/SDKRU/REST+API+v1#RESTAPIv1-Создатьканал.");
     });
 };
+
+module.exports.fakeCall = function (req, res, next) {
+    var number = req.body.number || '',
+        dialString =  ''.concat('originate user/', number, ' &echo()')
+        ;
+    eslConn.bgapi(dialString, function (result) {
+        sendResponse(result, res, "https://docs.webitel.com/display/SDKRU/REST+API+v1#RESTAPIv1-Создатьканал.");
+    });
+},
 
 module.exports.HupAll = function (req, res, next) {
     eslConn.bgapi('hupall', function (result) {
