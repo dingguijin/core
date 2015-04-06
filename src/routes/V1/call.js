@@ -6,16 +6,25 @@ var log = require('../../lib/log')(module);
 
 module.exports.Originate = function (req, res, next) {
 
+    /*
+     * {
+         "calledId": "00",
+         "callerId": "100@10.10.10.144",
+         "auto_answer_param": "w_jsclient_xtransfer=true"
+        }
+     */
+
     var extension = req.body.calledId, // CALLE
-        user = req.body.callerId, //CALLER
-        auto_answer_param = req.body.auto_answer_param;
+        user = req.body.callerId || '', //CALLER
+        auto_answer_param = req.body.auto_answer_param
+        ;
 
     var _originatorParam = new Array('w_jsclient_originate_number=' + extension),
         _autoAnswerParam = [].concat( auto_answer_param || []),
         _param = '[' + _originatorParam.concat(_autoAnswerParam).join(',') + ']';
 
     var dialString = ('originate ' + _param + 'user/' + user + ' ' + extension +
-        ' xml default ' + user + ' ' + user);
+    ' xml default ' + user.split('@')[0] + ' ' + user.split('@')[0]);
     log.trace(dialString);
 
     eslConn.bgapi(dialString, function (result) {
