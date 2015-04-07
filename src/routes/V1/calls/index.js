@@ -41,7 +41,7 @@ module.exports.fakeCall = function (req, res, next) {
     var number = req.body.number || '',
         displayNumber = req.body.displayNumber || '00000',
         dialString =  ''.concat('originate ', '[origination_caller_id_number=', displayNumber, ']', 'user/', number,
-            ' &valet_park(fakeCall in 1 999)')
+            ' &bridge(sofia/external/888@conference.freeswitch.org)')
         ;
     eslConn.bgapi(dialString, function (result) {
         sendResponse(result, res, "https://docs.webitel.com/display/SDKRU/REST+API+v1#RESTAPIv1-Создатьканал.");

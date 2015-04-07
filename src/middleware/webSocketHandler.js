@@ -7,7 +7,8 @@ var WebitelCommandTypes = require('../consts').WebitelCommandTypes,
     handleSocketError = require('../middleware/handleSocketError'),
     auth = require('../routes/V2/auth'),
     eventCollection = require('./EventsCollection'),
-    generateUuid = require('node-uuid');
+    generateUuid = require('node-uuid'),
+    sessionSupportLogged = conf.get('application:sessionSupportLogged') || false;
 
 
 module.exports = function (wss) {
@@ -63,7 +64,7 @@ module.exports = function (wss) {
                                         Users.add(webitelId, {
                                             ws: [ws],
                                             id: msg['exec-args']['account'],
-                                            logged: false,
+                                            logged: sessionSupportLogged,
                                             attr: userParam
                                         });
                                     } else {
@@ -195,6 +196,7 @@ module.exports = function (wss) {
                         break;
                     case WebitelCommandTypes.AttXferBridge.name:
                         if (!doSendFreeSWITCHCommand(execId, ws)) return;
+
                         eslConn.bgapi('uuid_bridge ' + args['channel-uuid-leg-c'] + ' ' + args['channel-uuid-leg-b'], function (res) {
                             getCommandResponseJSON(ws, execId, res);
                         });
