@@ -18,10 +18,10 @@ module.exports.Originate = function (req, res, next) {
         user = req.body.callerId || '', //CALLER
         auto_answer_param = req.body.auto_answer_param,
         dialString = '',
-        _dialstring = req.dialstring
+        _dialstring = req.body.dialstring
         ;
     if (_dialstring) {
-        dialString = _dialstring;
+        dialString = 'originate ' + _dialstring;
     } else {
         var _originatorParam = new Array('w_jsclient_originate_number=' + extension),
             _autoAnswerParam = [].concat(auto_answer_param || []),
@@ -40,7 +40,8 @@ module.exports.Originate = function (req, res, next) {
 module.exports.fakeCall = function (req, res, next) {
     var number = req.body.number || '',
         displayNumber = req.body.displayNumber || '00000',
-        dialString =  ''.concat('originate ', '[origination_caller_id_number=', displayNumber, ']', 'user/', number, ' &echo()')
+        dialString =  ''.concat('originate ', '[origination_caller_id_number=', displayNumber, ']', 'user/', number,
+            ' &valet_park(fakeCall in 1 999)')
         ;
     eslConn.bgapi(dialString, function (result) {
         sendResponse(result, res, "https://docs.webitel.com/display/SDKRU/REST+API+v1#RESTAPIv1-Создатьканал.");
