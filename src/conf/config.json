@@ -1,6 +1,6 @@
 {
     "ssl": {
-        "enabled": SSL,
+        "enabled": false,
         "ssl_key": "/core/cert/wss.pem",
         "ssl_cert": "/core/cert/wss.pem"
     },
@@ -12,7 +12,7 @@
         }
     },
     "mongodb": {
-        "uri": "mongodb://MONGODB_HOST:27017/webitel",
+        "uri": "mongodb://pre.webitel.com:27017/webitel",
         "collectionPublic": "public",
         "collectionDefault": "default",
         "collectionSystem": "global",
@@ -20,14 +20,14 @@
         "collectionCalendar": "calendar"
     },
     "webitelServer": {
-        "host": "CONSOLE_HOST",
+        "host": "localhost",
         "port": "6873",
         "account": "root",
-        "secret": "CONSOLE_PASSWORD",
+        "secret": "",
         "reconnect": 5
     },
     "freeSWITCH": {
-        "host": "FS_HOST",
+        "host": "pre.webitel.com",
         "port": 8021,
         "pwd": "ClueCon",
         "reconnect": 5
@@ -36,9 +36,9 @@
         "host": "CDR_HTTP://CDR_SERVER"
     },
     "application": {
-        "loglevel": "LOGLEVEL",
+        "loglevel": "trace",
         "logstash": {
-            "enabled": LOGSTASH_ENABLE,
+            "enabled": false,
             "host": "LOGSTASH_HOST",
             "port": 28777,
             "node_name": "core"

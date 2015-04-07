@@ -226,6 +226,13 @@ module.exports.WebitelCommandTypes = {
             name: "unsubscribe",
             perm: 0
         }
+    },
+
+    CallCenter: {
+        Create: {
+            name: "",
+            perm: ""
+        }
     }
 };
 

@@ -379,6 +379,8 @@ Webitel.prototype.userList = function(_caller, domain, cb) {
     cmd.execute();*/
 };
 
+// TODO mod_cc
+
 Webitel.prototype.userCreate = function(_caller, role, _param, cb) {
     _param = _param || '';
     var _domain = _param.split('@')[1];
@@ -460,6 +462,56 @@ Webitel.prototype.userRemove = function(_caller, user, cb) {
     }, cb);
     cmd.execute();*/
 };
+
+Webitel.prototype.queueList = function (_caller, args, cb) {
+    args = args || {};
+    var _domain = args['domain'] || _caller['attr']['domain'];
+    if (!_caller || (_caller['attr']['role'].val < COMMAND_TYPES.Account.Create.perm ||
+        (_caller['attr']['domain'] != _domain && _caller['attr']['role'].val != ACCOUNT_ROLE.ROOT.val))) {
+        cb({
+            body: PERMISSION_DENIED
+        });
+        return;
+    };
+
+    var _params = [
+        WebitelCommandTypes.CallCenter.Root,
+        WebitelCommandTypes.CallCenter.Create
+
+    ];
+
+    if (args.hasOwnProperty('params')) {
+
+    }
+
+};
+
+/*
+
+ */
+
+Webitel.prototype.queueCreate = function (_caller, args, cb) {
+    args = args || {};
+    var _domain = args['domain'] || _caller['attr']['domain'];
+    if (!_caller || (_caller['attr']['role'].val < COMMAND_TYPES.Account.Create.perm ||
+        (_caller['attr']['domain'] != _domain && _caller['attr']['role'].val != ACCOUNT_ROLE.ROOT.val))) {
+        cb({
+            body: PERMISSION_DENIED
+        });
+        return;
+    };
+
+    var _params = [
+        WebitelCommandTypes.CallCenter.Root,
+        WebitelCommandTypes.CallCenter.Create
+
+    ];
+
+    if (args.hasOwnProperty('params')) {
+
+    }
+};
+// TODO mod_cc END
 
 Webitel.prototype.deviceList = function(_caller, domain, cb) {
     var _cb, _domain;
@@ -812,7 +864,15 @@ var WebitelCommandTypes = {
     Gateway: {
         Index: "sip_gateway"
     },
-    UserData: 'user_data'
+    UserData: 'user_data',
+
+    CallCenter: {
+        Root: 'callcenter_config queue',
+        Create: 'create',
+        Delete: 'delete',
+        Enable: 'enable',
+        Disable: 'disable'
+    }
 };
 
 var WebitelGatevayTypeAttribute = {
