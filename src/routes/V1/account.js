@@ -32,5 +32,32 @@ module.exports.Create = function (req, res, next) {
         }
     } catch (e) {
         next(e)
-    }
+    };
+};
+
+module.exports.Delete = function (req, res, next) {
+    try {
+        var userId = (req.params && req.params.id)
+            ? req.params.id
+            : '';
+        if (userId != '') {
+            if (!webitel.doSendCommand(res)) return;
+
+            var _caller = {
+                attr: {
+                    role: {
+                        val: 2
+                    }
+                }
+            };
+
+            webitel.userRemove(_caller, userId, function(request) {
+                res.status(200).send(request.body);
+            });
+        } else {
+            res.status(400).send('id undefined.');
+        }
+    } catch (e) {
+        next(e)
+    };
 };
