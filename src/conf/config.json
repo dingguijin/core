@@ -33,7 +33,7 @@
         "reconnect": 5
     },
     "cdrServer": {
-        "host": "CDR_HTTP://CDR_SERVER"
+        "host": "http://10.10.10.127:10021"
     },
     "application": {
         "loglevel": "trace",

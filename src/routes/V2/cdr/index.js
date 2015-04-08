@@ -16,6 +16,5 @@ module.exports = function (req, res, next) {
             "info": "Not config CDR_SERVER_HOST"
         });
     };
-    //res.redirect(307, CDR_SERVER_HOST + req.originalUrl);
-    res.status(307).header("Location", CDR_SERVER_HOST + req.originalUrl).end();
+    res.redirect(307, CDR_SERVER_HOST + req.originalUrl);
 };

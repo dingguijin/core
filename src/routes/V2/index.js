@@ -4,7 +4,8 @@
 var auth = require('./auth'),
     calls = require('./calls'),
     dialplan = require('../../mod/dialplan'),
-    calendar = require('../../mod/calendar')
+    calendar = require('../../mod/calendar'),
+    callcenter = require('./callcenter')
     ;
 
 module.exports = function (app) {
@@ -50,4 +51,11 @@ module.exports = function (app) {
     app.post('/api/v2/calendar', calendar.post);
 
     app.all('/api/v2/cdr|files|media*', require('./cdr'));
+
+    app.get('/api/v2/callcenter/queues', callcenter.List);
+    app.post('/api/v2/callcenter/queues', callcenter.Create);
+    app.get('/api/v2/callcenter/queues/:name', callcenter.Item);
+    app.put('/api/v2/callcenter/queues/:name', callcenter.Update);
+    app.put('/api/v2/callcenter/queues/:name/:state', callcenter.SetState);
+    app.delete('/api/v2/callcenter/queues/:name', callcenter.Delete);
 };

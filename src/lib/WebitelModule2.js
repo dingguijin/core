@@ -466,7 +466,8 @@ Webitel.prototype.userRemove = function(_caller, user, cb) {
 Webitel.prototype.queueList = function (_caller, args, cb) {
     args = args || {};
     var _domain = args['domain'] || _caller['attr']['domain'];
-    if (!_caller || (_caller['attr']['role'].val < COMMAND_TYPES.Account.Create.perm ||
+
+    if (!_caller || (_caller['attr']['role'].val < COMMAND_TYPES.CallCenter.List.perm ||
         (_caller['attr']['domain'] != _domain && _caller['attr']['role'].val != ACCOUNT_ROLE.ROOT.val))) {
         cb({
             body: PERMISSION_DENIED
@@ -474,26 +475,45 @@ Webitel.prototype.queueList = function (_caller, args, cb) {
         return;
     };
 
-    var _params = [
-        WebitelCommandTypes.CallCenter.Root,
-        WebitelCommandTypes.CallCenter.Create
+    if (!_domain || typeof _domain !== 'string') {
+        cb({
+            body: "-ERR Bad request: domain is required!"
+        });
+        return;
+    };
 
-    ];
+    var _params = WebitelCommandTypes.CallCenter.List + ' '.concat('@', _domain),
+        self = this
+        ;
 
-    if (args.hasOwnProperty('params')) {
-
-    }
+    this.api(WebitelCommandTypes.CallCenter.Root, [
+        _params
+    ], function (res) {
+        if (res['body'].indexOf('-ERR') == 0) {
+            cb(res);
+            return;
+        };
+        self._parsePlainTableToJSONArray(res.getBody(), function (err, resJSON) {
+            if (err) {
+                log.error(err);
+                cb({
+                    body: '-ERR ' + err.message
+                });
+                return;
+            }
+            cb({
+                body: resJSON
+            })
+        });
+    });
 
 };
-
-/*
-
- */
 
 Webitel.prototype.queueCreate = function (_caller, args, cb) {
     args = args || {};
     var _domain = args['domain'] || _caller['attr']['domain'];
-    if (!_caller || (_caller['attr']['role'].val < COMMAND_TYPES.Account.Create.perm ||
+
+    if (!_caller || (_caller['attr']['role'].val < COMMAND_TYPES.CallCenter.Create.perm ||
         (_caller['attr']['domain'] != _domain && _caller['attr']['role'].val != ACCOUNT_ROLE.ROOT.val))) {
         cb({
             body: PERMISSION_DENIED
@@ -501,15 +521,172 @@ Webitel.prototype.queueCreate = function (_caller, args, cb) {
         return;
     };
 
-    var _params = [
-        WebitelCommandTypes.CallCenter.Root,
-        WebitelCommandTypes.CallCenter.Create
+    if (!args['name'] || !_domain) {
+        cb({
+            body: "Bad request: name or domain is required!"
+        });
+        return;
+    };
 
-    ];
+    var _params = WebitelCommandTypes.CallCenter.Create + ' '
+        ;
 
-    if (args.hasOwnProperty('params')) {
+    if (args.hasOwnProperty('params') && args['params'] instanceof Array) {
+        _params = _params.concat('[', args['params'].join(','), ']');
+    };
+    _params = _params.concat(args['name'] + '@' + _domain);
 
-    }
+    this.api(WebitelCommandTypes.CallCenter.Root, [_params], cb);
+};
+
+Webitel.prototype.queueItem = function (_caller, args, cb) {
+    args = args || {};
+    var _domain = args['domain'] || _caller['attr']['domain'];
+
+    if (!_caller || (_caller['attr']['role'].val < COMMAND_TYPES.CallCenter.List.perm ||
+        (_caller['attr']['domain'] != _domain && _caller['attr']['role'].val != ACCOUNT_ROLE.ROOT.val))) {
+        cb({
+            body: PERMISSION_DENIED
+        });
+        return;
+    };
+
+    if (!args['name'] || !_domain) {
+        cb({
+            body: "-ERR Bad request: name or domain is required!"
+        });
+        return;
+    };
+
+    var _params = args['name'] + '@' + _domain,
+        self = this
+        ;
+    this.api(WebitelCommandTypes.CallCenter.Root, [_params], function (res) {
+        if (res['body'].indexOf('-ERR') == 0) {
+            cb(res);
+            return;
+        };
+
+        self._parsePlainCollectionToJSON(res.getBody(), function (err, resJSON) {
+            if (err) {
+                log.error(err);
+                cb({
+                    body: '-ERR ' + err.message
+                });
+                return;
+            }
+            cb({
+                body: resJSON
+            })
+        });
+    });
+};
+
+Webitel.prototype.queueUpdateItem = function (_caller, args, cb) {
+    args = args || {};
+    var _domain = args['domain'] || _caller['attr']['domain'];
+
+    if (!_caller || (_caller['attr']['role'].val < COMMAND_TYPES.CallCenter.List.perm ||
+        (_caller['attr']['domain'] != _domain && _caller['attr']['role'].val != ACCOUNT_ROLE.ROOT.val))) {
+        cb({
+            body: PERMISSION_DENIED
+        });
+        return;
+    };
+
+    if (!args['name'] || !_domain || !(args['params'] instanceof Object)) {
+        cb({
+            body: "-ERR Bad request: name, params or domain is required!"
+        });
+        return;
+    };
+
+    var _params = args['name'] + '@' + _domain + ' ',
+        self = this
+        ;
+
+    for (var key in args['params']) {
+        _params = _params.concat(key, '='
+            , args['params'][key] instanceof Object
+                ? ''
+                : String(args['params'][key])
+            , ',');
+    };
+
+    this.api(WebitelCommandTypes.CallCenter.Root, [_params], function (res) {
+        if (res['body'].indexOf('-ERR') == 0) {
+            cb(res);
+            return;
+        };
+
+        self._parsePlainCollectionToJSON(res.getBody(), function (err, resJSON) {
+            if (err) {
+                log.error(err);
+                cb({
+                    body: '-ERR ' + err.message
+                });
+                return;
+            }
+            cb({
+                body: resJSON
+            })
+        });
+    });
+};
+
+Webitel.prototype.queueDelete = function (_caller, args, cb) {
+    args = args || {};
+    var _domain = args['domain'] || _caller['attr']['domain'];
+
+    if (!_caller || (_caller['attr']['role'].val < COMMAND_TYPES.CallCenter.Delete.perm ||
+        (_caller['attr']['domain'] != _domain && _caller['attr']['role'].val != ACCOUNT_ROLE.ROOT.val))) {
+        cb({
+            body: PERMISSION_DENIED
+        });
+        return;
+    };
+
+    if (!args['name'] || !_domain) {
+        cb({
+            body: "-ERR Bad request: name or domain is required!"
+        });
+        return;
+    };
+
+    var _params = WebitelCommandTypes.CallCenter.Delete + ' ' + args['name'] + '@' + _domain
+        ;
+    this.api(WebitelCommandTypes.CallCenter.Root, [_params], cb);
+};
+
+Webitel.prototype.queueUpdateItemState = function (_caller, args, cb) {
+    args = args || {};
+    var _domain = args['domain'] || _caller['attr']['domain'];
+
+    if (!_caller || (_caller['attr']['role'].val < COMMAND_TYPES.CallCenter.State.perm ||
+        (_caller['attr']['domain'] != _domain && _caller['attr']['role'].val != ACCOUNT_ROLE.ROOT.val))) {
+        cb({
+            body: PERMISSION_DENIED
+        });
+        return;
+    };
+
+    if (!args['name'] || !_domain) {
+        cb({
+            body: "-ERR Bad request: name or domain is required!"
+        });
+        return;
+    };
+
+    if (['enable', 'disable'].indexOf(args['state']) == -1) {
+        cb({
+            body: "-ERR Bad request: state " + args['state'] + ' inexplicable!'
+        });
+        return;
+    };
+
+    var _params = args['state'] + ' ' + args['name'] + '@' + _domain
+        ;
+    this.api(WebitelCommandTypes.CallCenter.Root, [_params], cb);
 };
 // TODO mod_cc END
 
@@ -868,6 +1045,7 @@ var WebitelCommandTypes = {
 
     CallCenter: {
         Root: 'callcenter_config queue',
+        List: 'list',
         Create: 'create',
         Delete: 'delete',
         Enable: 'enable',
@@ -958,3 +1136,55 @@ Webitel.prototype._parsePlainTableToJSON = function(data, domain, cb) {
     };
 };
 /*  */
+
+Webitel.prototype._parsePlainTableToJSONArray = function(data, cb) {
+    if (!data) {
+        cb('Data is undefined!');
+        return
+    };
+    try {
+        var _line,
+            _head,
+            _json = [],
+            _item;
+
+        _line = data.split('\n');
+        _head = _line[0].split('\t');
+        for (var i = 2; i < _line.length && _line[i] != const_DataSeparator; i++) {
+            _item = {};
+            _line[i].split('\t').reduce(function (_item, line, index) {
+                _item[_head[index]] = line.trim();
+                return _item;
+            }, _item);
+
+            _json.push(_item);
+        };
+        cb(null, _json);
+    } catch (e) {
+        cb(e);
+    };
+};
+/*  */
+
+Webitel.prototype._parsePlainCollectionToJSON = function (data, cb) {
+    if (!data) {
+        cb('Data is undefined!');
+        return
+    };
+
+    try {
+
+        var _json = {},
+            lines = data.split('\n'),
+            line;
+
+        for (var i = 0, len = lines.length; i < len; i++) {
+            line = lines[i].split('=');
+            _json[line[0]] = line[1];
+        };
+
+        cb(null, _json);
+    } catch (e) {
+        cb(e['message']);
+    }
+}

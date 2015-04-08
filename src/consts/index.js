@@ -229,9 +229,24 @@ module.exports.WebitelCommandTypes = {
     },
 
     CallCenter: {
+        List: {
+            name: "",
+            perm: 1
+        },
+
         Create: {
             name: "",
-            perm: ""
+            perm: 1
+        },
+
+        Delete: {
+            name: "",
+            perm: 1
+        },
+
+        State: {
+            name: "",
+            perm: 1
         }
     }
 };
