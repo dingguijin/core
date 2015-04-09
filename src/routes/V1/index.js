@@ -20,6 +20,8 @@ module.exports = function (app) {
     app.post('/api/v1/channels', require('./calls').Originate);
     app.post('/api/v1/fake', require('./calls').fakeCall);
     app.delete('/api/v1/channels', require('./calls').HupAll);
+    app.delete('/api/v1/channels/:domain', require('./calls').KillChannelsFromDomain);
+
     app.delete('/api/v1/channels/:id', require('./calls').KillUuid);
     app.put('/api/v1/channels/:id', require('./calls').ChangeState);
 };

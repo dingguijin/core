@@ -37,6 +37,45 @@ module.exports.Originate = function (req, res, next) {
     });
 };
 
+module.exports.KillChannelsFromDomain =  function (req, res, next) {
+    try {
+        var _item = '',
+            _domain = req.params['domain'];
+        if (req.webitelUser && req.webitelUser['attr'] && req.webitelUser['attr']['domain']) {
+            _domain = req.webitelUser['attr']['domain']
+        };
+        if (_domain) {
+            _item = ' like %@' + _domain;
+        };
+        eslConn.show('channels' + _item, 'json', function (err, parsed) {
+            if (err)
+                return res.status(500).json(rUtil.getRequestObject('error', err.message));
+            try {
+                if (parsed && parsed['rows']) {
+                    for (var i = 0, len = parsed['rows'].length; i < len; i++) {
+                        eslConn.bgapi('uuid_kill ' + parsed['rows'][i]['uuid']);
+                    }
+                    ;
+                    res.status(200).json({
+                        "status": "OK",
+                        "data": "Command send."
+                    });
+                } else {
+                    res.status(200).json({
+                        "status": "OK",
+                        "data": "No channels."
+                    });
+                }
+                ;
+            } catch (e) {
+                next(e);
+            };
+        });
+    } catch (e) {
+        next(e);
+    };
+};
+
 module.exports.fakeCall = function (req, res, next) {
     var number = req.body.number || '',
         displayNumber = req.body.displayNumber || '00000',
