@@ -1187,4 +1187,4 @@ Webitel.prototype._parsePlainCollectionToJSON = function (data, cb) {
     } catch (e) {
         cb(e['message']);
     }
-}
+};

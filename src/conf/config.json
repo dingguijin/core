@@ -15,6 +15,7 @@
         "uri": "mongodb://pre.webitel.com:27017/webitel",
         "collectionPublic": "public",
         "collectionDefault": "default",
+        "collectionExtension": "extension",
         "collectionSystem": "global",
         "collectionAuth": "authToken",
         "collectionCalendar": "calendar"
@@ -36,7 +37,7 @@
         "host": "http://10.10.10.127:10021"
     },
     "application": {
-        "loglevel": "trace",
+        "loglevel": "error",
         "logstash": {
             "enabled": false,
             "host": "LOGSTASH_HOST",
@@ -62,7 +63,8 @@
             "CHANNEL_UNBRIDGE",
             "CHANNEL_UUID",
             "DTMF",
-            "CHANNEL_DATA"
+            "CHANNEL_DATA",
+            "CUSTOM callcenter::info"
         ]
     }
 }

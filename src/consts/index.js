@@ -247,6 +247,16 @@ module.exports.WebitelCommandTypes = {
         State: {
             name: "",
             perm: 1
+        },
+
+        Login: {
+            name: "cc login",
+            perm: 0
+        },
+
+        Logout: {
+            name: "cc logout",
+            perm: 0
         }
     }
 };
@@ -285,3 +295,19 @@ ACCOUNT_ROLE.getRoleFromName = function (name) {
             return null;
     }
 };
+
+module.exports.ACCOUNT_SATUS_TYPE = {
+    READY: "ONHOOK",
+    BUSY: "ISBUSY",
+    UNREGISTER: "NONREG"
+};
+
+module.exports.ACCOUNT_STATE_TYPE = {
+    NONE: "NONE",
+    DND: "DND"
+};
+
+module.exports.WEBITEL_EVENT_NAME_TYPE = {
+    USER_STATE: "USER_STATE",
+    USER_STATUS: "USER_STATUS"
+}
