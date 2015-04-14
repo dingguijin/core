@@ -688,6 +688,113 @@ Webitel.prototype.queueUpdateItemState = function (_caller, args, cb) {
         ;
     this.api(WebitelCommandTypes.CallCenter.Root, [_params], cb);
 };
+
+Webitel.prototype.tierCreate = function (_caller, args, cb) {
+    args = args || {};
+    var _domain = args['domain'] || _caller['attr']['domain'];
+
+    if (!_caller || (_caller['attr']['role'].val < COMMAND_TYPES.CallCenter.Tier.Create.perm ||
+        (_caller['attr']['domain'] != _domain && _caller['attr']['role'].val != ACCOUNT_ROLE.ROOT.val))) {
+        cb({
+            body: PERMISSION_DENIED
+        });
+        return;
+    };
+
+    if (!args['queue'] || !args['agent'] ||!_domain) {
+        cb({
+            body: "-ERR Bad request: queue, agent or domain is required!"
+        });
+        return;
+    };
+
+    var _params = 'tier add '.concat(args['queue'], '@', _domain, ' ', args['agent'],
+        '@', _domain);
+    if (args['level'])
+        _params += ' ' + args['level']
+        ;
+
+    if (args['position'])
+        _params += ' ' + args['position']
+        ;
+    this.api(WebitelCommandTypes.CallCenter.Root, [_params], cb);
+};
+
+Webitel.prototype.tierSetLvl = function (_caller, args, cb) {
+    args = args || {};
+    var _domain = args['domain'] || _caller['attr']['domain'];
+
+    if (!_caller || (_caller['attr']['role'].val < COMMAND_TYPES.CallCenter.Tier.SetLvl.perm ||
+        (_caller['attr']['domain'] != _domain && _caller['attr']['role'].val != ACCOUNT_ROLE.ROOT.val))) {
+        cb({
+            body: PERMISSION_DENIED
+        });
+        return;
+    };
+
+    if (!args['level'] || !args['queue'] || !args['agent'] || !_domain) {
+        cb({
+            body: "-ERR Bad request: level, queue, agent or domain is required!"
+        });
+        return;
+    };
+
+    var _params = 'tier set level '.concat(args['queue'], '@', _domain, ' ', args['agent'],
+        '@', _domain, ' ', args['level']);
+
+    this.api(WebitelCommandTypes.CallCenter.Root, [_params], cb);
+};
+
+Webitel.prototype.tierSetPos = function (_caller, args, cb) {
+    args = args || {};
+    var _domain = args['domain'] || _caller['attr']['domain'];
+
+    if (!_caller || (_caller['attr']['role'].val < COMMAND_TYPES.CallCenter.Tier.SetPos.perm ||
+        (_caller['attr']['domain'] != _domain && _caller['attr']['role'].val != ACCOUNT_ROLE.ROOT.val))) {
+        cb({
+            body: PERMISSION_DENIED
+        });
+        return;
+    };
+
+    if (!args['position'] || !args['queue'] || !args['agent'] || !_domain) {
+        cb({
+            body: "-ERR Bad request: position, queue, agent or domain is required!"
+        });
+        return;
+    };
+
+    var _params = 'tier set position '.concat(args['queue'], '@', _domain, ' ', args['agent'],
+        '@', _domain, ' ', args['position']);
+
+    this.api(WebitelCommandTypes.CallCenter.Root, [_params], cb);
+};
+
+Webitel.prototype.tierRemove = function (_caller, args, cb) {
+    args = args || {};
+    var _domain = args['domain'] || _caller['attr']['domain'];
+
+    if (!_caller || (_caller['attr']['role'].val < COMMAND_TYPES.CallCenter.Tier.Delete.perm ||
+        (_caller['attr']['domain'] != _domain && _caller['attr']['role'].val != ACCOUNT_ROLE.ROOT.val))) {
+        cb({
+            body: PERMISSION_DENIED
+        });
+        return;
+    };
+
+    if (!args['queue'] || !args['agent'] || !_domain) {
+        cb({
+            body: "-ERR Bad request: queue, agent or domain is required!"
+        });
+        return;
+    };
+
+    var _params = 'tier del '.concat(args['queue'], '@', _domain, ' ', args['agent'],
+        '@', _domain);
+
+    this.api(WebitelCommandTypes.CallCenter.Root, [_params], cb);
+};
+
 // TODO mod_cc END
 
 Webitel.prototype.deviceList = function(_caller, domain, cb) {

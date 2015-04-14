@@ -4,12 +4,9 @@
 
 var conf = require('../../conf'),
     log = require('../../lib/log')(module),
-    CC_STATE = require('./const').CC_STATE,
-    CC_STATUS = require('./const').CC_STATUS,
-    W_STATUS = require('../../consts').ACCOUNT_SATUS_TYPE,
-    W_STATE = require('../../consts').ACCOUNT_STATE_TYPE,
     WEBITEL_EVENT_NAME_TYPE = require('../../consts').WEBITEL_EVENT_NAME_TYPE
     ;
+
 log.info('Call center load.');
 var CC = function (conn) {
     this.connection = conn;
@@ -29,7 +26,7 @@ CC.prototype._onEvent = function (e) {
     var jEvent = JSON.parse(e.serialize('json')),
         user = jEvent['CC-Agent'] && jEvent['CC-Agent'].split('@')
         ;
-    console.dir(jEvent);
+    //console.dir(jEvent);
 
     switch (jEvent['CC-Action']) {
         case 'agent-state-change':
@@ -53,13 +50,11 @@ CC.prototype._onEvent = function (e) {
 
 CC.prototype.setAttributesEvent = function (ccEvent, user) {
     if (ccEvent['CC-Action'] == 'agent-state-change') {
-        ccEvent['User-State'] = this.getWState(ccEvent['CC-Agent-State']);
         ccEvent['Event-Name'] = WEBITEL_EVENT_NAME_TYPE.USER_STATE;
-        this.setWebitelUserAttribute(ccEvent, user);
+        this.setWebitelUserAttribute(ccEvent, user[1], user[0]);
     } else if (ccEvent['CC-Action'] == 'agent-status-change') {
-        ccEvent['User-Status'] = this.getWStatus(ccEvent['CC-Agent-Status']);
         ccEvent['Event-Name'] = WEBITEL_EVENT_NAME_TYPE.USER_STATUS;
-        this.setWebitelUserAttribute(ccEvent, user);
+        this.setWebitelUserAttribute(ccEvent, user[1], user[0]);
     } else {
         ccEvent['Event-Name'] = null;
     };
@@ -74,6 +69,7 @@ CC.prototype.readyAgent = function (_user, opt, cb) {
         if (getResponseOK(res)) {
             eslConn.bgapi('callcenter_config agent set state ' + _user['id'] + " 'Waiting'", function (res) {
                 if (getResponseOK(res)) {
+                    _user.delEventGroup('webitel');
                     _user['cc-logged'] = true;
                     _user['cc'] = {};
                 };
@@ -83,6 +79,14 @@ CC.prototype.readyAgent = function (_user, opt, cb) {
             cb(res);
         }
     });
+};
+
+CC.prototype.busyAgent = function (_user, opt, cb) {
+    var state = opt['state']
+        ? "'" + opt['state'] + "'"
+        : "'Idle'";
+
+    eslConn.bgapi('callcenter_config agent set state ' + _user['id'] + " " + state, cb);
 };
 
 function getResponseOK (res) {
@@ -97,30 +101,11 @@ CC.prototype.setWebitelUserAttribute = function (event, domainName, userId) {
     event["Event-Domain"] =  domainName;
     event["User-ID"] = userId;
     event["User-Domain"] = domainName;
-    event["User-Scheme"] = "account";
-    event["webitel-event-name"] = "user";
+    event["webitel-event-name"] = "cc";
 };
 
 CC.prototype._onAuth = function () {
     this._subscribeESL();
-};
-
-CC.prototype.getWStatus = function (cc_status) {
-    if (cc_status == CC_STATUS.AVAILABLE || cc_status == CC_STATUS.AVAILABLE_ON_DEMAND) {
-        return W_STATUS.READY;
-    } else if (cc_status == CC_STATUS.ON_BREAK) {
-        return W_STATUS.BUSY;
-    } else if (CC_STATUS.LOGGED_OUT) {
-        // todo шожеделать
-    } else {
-        // todo шожеделать
-    }
-};
-
-CC.prototype.getWState = function (cc_state) {
-    if (cc_state == CC_STATE.WAITING)
-        return W_STATE.NONE;
-    return W_STATE.DND;
 };
 
 

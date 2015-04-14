@@ -58,4 +58,9 @@ module.exports = function (app) {
     app.put('/api/v2/callcenter/queues/:name', callcenter.Update);
     app.put('/api/v2/callcenter/queues/:name/:state', callcenter.SetState);
     app.delete('/api/v2/callcenter/queues/:name', callcenter.Delete);
+
+    app.post('/api/v2/callcenter/queues/:queue/tiers', callcenter.PostTier);
+    app.put('/api/v2/callcenter/queues/:queue/tiers/:agent/level', callcenter.PutLevel);
+    app.put('/api/v2/callcenter/queues/:queue/tiers/:agent/position', callcenter.PutPosition);
+    app.delete('/api/v2/callcenter/queues/:queue/tiers/:agent', callcenter.DeleteTier);
 };

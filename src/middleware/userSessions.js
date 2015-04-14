@@ -5,7 +5,6 @@ var HashCollection = require('../lib/HashCollection'),
     ACCOUNT_EVENTS = require('../consts').ACCOUNT_EVENTS,
     eventsCollection = require('./EventsCollection');
 
-
 Domains.broadcast = function (domainName, event) {
     if (!domainName || !event) return;
     var _domain,

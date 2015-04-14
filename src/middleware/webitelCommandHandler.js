@@ -8,7 +8,8 @@ var WebitelCommandTypes = require('../consts').WebitelCommandTypes,
     checkUser = require('../middleware/checkUser'),
     eventCollection = require('./EventsCollection'),
     ACCOUNT_EVENTS = require('../consts').ACCOUNT_EVENTS,
-    handleSocketError = require('../middleware/handleSocketError');
+    handleSocketError = require('../middleware/handleSocketError'),
+    User = require('../lib/User');
 
 commandEmitter.on('wss::' + WebitelCommandTypes.Auth.name, function (execId, args, ws) {
     checkUser(args['account'], args['secret'], function (err, userParam) {
@@ -31,12 +32,17 @@ commandEmitter.on('wss::' + WebitelCommandTypes.Auth.name, function (execId, arg
                 ws['upgradeReq']['webitelId'] = webitelId;
                 var user = Users.get(webitelId);
                 if (!user) {
-                    Users.add(webitelId, {
+                    user = new User(args['account'], ws, {
+                        attr: userParam,
+                        logged: false
+                    });
+                    Users.add(webitelId, user);
+                    /*Users.add(webitelId, {
                         ws: [ws],
                         id: args['account'],
                         logged: false,
                         attr: userParam
-                    });
+                    });*/
                 } else {
                     user['attr'] = userParam;
                     user.ws.push(ws);
@@ -49,7 +55,8 @@ commandEmitter.on('wss::' + WebitelCommandTypes.Auth.name, function (execId, arg
                     'exec-response': {
                         'login': webitelId,
                         'role': userParam.role.name,
-                        'domain': userParam.domain
+                        'domain': userParam.domain,
+                        'cc-agent': userParam['cc-agent']
                     }
                 }));
             } catch (e) {

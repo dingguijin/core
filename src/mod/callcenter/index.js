@@ -1,7 +1,8 @@
 var CC = require('./callcenter'),
     WebitelCommandTypes = require('../../consts').WebitelCommandTypes,
     cc,
-    handleSocketError = require('../../middleware/handleSocketError');
+    handleSocketError = require('../../middleware/handleSocketError'),
+    log = require('../../lib/log')(module);
 
 try {
     commandEmitter.on('sys::esl_create', function () {
@@ -10,10 +11,18 @@ try {
         cc = new CC(eslConn);
     });
     
-    commandEmitter.on('wss::' + WebitelCommandTypes.CallCenter.Login.name, function (execId, args, ws) {
-        var _caller = doSendCCCommand(execId, ws, WebitelCommandTypes.CallCenter.Login);
+    commandEmitter.on('wss::' + WebitelCommandTypes.CallCenter.Ready.name, function (execId, args, ws) {
+        var _caller = doSendCCCommand(execId, ws, WebitelCommandTypes.CallCenter.Ready);
         if (!_caller) return;
         cc.readyAgent(_caller, {status: args['status']}, function(res) {
+            getCommandResponseJSON(ws, execId, res);
+        });
+    });
+
+    commandEmitter.on('wss::' + WebitelCommandTypes.CallCenter.Busy.name, function (execId, args, ws) {
+        var _caller = doSendCCCommand(execId, ws, WebitelCommandTypes.CallCenter.Busy);
+        if (!_caller) return;
+        cc.busyAgent(_caller, {state: args['state']}, function(res) {
             getCommandResponseJSON(ws, execId, res);
         });
     });

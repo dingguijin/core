@@ -76,6 +76,66 @@ var API = {
             && request['body'].indexOf('-ERR') == 0)
                 ? "error" : "OK", request['body'], ''));
         });
+    },
+
+    PostTier: function (req, res, next) {
+        if (!webitel.doSendCommandV2(res)) return;
+        var _q = {
+            "queue": req.params['queue'],
+            "agent": req.body['agent'],
+            "domain": req.query['domain'],
+            "level": req.body['level'],
+            "position": req.body['position']
+        };
+        webitel.tierCreate(req.webitelUser, _q, function (request) {
+            res.status(200).json(rUtil.getRequestObject((request['body'] && typeof request['body'] === 'string'
+            && request['body'].indexOf('-ERR') == 0)
+                ? "error" : "OK", request['body'], ''));
+        });
+    },
+
+    PutLevel: function (req, res, next) {
+        if (!webitel.doSendCommandV2(res)) return;
+        var _q = {
+            "queue": req.params['queue'],
+            "agent": req.params['agent'],
+            "domain": req.query['domain'],
+            "level": req.body['level']
+        };
+        webitel.tierSetLvl(req.webitelUser, _q, function (request) {
+            res.status(200).json(rUtil.getRequestObject((request['body'] && typeof request['body'] === 'string'
+            && request['body'].indexOf('-ERR') == 0)
+                ? "error" : "OK", request['body'], ''));
+        });
+    },
+
+    PutPosition: function (req, res, next) {
+        if (!webitel.doSendCommandV2(res)) return;
+        var _q = {
+            "queue": req.params['queue'],
+            "agent": req.params['agent'],
+            "domain": req.query['domain'],
+            "position": req.body['position']
+        };
+        webitel.tierSetPos(req.webitelUser, _q, function (request) {
+            res.status(200).json(rUtil.getRequestObject((request['body'] && typeof request['body'] === 'string'
+            && request['body'].indexOf('-ERR') == 0)
+                ? "error" : "OK", request['body'], ''));
+        });
+    },
+
+    DeleteTier: function (req, res, next) {
+        if (!webitel.doSendCommandV2(res)) return;
+        var _q = {
+            "queue": req.params['queue'],
+            "agent": req.params['agent'],
+            "domain": req.query['domain']
+        };
+        webitel.tierRemove(req.webitelUser, _q, function (request) {
+            res.status(200).json(rUtil.getRequestObject((request['body'] && typeof request['body'] === 'string'
+            && request['body'].indexOf('-ERR') == 0)
+                ? "error" : "OK", request['body'], ''));
+        });
     }
 };
 

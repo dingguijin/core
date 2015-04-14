@@ -4,7 +4,7 @@ var conf = require('../conf'),
     handleSocketError = require('../middleware/handleSocketError'),
     generateUuid = require('node-uuid')
     ;
-var heapdump = require("heapdump");
+//var heapdump = require("heapdump");
 
 function writeEndSnapshot () {
     setTimeout(function () {
@@ -19,10 +19,9 @@ function writeEndSnapshot () {
 
 module.exports = function (wss) {
     wss.on('connection', function(ws) {
-
-        heapdump.writeSnapshot(__dirname + "/initial.heapsnapshot", function writeInitialSnapshot () {
-            console.log("Wrote initial heap snapshot");
-        });
+        //heapdump.writeSnapshot(__dirname + "/initial.heapsnapshot", function writeInitialSnapshot () {
+        //    console.log("Wrote initial heap snapshot");
+        //});
 
         ws['webitelSessionId'] = generateUuid.v4();
 
@@ -40,10 +39,10 @@ module.exports = function (wss) {
                     }
                 }
             }, socketTimeUnauthorized * 1000);
-        }
+        };
+
         ws.on('message', function(message) {
             log.trace('received: %s', message);
-            console.log(process.memoryUsage().heapUsed);
             try {
                 var msg = JSON.parse(message);
                 var execId = msg['exec-uuid'];
@@ -75,7 +74,6 @@ module.exports = function (wss) {
                         };
                     };
                 };
-                writeEndSnapshot();
             } catch (e) {
                 log.error(e);
             }

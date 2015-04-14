@@ -249,14 +249,41 @@ module.exports.WebitelCommandTypes = {
             perm: 1
         },
 
-        Login: {
-            name: "cc login",
+        Ready: {
+            name: "cc ready",
+            perm: 0
+        },
+
+        Busy: {
+            name: "cc busy",
             perm: 0
         },
 
         Logout: {
             name: "cc logout",
             perm: 0
+        },
+
+        Tier: {
+            Create: {
+                name: "cc tier create",
+                perm: 1
+            },
+
+            SetLvl: {
+                name: "cc tier set lvl",
+                perm: 1
+            },
+
+            SetPos: {
+                name: "cc tier set pos",
+                perm: 1
+            },
+
+            Delete: {
+                name: "cc tier del",
+                perm: 1
+            }
         }
     }
 };
@@ -308,6 +335,6 @@ module.exports.ACCOUNT_STATE_TYPE = {
 };
 
 module.exports.WEBITEL_EVENT_NAME_TYPE = {
-    USER_STATE: "USER_STATE",
-    USER_STATUS: "USER_STATUS"
+    USER_STATE: "CC_AGENT_STATE",
+    USER_STATUS: "CC_AGENT_STATUS"
 }
