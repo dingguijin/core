@@ -30,7 +30,7 @@ describe('Routing', function() {
         it('Вход пользователя ROOT', function(done) {
             var profile = {
                 username: 'root',
-                password: 'ROOT_PASSWORD'
+                password: ''
             };
             request(url)
                 .post('/login')
@@ -253,7 +253,7 @@ describe('Routing', function() {
                 'func': 'auth',
                 'args': {
                     'account': 'root',
-                    'secret': 'ROOT_PASSWORD'
+                    'secret': ''
                 }
             };
             exec(uuid.v4(), _login, function (res) {

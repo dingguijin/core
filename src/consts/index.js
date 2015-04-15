@@ -226,6 +226,65 @@ module.exports.WebitelCommandTypes = {
             name: "unsubscribe",
             perm: 0
         }
+    },
+
+    CallCenter: {
+        List: {
+            name: "",
+            perm: 1
+        },
+
+        Create: {
+            name: "",
+            perm: 1
+        },
+
+        Delete: {
+            name: "",
+            perm: 1
+        },
+
+        State: {
+            name: "",
+            perm: 1
+        },
+
+        Ready: {
+            name: "cc ready",
+            perm: 0
+        },
+
+        Busy: {
+            name: "cc busy",
+            perm: 0
+        },
+
+        Logout: {
+            name: "cc logout",
+            perm: 0
+        },
+
+        Tier: {
+            Create: {
+                name: "cc tier create",
+                perm: 1
+            },
+
+            SetLvl: {
+                name: "cc tier set lvl",
+                perm: 1
+            },
+
+            SetPos: {
+                name: "cc tier set pos",
+                perm: 1
+            },
+
+            Delete: {
+                name: "cc tier del",
+                perm: 1
+            }
+        }
     }
 };
 
@@ -263,3 +322,19 @@ ACCOUNT_ROLE.getRoleFromName = function (name) {
             return null;
     }
 };
+
+module.exports.ACCOUNT_SATUS_TYPE = {
+    READY: "ONHOOK",
+    BUSY: "ISBUSY",
+    UNREGISTER: "NONREG"
+};
+
+module.exports.ACCOUNT_STATE_TYPE = {
+    NONE: "NONE",
+    DND: "DND"
+};
+
+module.exports.WEBITEL_EVENT_NAME_TYPE = {
+    USER_STATE: "CC_AGENT_STATE",
+    USER_STATUS: "CC_AGENT_STATUS"
+}

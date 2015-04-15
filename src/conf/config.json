@@ -16,6 +16,7 @@
         "collectionPublic": "public",
         "collectionDefault": "default",
         "collectionSystem": "global",
+        "collectionExtension": "extension",
         "collectionAuth": "authToken",
         "collectionCalendar": "calendar"
     },
@@ -62,7 +63,8 @@
             "CHANNEL_UNBRIDGE",
             "CHANNEL_UUID",
             "DTMF",
-            "CHANNEL_DATA"
+            "CHANNEL_DATA",
+            "CUSTOM callcenter::info"
         ]
     }
 }

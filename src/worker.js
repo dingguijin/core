@@ -1,4 +1,12 @@
 var userSessions = require('./middleware/userSessions');
+var CommandEmitter = require('./lib/CommandEmitter');
+var commandEmitter = global.commandEmitter = new CommandEmitter();
+
+require('./middleware/logo')();
+require('./middleware/webitelCommandHandler');
+require('./middleware/eslCommandHandler');
+require('./mod/callcenter');
+
 var Webitel = require('./lib/WebitelModule2');
 var log = require('./lib/log')(module);
 var conf = require('./conf');
@@ -7,8 +15,6 @@ var fs = require('fs');
 
 var webitel = global.webitel = null;
 var waitTimeReconnectWebitel = conf.get('webitelServer:reconnect') * 1000;
-
-require('./middleware/logo')();
 
 var mod_dialplan = require('./mod/dialplan');
 
@@ -95,7 +101,11 @@ var doConnectFreeSWITCH = function() {
     eslConn.on('esl::event::auth::success', function () {
         var ev = conf.get('application:freeSWITCHEvents');
         eslConnected = true;
-        eslConn.subscribe(ev);
+        eslConn.subscribe('ALL');
+        for (var key in ev) {
+            eslConn.filter('Event-Name', ev[key]);
+        };
+        //eslConn.subscribe(ev);
     });
 
     eslConn.on('esl::event::auth::fail', function () {
@@ -121,7 +131,9 @@ var doConnectFreeSWITCH = function() {
 
     eslConn.on('esl::event::**', require('./middleware/eslEvents').eventsHandle);
 
+    commandEmitter.emit('sys::esl_create');
 };
+
 doConnectFreeSWITCH();
 
 var wsOriginAllow = conf.get('server:socket:originHost');

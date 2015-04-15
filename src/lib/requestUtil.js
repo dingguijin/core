@@ -3,11 +3,12 @@
  */
 
 module.exports = {
-    getRequestObject: function (status, info, description) {
+    getRequestObject: function (status, info, description, data) {
         return {
             "status": status,
             "info": info,
-            "more info": description
+            "more info": description,
+            "data": data
         }
     }
 };
