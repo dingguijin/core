@@ -1,5 +1,5 @@
 /**
- * Created by i.navrotsktj on 09.04.2015.
+ * Created by i.navrotskyj on 09.04.2015.
  */
 
 var conf = require('../../conf'),
@@ -27,7 +27,7 @@ CC.prototype._onEvent = function (e) {
         user = jEvent['CC-Agent'] && jEvent['CC-Agent'].split('@')
         ;
     //console.dir(jEvent);
-
+/*
     switch (jEvent['CC-Action']) {
         case 'agent-state-change':
             var _user = Users.get(jEvent['CC-Agent']);
@@ -42,6 +42,7 @@ CC.prototype._onEvent = function (e) {
             };
             break;
     };
+    */
     this.setAttributesEvent(jEvent, user);
     if (jEvent['Event-Name'])
         Domains.broadcast(jEvent['Event-Domain'], jEvent);
@@ -69,7 +70,9 @@ CC.prototype.readyAgent = function (_user, opt, cb) {
         if (getResponseOK(res)) {
             eslConn.bgapi('callcenter_config agent set state ' + _user['id'] + " 'Waiting'", function (res) {
                 if (getResponseOK(res)) {
+                    // TODO переделать
                     _user.delEventGroup('webitel');
+
                     _user['cc-logged'] = true;
                     _user['cc'] = {};
                 };
