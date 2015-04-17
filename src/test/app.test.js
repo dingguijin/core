@@ -9,6 +9,7 @@ var uuid = require('node-uuid');
 describe('Routing', function() {
     var url = 'http://10.10.10.25:10022';
     var wsServer = 'ws://10.10.10.25:10022';
+    var ROOT_PASSWORD = 'ROOT_PASSWORD';
     var userCredentials = {};
     var testConfig = {
         domain: 'asd',
@@ -179,10 +180,68 @@ describe('Routing', function() {
                     }
                 });
         });
+        
+        it('Удалить домен', function (done) {
+            request(url)
+                .del('/api/v2/domains/' + testConfig.domain)
+                .set('x-key', userCredentials.key)
+                .set('x-access-token', userCredentials.token)
+                .expect('Content-Type', /json/)
+                .expect(200, function (err, res) {
+                    if (err) {
+                        throw err;
+                    };
+                    if (res.body.status === 'OK') {
+                        done();
+                    } else {
+                        throw 'Undef response'
+                    }
+                });
+        });
+
+        it('Выход пользователя ROOT', function (done) {
+            request(url)
+                .post('/logout')
+                .set('x-key', userCredentials.key)
+                .set('x-access-token', userCredentials.token)
+                .expect('Content-Type', /json/)
+                .expect(200, function (err, res) {
+                    if (err) {
+                        throw err;
+                    };
+                    if (res.body.status === 'OK') {
+                        done();
+                    } else {
+                        throw 'Undef response'
+                    }
+                });
+        });
 
 
         // TODO CC
         describe('MOD CC', function () {
+            it('Вход пользователя ROOT', function(done) {
+                var profile = {
+                    username: 'root',
+                    password: ROOT_PASSWORD
+                };
+                request(url)
+                    .post('/login')
+                    .send(profile)
+                    .end(function(err, res) {
+                        if (err) {
+                            throw err;
+                        };
+                        userCredentials = res.body;
+                        if (userCredentials && userCredentials.key) {
+                            done(null, res.body);
+                        } else {
+                            throw res.body.info
+                        }
+                        //console.dir(userCredentials)
+                    });
+            });
+
             it('Создать очередь.', function (done) {
                 var _r = {
                     name: testConfig.cc.queue,
@@ -223,44 +282,26 @@ describe('Routing', function() {
                         }
                     });
             });
-        });
-        
-        it('Удалить домен', function (done) {
-            request(url)
-                .del('/api/v2/domains/' + testConfig.domain)
-                .set('x-key', userCredentials.key)
-                .set('x-access-token', userCredentials.token)
-                .expect('Content-Type', /json/)
-                .expect(200, function (err, res) {
-                    if (err) {
-                        throw err;
-                    };
-                    if (res.body.status === 'OK') {
-                        done();
-                    } else {
-                        throw 'Undef response'
-                    }
-                });
-        });
 
-        it('Выход пользователя ROOT', function (done) {
-            request(url)
-                .post('/logout')
-                .set('x-key', userCredentials.key)
-                .set('x-access-token', userCredentials.token)
-                .expect('Content-Type', /json/)
-                .expect(200, function (err, res) {
-                    if (err) {
-                        throw err;
-                    };
-                    if (res.body.status === 'OK') {
-                        done();
-                    } else {
-                        throw 'Undef response'
-                    }
-                });
-        });
 
+            it('Выход пользователя ROOT', function (done) {
+                request(url)
+                    .post('/logout')
+                    .set('x-key', userCredentials.key)
+                    .set('x-access-token', userCredentials.token)
+                    .expect('Content-Type', /json/)
+                    .expect(200, function (err, res) {
+                        if (err) {
+                            throw err;
+                        };
+                        if (res.body.status === 'OK') {
+                            done();
+                        } else {
+                            throw 'Undef response'
+                        }
+                    });
+            });
+        });
     });
     
     describe('WSS', function () {

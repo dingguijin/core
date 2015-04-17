@@ -9,7 +9,9 @@ var url = require("url"),
 var API = {
     Create: function (req, res, next) {
         if (!webitel.doSendCommandV2(res)) return;
-        webitel.queueCreate(req.webitelUser, req.body, function (request) {
+        var _q = req.body;
+        _q['domain']= req.query['domain'];
+        webitel.queueCreate(req.webitelUser, _q, function (request) {
             res.status(200).json(rUtil.getRequestObject((request['body'] && request['body'].indexOf('-ERR') == 0)
                 ? "error" : "OK", request['body'], ''));
         });
