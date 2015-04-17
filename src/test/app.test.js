@@ -17,6 +17,9 @@ describe('Routing', function() {
             password: '100',
             role: 'admin'
         },
+        cc: {
+            queue: "AUTO_TEST_QUEUE"
+        },
         callNumber: '00'
     };
     before(function(done) {
@@ -30,7 +33,7 @@ describe('Routing', function() {
         it('Вход пользователя ROOT', function(done) {
             var profile = {
                 username: 'root',
-                password: ''
+                password: 'ROOT_PASSWORD'
             };
             request(url)
                 .post('/login')
@@ -176,6 +179,51 @@ describe('Routing', function() {
                     }
                 });
         });
+
+
+        // TODO CC
+        describe('MOD CC', function () {
+            it('Создать очередь.', function (done) {
+                var _r = {
+                    name: testConfig.cc.queue,
+                    params: ['i=0']
+                };
+                request(url)
+                    .post('/api/v2/callcenter/queues?' + testConfig.domain)
+                    .set('x-key', userCredentials.key)
+                    .set('x-access-token', userCredentials.token)
+                    .send(_r)
+                    .expect('Content-Type', /json/)
+                    .expect(200, function (err, res) {
+                        if (err) {
+                            throw err;
+                        };
+                        if (res.body.status === 'OK') {
+                            done();
+                        } else {
+                            throw 'Undef response'
+                        }
+                    });
+            });
+
+            it('Удалить очередь.', function (done) {
+                request(url)
+                    .del('/api/v2/callcenter/queues/' + testConfig.cc.queue + '?' + testConfig.domain)
+                    .set('x-key', userCredentials.key)
+                    .set('x-access-token', userCredentials.token)
+                    .expect('Content-Type', /json/)
+                    .expect(200, function (err, res) {
+                        if (err) {
+                            throw err;
+                        };
+                        if (res.body.status === 'OK') {
+                            done();
+                        } else {
+                            throw 'Undef response'
+                        }
+                    });
+            });
+        });
         
         it('Удалить домен', function (done) {
             request(url)
@@ -253,7 +301,7 @@ describe('Routing', function() {
                 'func': 'auth',
                 'args': {
                     'account': 'root',
-                    'secret': ''
+                    'secret': 'ROOT_PASSWORD'
                 }
             };
             exec(uuid.v4(), _login, function (res) {
@@ -315,8 +363,7 @@ describe('Routing', function() {
                 };
             });
         });
-
-
+        
         it ('Удалить домен', function (done) {
             var _e = {
                 'func': 'api domain remove',

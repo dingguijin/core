@@ -1,17 +1,18 @@
 var userSessions = require('./middleware/userSessions');
 var CommandEmitter = require('./lib/CommandEmitter');
 var commandEmitter = global.commandEmitter = new CommandEmitter();
-
-require('./middleware/logo')();
-require('./middleware/webitelCommandHandler');
-require('./middleware/eslCommandHandler');
-require('./mod/callcenter');
-
 var Webitel = require('./lib/WebitelModule2');
 var log = require('./lib/log')(module);
 var conf = require('./conf');
 var httpServ = (conf.get('ssl:enabled')) ? require('https') : require('http');
 var fs = require('fs');
+
+require('./middleware/logo')();
+require('./middleware/webitelCommandHandler');
+require('./middleware/eslCommandHandler');
+
+if (conf.get('application:callcenter'))
+    require('./mod/callcenter');
 
 var webitel = global.webitel = null;
 var waitTimeReconnectWebitel = conf.get('webitelServer:reconnect') * 1000;

@@ -57,7 +57,8 @@ module.exports.eventsHandle = function (event) {
                     "Bridge-B-Unique-ID": jsonEvent["Bridge-B-Unique-ID"],
                     "variable_originating_leg_uuid": jsonEvent["variable_originating_leg_uuid"],
                     "variable_webitel_att_xfer": jsonEvent["variable_webitel_att_xfer"],
-                    "variable_cc_queue": jsonEvent['variable_cc_queue']
+                    "variable_cc_queue": jsonEvent['variable_cc_queue'],
+                    "variable_webitel_data": jsonEvent['variable_webitel_data']
                 };
 
                 Users.sendObject(user, jsonRequest);

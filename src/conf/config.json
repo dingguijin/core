@@ -38,6 +38,7 @@
     },
     "application": {
         "loglevel": "LOGLEVEL",
+        "callcenter": true,
         "logstash": {
             "enabled": LOGSTASH_ENABLE,
             "host": "LOGSTASH_HOST",
