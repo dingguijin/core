@@ -7,7 +7,7 @@ var conf = require('./conf');
 var httpServ = (conf.get('ssl:enabled')) ? require('https') : require('http');
 var fs = require('fs');
 
-//require('./middleware/logo')();
+require('./middleware/logo')();
 require('./middleware/webitelCommandHandler');
 require('./middleware/eslCommandHandler');
 
