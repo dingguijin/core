@@ -5,7 +5,7 @@ var log = require('../lib/log')(module),
 module.exports.eventsHandle = function (event) {
     try {
         var jsonEvent = JSON.parse(event.serialize());
-        
+        //console.log(jsonEvent['Event-Name'] + '>>>'  + jsonEvent['Channel-Presence-ID'] + '>>>' + jsonEvent['variable_webitel_data']);
         // mod call
         if (jsonEvent['Event-Name'] == 'CHANNEL_DESTROY') {
             callHandler.onHandleCallDestroy(jsonEvent);
