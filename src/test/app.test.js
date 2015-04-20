@@ -244,41 +244,40 @@ describe('Routing', function() {
 
             it('Создать очередь.', function (done) {
                 var _r = {
-                    name: testConfig.cc.queue,
-                    params: ['i=0']
+                    name: testConfig.cc.queue
                 };
                 request(url)
-                    .post('/api/v2/callcenter/queues?' + testConfig.domain)
+                    .post('/api/v2/callcenter/queues?domain=' + testConfig.domain)
                     .set('x-key', userCredentials.key)
                     .set('x-access-token', userCredentials.token)
                     .send(_r)
                     .expect('Content-Type', /json/)
                     .expect(200, function (err, res) {
                         if (err) {
-                            throw err;
+                            return done(err);
                         };
-                        if (res.body.status === 'OK') {
+                        if (res.body.status == 'OK') {
                             done();
                         } else {
-                            throw 'Undef response'
+                            done(res.body);
                         }
                     });
             });
 
             it('Удалить очередь.', function (done) {
                 request(url)
-                    .del('/api/v2/callcenter/queues/' + testConfig.cc.queue + '?' + testConfig.domain)
+                    .del('/api/v2/callcenter/queues/' + testConfig.cc.queue + '?domain=' + testConfig.domain)
                     .set('x-key', userCredentials.key)
                     .set('x-access-token', userCredentials.token)
                     .expect('Content-Type', /json/)
                     .expect(200, function (err, res) {
                         if (err) {
-                            throw err;
+                            done(err);
                         };
-                        if (res.body.status === 'OK') {
+                        if (res.body.status == 'OK') {
                             done();
                         } else {
-                            throw 'Undef response'
+                            done(res.body);
                         }
                     });
             });

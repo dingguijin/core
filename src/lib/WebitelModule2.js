@@ -523,7 +523,7 @@ Webitel.prototype.queueCreate = function (_caller, args, cb) {
 
     if (!args['name'] || !_domain) {
         cb({
-            body: "Bad request: name or domain is required!"
+            body: "-ERR: Bad request: name or domain is required!"
         });
         return;
     };

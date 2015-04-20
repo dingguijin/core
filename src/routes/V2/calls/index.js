@@ -112,7 +112,7 @@ var Calls = {
         var number = req.body.number || '',
             displayNumber = req.body.displayNumber || '00000',
             dialString =  ''.concat('originate ', '[origination_caller_id_number=', displayNumber, ']', 'user/', number,
-                ' &bridge(sofia/external/888@conference.freeswitch.org)')
+                ' &bridge(sofia/external/test_terrasoft@switch-d1.webitel.com)')
             ;
         eslConn.bgapi(dialString, function (result) {
             sendResponse(result, res, "https://docs.webitel.com/display/SDKRU/REST+API+v1#RESTAPIv1-Создатьканал.");

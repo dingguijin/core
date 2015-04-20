@@ -12,8 +12,12 @@ var API = {
         var _q = req.body;
         _q['domain']= req.query['domain'];
         webitel.queueCreate(req.webitelUser, _q, function (request) {
-            res.status(200).json(rUtil.getRequestObject((request['body'] && request['body'].indexOf('-ERR') == 0)
-                ? "error" : "OK", request['body'], ''));
+            res.status(200).json({
+                "status": request['body'] && request['body'].indexOf('-ERR') == 0 ? "error" : "OK",
+                "info": request['body']
+            });
+            //res.status(200).json(rUtil.getRequestObject((request['body'] && request['body'].indexOf('-ERR') == 0)
+            //    ? "error" : "OK", request['body'], ''));
         });
     },
 

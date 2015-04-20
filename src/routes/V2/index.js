@@ -61,7 +61,7 @@ module.exports = function (app) {
     app.put('/api/v2/callcenter/queues/:name', callcenter.Update);
     // TODO PATCH !!!
     app.put('/api/v2/callcenter/queues/:name/:state', callcenter.SetState);
-    app.delete('/api/v2/callcenter/queues/:name', callcenter.Delete);
+    app.delete('/api/v2/callcenter/queues/:name?:domain', callcenter.Delete);
 
     app.post('/api/v2/callcenter/queues/:queue/tiers', callcenter.PostTier);
     // TODO PATCH !!!
