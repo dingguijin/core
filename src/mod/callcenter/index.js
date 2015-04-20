@@ -5,6 +5,20 @@ var CC = require('./callcenter'),
     log = require('../../lib/log')(module);
 
 try {
+    Users.on('removed', function (e) {
+        try {
+            if (e['id'] && e['attr'] && e.attr['cc-agent']) {
+                cc.logoutUser(e, function (res) {
+                    log.trace((res && res['body'] && res.body.indexOf('+OK') === 0)
+                        ? "Success logout cc " +  e['id']
+                        : "Error: " + res.body);
+                });
+            };
+        } catch (e){
+            log.error(e['message']);
+        }
+    });
+
     commandEmitter.on('sys::esl_create', function () {
         if (cc)
             delete cc;
