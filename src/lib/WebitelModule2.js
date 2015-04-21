@@ -391,10 +391,19 @@ Webitel.prototype.userCreate = function(_caller, role, _param, cb) {
             body: PERMISSION_DENIED
         });
         return;
+    };
+
+    if (!role) {
+        cb({
+            body: "ROLE is require."
+        });
+        return;
+    } else {
+        role += ',webrtc';
     }
 
     this.api(WebitelCommandTypes.Account.Create, [
-        role || '',
+        role,
         _param || ''
     ], cb);
    /* var cmd = new WebitelCommand(WebitelCommandTypes.Account.Create, {
