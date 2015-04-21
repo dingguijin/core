@@ -28,6 +28,6 @@ module.exports.GetRedirectUrl = function (req, res, next) {
     };
     res.status(200).json({
         "status": "OK",
-        "info": CDR_SERVER_HOST + req.originalUrl
+        "info": CDR_SERVER_HOST + req.originalUrl.replace(/(\/api\/v2\/)(r\/)/, '$1')
     });
 };
