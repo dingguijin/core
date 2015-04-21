@@ -9,7 +9,7 @@ if (CDR_SERVER_HOST) {
     CDR_SERVER_HOST = CDR_SERVER_HOST.replace(/\/$/g, '');
 };
 
-module.exports = function (req, res, next) {
+module.exports.Redirect = function (req, res, next) {
     if (!CDR_SERVER_HOST) {
         return res.status(500).json({
             "status": "error",
@@ -17,4 +17,17 @@ module.exports = function (req, res, next) {
         });
     };
     res.redirect(307, CDR_SERVER_HOST + req.originalUrl);
+};
+
+module.exports.GetRedirectUrl = function (req, res, next) {
+    if (!CDR_SERVER_HOST) {
+        return res.status(500).json({
+            "status": "error",
+            "info": "Not config CDR_SERVER_HOST"
+        });
+    };
+    res.status(200).json({
+        "status": "OK",
+        "info": CDR_SERVER_HOST + req.originalUrl
+    });
 };
