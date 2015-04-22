@@ -225,9 +225,13 @@ var ConnectionStatus = {
     Disconnected: 2
 };
 
-Webitel.prototype.domainCreate = function(_caller, name, customerId, cb) {
+Webitel.prototype.domainCreate = function(_caller, name, customerId, parameters, cb) {
+    var param = '';
+    if (parameters instanceof Array) {
+        param = '[' + parameters.join(',') + ']';
+    };
     this.api(WebitelCommandTypes.Domain.Create, [
-        '\"' + name + '\"',
+        param + name,
         customerId || ''
     ], cb);
     /*var command = new WebitelCommand(WebitelCommandTypes.Domain.Create, {

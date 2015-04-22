@@ -203,7 +203,7 @@ commandEmitter.on('wss::' + WebitelCommandTypes.Domain.List.name, function (exec
 commandEmitter.on('wss::' + WebitelCommandTypes.Domain.Create.name, function (execId, args, ws) {
     var _caller = doSendWebitelCommand(execId, ws, WebitelCommandTypes.Domain.Create);
     if (!_caller) return;
-    webitel.domainCreate(_caller, args['name'] || '', args['customerId'] || '', function(res) {
+    webitel.domainCreate(_caller, args['name'] || '', args['customerId'] || '', args['parameters'], function(res) {
         getCommandResponseJSON(ws, execId, res);
     });
 });

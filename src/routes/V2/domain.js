@@ -6,10 +6,12 @@ module.exports.Create = function (req, res, next) {
         if (!checkPermission(req, res)) return;
 
         var domain_name = req.body.domain_name,
-            customer_id = req.body.customer_id;
+            customer_id = req.body.customer_id,
+            parameters = req.body.parameters
+        ;
         if (domain_name && customer_id) {
             if (!webitel.doSendCommandV2(res)) return;
-            webitel.domainCreate(null, domain_name, customer_id, function (request) {
+            webitel.domainCreate(null, domain_name, customer_id, parameters, function (request) {
                 res.status(200).json(rUtil.getRequestObject((request['body'] && request['body'].indexOf('-ERR') == 0)
                     ? "error" : "OK", request['body'], DOCS_LINK_DOMAIN));
             });

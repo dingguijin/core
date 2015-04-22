@@ -1,10 +1,12 @@
 module.exports.Create = function (req, res, next) {
     try {
         var domain_name = req.body.domain_name,
-            customer_id = req.body.customer_id;
+            customer_id = req.body.customer_id,
+            parameters = req.body.parameters
+        ;
         if (domain_name && customer_id) {
             if (!webitel.doSendCommand(res)) return;
-            webitel.domainCreate(null, domain_name, customer_id, function (request) {
+            webitel.domainCreate(null, domain_name, customer_id, parameters, function (request) {
                 res.status(200).send(request.body);
             });
         } else {
