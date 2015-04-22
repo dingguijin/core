@@ -52,7 +52,7 @@ module.exports = function (app) {
 
     app.post('/api/v2/calendar', calendar.post);
 
-    app.get('/api/v2/r/cdr|files|media*', require('./cdr').GetRedirectUrl);
+    app.all('/api/v2/r/cdr|files|media*', require('./cdr').GetRedirectUrl);
     app.all('/api/v2/cdr|files|media*', require('./cdr').Redirect);
 
     app.get('/api/v2/callcenter/queues', callcenter.List);
