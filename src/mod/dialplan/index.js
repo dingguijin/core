@@ -7,6 +7,7 @@ var db = require('../../lib/mongoDrv'),
     conf = require('../../conf'),
     PUBLIC_DIALPLAN_NAME = conf.get("mongodb:collectionPublic"),
     DEFAULT_DIALPLAN_NAME = conf.get("mongodb:collectionDefault"),
+    EXTENSION_DIALPLAN_NAME = conf.get("mongodb:collectionExtension"),
     expVal = require('./expressionValidator'),
     url = require("url"),
     ObjectID = require('mongodb').ObjectID,
@@ -25,6 +26,53 @@ function getDomainFromRequest (request, defDomain) {
 };
 
 var Dialplan = {
+    /**
+     * Internal extension
+     */
+    GetExtensions: function (req, res, next) {
+        var dialCollection = db.getCollection(EXTENSION_DIALPLAN_NAME);
+        Dialplan.getDialplan(req, res, next, dialCollection);
+    },
+
+    UpdateExtension: function (req, res, next) {
+        var _id = req.params['id'],
+            callflow = req.body['callflow'],
+            timezone = req.body['timezone'],
+            timezonename = req.body['timezonename'],
+            extension = {
+                "$set": {}
+            }
+            ;
+        if (!_id || (!callflow && !timezone && !timezonename)) {
+            res.status(400).json({
+                "status": "error",
+                "info": "Bad request!"
+            });
+            return;
+        };
+        if (callflow) {
+            extension.$set['callflow'] = callflow;
+        };
+        if (timezone) {
+            extension.$set['timezone'] = timezone;
+        };
+
+        if (timezonename) {
+            extension.$set['timezonename'] = timezonename;
+        };
+
+        var dialCollection = db.getCollection(EXTENSION_DIALPLAN_NAME);
+        dialCollection.findAndModify({"_id": new ObjectID(_id)}, [], extension, function (err, result) {
+            if (err) {
+                res.status(500).json({
+                    "status": "error",
+                    "info": err['message']
+                });
+                return;
+            };
+            res.status(200).json(result);
+        });
+    },
 
     /*
      * Public dialplan.

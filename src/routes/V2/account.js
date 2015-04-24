@@ -7,7 +7,9 @@ module.exports.Create = function (req, res, next) {
         var domain = req.body.domain,
             login = req.body.login,
             role = req.body.role,
-            password = req.body.password;
+            password = req.body.password,
+            parameters = req.body.parameters
+            ;
 
         if (domain && login && role) {
             if (!webitel.doSendCommandV2(res)) return;
@@ -18,7 +20,13 @@ module.exports.Create = function (req, res, next) {
                 _param.push(':' + password);
             _param.push('@' + domain);
 
-            webitel.userCreate(req.webitelUser, role, _param.join(''), function(request) {
+            var q = {
+                "role": role,
+                "param": _param.join(''),
+                "parameters": parameters
+            };
+
+            webitel.userCreate(req.webitelUser, q, function(request) {
                 res.status(200).json(rUtil.getRequestObject((request['body'] && request['body'].indexOf('-ERR') == 0)
                     ? "error" : "OK", request['body'], DOCS_LINK_ACCOUNT));
             });

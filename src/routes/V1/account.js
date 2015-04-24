@@ -3,7 +3,9 @@ module.exports.Create = function (req, res, next) {
         var domain = req.body.domain,
             login = req.body.login,
             role = req.body.role,
-            password = req.body.password;
+            password = req.body.password,
+            parameters = req.body.parameters
+            ;
 
         if (domain && login && role) {
             if (!webitel.doSendCommand(res)) return;
@@ -14,6 +16,12 @@ module.exports.Create = function (req, res, next) {
                 _param.push(':' + password);
             _param.push('@' + domain);
 
+            var q = {
+                "role": role,
+                "param": _param.join(''),
+                "parameters": parameters
+            };
+
             // TODO _caller - сделать когда будет логин работать
             var _caller = {
                 attr: {
@@ -23,7 +31,7 @@ module.exports.Create = function (req, res, next) {
                 }
             };
 
-            webitel.userCreate(_caller, role, _param.join(''), function(request) {
+            webitel.userCreate(_caller, q, function(request) {
                 res.status(200).send(request.body);
             });
 

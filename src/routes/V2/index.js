@@ -38,6 +38,9 @@ module.exports = function (app) {
     app.put('/api/v2/channels/:id', calls.ChangeState);
 
     /* DIALPLAN */
+    app.get('/api/v2/routes/extensions', dialplan.GetExtensions);
+    app.put('/api/v2/routes/extensions/:id', dialplan.UpdateExtension);
+
     app.post('/api/v2/routes/public', dialplan.CreatePublic);
     app.get('/api/v2/routes/public', dialplan.GetPublicDialplan);
     app.delete('/api/v2/routes/public/:id', dialplan.DeletePublicDialplan);
@@ -52,8 +55,8 @@ module.exports = function (app) {
 
     app.post('/api/v2/calendar', calendar.post);
 
-    app.all('/api/v2/r/cdr|files|media*', require('./cdr').GetRedirectUrl);
-    app.all('/api/v2/cdr|files|media*', require('./cdr').Redirect);
+    app.all(/^\/api\/v2\/r\/(cdr|files|media)/, require('./cdr').GetRedirectUrl);
+    app.all(/^\/api\/v2\/(cdr|files|media)/, require('./cdr').Redirect);
 
     app.get('/api/v2/callcenter/queues', callcenter.List);
     app.post('/api/v2/callcenter/queues', callcenter.Create);
@@ -62,7 +65,7 @@ module.exports = function (app) {
     app.put('/api/v2/callcenter/queues/:name', callcenter.Update);
     // TODO PATCH !!!
     app.put('/api/v2/callcenter/queues/:name/:state', callcenter.SetState);
-    app.delete('/api/v2/callcenter/queues/:name?:domain', callcenter.Delete);
+    app.delete('/api/v2/callcenter/queues/:name', callcenter.Delete);
 
     app.post('/api/v2/callcenter/queues/:queue/tiers', callcenter.PostTier);
     // TODO PATCH !!!

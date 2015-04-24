@@ -5,6 +5,7 @@ var EventEmitter2 = require('eventemitter2').EventEmitter2,
     net = require('net'),
     PERMISSION_DENIED = '-ERR permission denied!',
     ACCOUNT_ROLE = require('../consts').ACCOUNT_ROLE,
+    Controller = require('../mod/dialplan/controller'),
     COMMAND_TYPES = require('../consts').WebitelCommandTypes;
 
 var Webitel = module.exports = function (parameters) {
@@ -385,9 +386,19 @@ Webitel.prototype.userList = function(_caller, domain, cb) {
 
 // TODO mod_cc
 
-Webitel.prototype.userCreate = function(_caller, role, _param, cb) {
-    _param = _param || '';
-    var _domain = _param.split('@')[1];
+Webitel.prototype.userCreate = function(_caller, args, cb) {
+    var _id = args['param'] || '',
+        role = args['role'],
+        parameters,
+        extensions,
+        scope = this;
+
+    if (typeof args['attribute'] === 'object') {
+        parameters = args.attribute['parameters'];
+        extensions = args.attribute['extensions'];
+    };
+
+    var _domain = _id.split('@')[1];
 
     if (!_caller || (_caller['attr']['role'].val < COMMAND_TYPES.Account.Create.perm ||
         (_caller['attr']['domain'] != _domain && _caller['attr']['role'].val != ACCOUNT_ROLE.ROOT.val))) {
@@ -404,12 +415,63 @@ Webitel.prototype.userCreate = function(_caller, role, _param, cb) {
         return;
     } else {
         role += ',webrtc';
-    }
+    };
 
-    this.api(WebitelCommandTypes.Account.Create, [
-        role,
-        _param || ''
-    ], cb);
+    if (parameters instanceof Array) {
+        role = '[' + parameters.join(',') + ']' + role;
+    };
+    var _refUser = _id.split(/\:|@/)[0];
+    var number = extensions || _refUser;
+
+    // TODO возможность задавать масив номера для пользователя
+    if (typeof number !== 'string') {
+        return cb({
+            "body": "-ERR: bar request (number)!"
+        });
+    };
+    Controller.existsNumber(number, _domain, function (err, exists) {
+        try {
+            if (err) {
+                return cb({
+                    "body": "-ERR: " + err['message']
+                });
+            }
+            ;
+            if (exists) {
+                log.debug('Add number: %s in extension collection exists.', number);
+                return cb({
+                    "body": "-ERR: Number exists"
+                });
+            }
+            ;
+
+            scope.api(WebitelCommandTypes.Account.Create, [
+                role,
+                _id
+            ], function (res) {
+                try {
+                    if (res && res['body'] && res['body'].indexOf('+OK') == 0) {
+                        Controller.createNumber(_refUser, number, _domain, function (err) {
+                            if (err)
+                                return log.error(err['message']);
+                            log.debug('User save DB: %s', _id);
+                        });
+                    }
+                    ;
+                } catch (e) {
+                    return cb({
+                        "body": '-ERR: ' + e['message']
+                    });
+                }
+                cb(res);
+            });
+
+            } catch (e) {
+                log.error(e['message'])
+            }
+        });
+
+
    /* var cmd = new WebitelCommand(WebitelCommandTypes.Account.Create, {
         role: role,
         param: _param
@@ -434,6 +496,37 @@ Webitel.prototype.userUpdate = function(_caller, user, paramName, paramValue, cb
             body: '-ERR Woow! Slow down!' // (c) srg
         });
         return
+    } else if (paramName == 'extensions') {
+        Controller.existsNumber(paramValue, _domain, function (err, exists) {
+            if (err) {
+                return cb({
+                    "body": "-ERR: " + err['message']
+                });
+            }
+            ;
+            if (exists) {
+                log.debug('Add number: %s in extension collection exists.', user);
+                return cb({
+                    "body": "-ERR: Number reserved."
+                });
+            }
+            ;
+
+            Controller.updateOrInsertNumber(user.split('@')[0], paramValue, _domain, function (err) {
+                if (err) {
+                    cb({
+                        body: '-ERR: ' + err['message']
+                    });
+                    return log.error(err['message']);
+                };
+                cb({
+                    "body": "+OK: User updated."
+                });
+                log.debug('User update DB: %s', user);
+            });
+        });
+
+        return;
     };
 
     this.api(WebitelCommandTypes.Account.Change, [

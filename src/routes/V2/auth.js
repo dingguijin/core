@@ -102,6 +102,7 @@ var auth = {
                 userObj = {
                     "key": _id,
                     "domain": user.domain,
+                    "username": username,
                     "expires": tokenObj.expires,
                     "token": tokenObj.token,
                     "role": user.role.val

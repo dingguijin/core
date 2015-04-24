@@ -227,7 +227,7 @@ commandEmitter.on('wss::' + WebitelCommandTypes.Account.List.name, function (exe
 commandEmitter.on('wss::' + WebitelCommandTypes.Account.Create.name, function (execId, args, ws) {
     var _caller = doSendWebitelCommand(execId, ws, WebitelCommandTypes.Account.Create);
     if (!_caller) return;
-    webitel.userCreate(_caller, args['role'] || '', args['param'] || '', function(res) {
+    webitel.userCreate(_caller, args, function(res) {
         getCommandResponseJSON(ws, execId, res);
     });
 });
@@ -236,14 +236,6 @@ commandEmitter.on('wss::' + WebitelCommandTypes.Account.Change.name, function (e
     var _caller = doSendWebitelCommand(execId, ws, WebitelCommandTypes.Account.Change);
     if (!_caller) return;
     webitel.userUpdate(_caller, args['user'] || '', args['param'] || '', args['value'] || '', function(res) {
-        getCommandResponseJSON(ws, execId, res);
-    });
-});
-
-commandEmitter.on('wss::' + WebitelCommandTypes.Account.Remove.name, function (execId, args, ws) {
-    var _caller = doSendWebitelCommand(execId, ws, WebitelCommandTypes.Account.Remove);
-    if (!_caller) return;
-    webitel.userRemove(_caller, args['user'] || '', function(res) {
         getCommandResponseJSON(ws, execId, res);
     });
 });

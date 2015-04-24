@@ -1,5 +1,6 @@
 var userSessions = require('./middleware/userSessions');
 var CommandEmitter = require('./lib/CommandEmitter');
+var moduleEventEmitter = global.moduleEventEmitter = new CommandEmitter();
 var commandEmitter = global.commandEmitter = new CommandEmitter();
 var Webitel = require('./lib/WebitelModule2');
 var log = require('./lib/log')(module);
@@ -26,7 +27,6 @@ var doConnectWebitel = function() {
         account: conf.get('webitelServer:account'),
         secret: conf.get('webitelServer:secret')
     });
-
 
     webitel.on('webitel::socket::close', function (e) {
         log.error('Webitel error:', e);
