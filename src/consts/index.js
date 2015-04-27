@@ -285,6 +285,13 @@ module.exports.WebitelCommandTypes = {
                 perm: 1
             }
         }
+    },
+
+    CDR: {
+        RecordCall: {
+            name: "cdr_get_record_link",
+            perm: 0
+        }
     }
 };
 

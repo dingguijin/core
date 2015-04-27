@@ -123,6 +123,52 @@ var auth = {
         var _id = generateUuid.v4();
         auth.validate(username, password, _id, cb);
     },
+    
+    getTokenWS: function (_caller, cb) {
+        try {
+            var _db = mongoDb.getCollection(AUTH_DB_NAME)
+                ;
+            _db.findOne({
+                "username": _caller['id'],
+                "expires": {
+                    "$gt": new Date().getTime()
+                }
+            }, function (err, res) {
+                if (err)
+                    return cb(err);
+                if (res) {
+                    return cb(null, res);
+                } else {
+                    try {
+                        var _id = generateUuid.v4();
+                        var tokenObj = genToken(_caller['id']),
+                            userObj = {
+                                "key": _id,
+                                "domain": _caller['attr']['domain'],
+                                "username": _caller['id'],
+                                "expires": tokenObj.expires,
+                                "token": tokenObj.token,
+                                "role": _caller['attr']['role']['val']
+                            };
+
+                        auth.insertDb(userObj, function (err) {
+                            if (err) {
+                                log.error(err);
+                                cb(err);
+                                return;
+                            }
+                            ;
+                            cb(null, userObj);
+                        });
+                    } catch (e) {
+                        return cb(e);
+                    };
+                };
+            });
+        } catch (e) {
+            cb(e);
+        }
+    },
 
     validateUser: function (key, cb) {
         try {

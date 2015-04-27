@@ -43,22 +43,16 @@ var Dialplan = {
                 "$set": {}
             }
             ;
-        if (!_id || (!callflow && !timezone && !timezonename)) {
+        if (!_id || req.body['destination_number'] || req.body['domain'] || req.body['userRef'] || req.body['version']) {
             res.status(400).json({
                 "status": "error",
                 "info": "Bad request!"
             });
             return;
         };
-        if (callflow) {
-            extension.$set['callflow'] = callflow;
-        };
-        if (timezone) {
-            extension.$set['timezone'] = timezone;
-        };
 
-        if (timezonename) {
-            extension.$set['timezonename'] = timezonename;
+        for (var key in req.body) {
+            extension.$set[key] = req.body[key];
         };
 
         var dialCollection = db.getCollection(EXTENSION_DIALPLAN_NAME);

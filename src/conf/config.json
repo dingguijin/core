@@ -18,7 +18,8 @@
         "collectionSystem": "global",
         "collectionExtension": "extension",
         "collectionAuth": "authToken",
-        "collectionCalendar": "calendar"
+        "collectionCalendar": "calendar",
+        "collectionFile": "cdrFile"
     },
     "webitelServer": {
         "host": "CONSOLE_HOST",

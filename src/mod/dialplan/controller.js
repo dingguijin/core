@@ -23,7 +23,7 @@ var Controller = {
                 log.warn('Add number in extension collection exists.');
                 return cb(new Error('Number exists'));
             };
-            Controller.addNumber(number, domain, cb);
+            //Controller.addNumber(number, domain, cb);
         });
     },
 

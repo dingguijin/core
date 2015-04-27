@@ -345,6 +345,53 @@ commandEmitter.on('wss::' + WebitelCommandTypes.Gateway.Down.name, function (exe
 });
 
 
+var cdr = require('./cdr');
+
+commandEmitter.on('wss::' + WebitelCommandTypes.CDR.RecordCall.name, function (execId, args, ws) {
+    var _caller = doSendWebitelCommand(execId, ws, WebitelCommandTypes.CDR.RecordCall);
+    if (!_caller) return;
+    cdr.existsRecordFile(args['uuid'], function (err, exists) {
+        if (err) {
+            getCommandResponseV2JSON(ws, execId, {
+                "body": "-ERR: " + err['message']
+            });
+            return;
+        };
+        try {
+            if (exists) {
+                auth.getTokenWS(_caller, function (err, res) {
+                    try {
+                        if (err)
+                            return getCommandResponseV2JSON(ws, execId, {
+                                "body": "+OK: " + err['message']
+                            });
+                        var url = cdr.Route.Root + cdr.Route.GetFile + args['uuid'] + '&x_key=' + res['key'] +
+                            '&access_token=' + res['token'];
+
+                        getCommandResponseV2JSON(ws, execId, {
+                            "body": url
+                        });
+                    } catch (e) {
+
+                    }
+                });
+            } else {
+                getCommandResponseV2JSON(ws, execId, {
+                    "body": "+OK: " + "Not found."
+                });
+                return;
+            }
+            ;
+        } catch (e) {
+            getCommandResponseV2JSON(ws, execId, {
+                "body": "+OK: " + e['message']
+            });
+            return;
+        }
+    });
+});
+
+
 var getCommandResponseJSON = function (_ws, id, res) {
     try {
         _ws.send(JSON.stringify({
@@ -357,7 +404,20 @@ var getCommandResponseJSON = function (_ws, id, res) {
     } catch (e) {
         handleSocketError(_ws);
         log.warn('Error send response');
-    }
+    };
+};
+
+var getCommandResponseV2JSON = function (_ws, id, res) {
+    try {
+        _ws.send(JSON.stringify({
+            'exec-uuid': id,
+            'exec-complete': (res['body'].indexOf('-ERR') == 0 || res['body'].indexOf('-USAGE') == 0) ? "-ERR" : "+OK",
+            'exec-response': res['body']
+        }));
+    } catch (e) {
+        handleSocketError(_ws);
+        log.warn('Error send response');
+    };
 };
 
 var doSendWebitelCommand = function (id, socket, command) {
