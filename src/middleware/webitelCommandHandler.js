@@ -365,7 +365,7 @@ commandEmitter.on('wss::' + WebitelCommandTypes.CDR.RecordCall.name, function (e
                             return getCommandResponseV2JSON(ws, execId, {
                                 "body": "+OK: " + err['message']
                             });
-                        var url = cdr.Route.Root + cdr.Route.GetFile + args['uuid'] + '&x_key=' + res['key'] +
+                        var url = cdr.Route.Root + cdr.Route.GetFile + args['uuid'] + '?x_key=' + res['key'] +
                             '&access_token=' + res['token'];
 
                         getCommandResponseV2JSON(ws, execId, {
