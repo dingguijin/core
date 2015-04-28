@@ -41,6 +41,11 @@ module.exports = function (app) {
     app.get('/api/v2/routes/extensions', dialplan.GetExtensions);
     app.put('/api/v2/routes/extensions/:id', dialplan.UpdateExtension);
 
+    app.get('/api/v2/routes/variables', dialplan.GetDomainVariable);
+    app.post('/api/v2/routes/variables', dialplan.InsertOrUpdateDomainVariable);
+    app.put('/api/v2/routes/variables', dialplan.InsertOrUpdateDomainVariable);
+
+
     app.post('/api/v2/routes/public', dialplan.CreatePublic);
     app.get('/api/v2/routes/public', dialplan.GetPublicDialplan);
     app.delete('/api/v2/routes/public/:id', dialplan.DeletePublicDialplan);

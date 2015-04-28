@@ -8,6 +8,7 @@ var db = require('../../lib/mongoDrv'),
     PUBLIC_DIALPLAN_NAME = conf.get("mongodb:collectionPublic"),
     DEFAULT_DIALPLAN_NAME = conf.get("mongodb:collectionDefault"),
     EXTENSION_DIALPLAN_NAME = conf.get("mongodb:collectionExtension"),
+    DOMAIN_VAR_DIALPLAN_NAME = conf.get("mongodb:collectionDomainVar"),
     expVal = require('./expressionValidator'),
     url = require("url"),
     ObjectID = require('mongodb').ObjectID,
@@ -66,6 +67,51 @@ var Dialplan = {
             };
             res.status(200).json(result);
         });
+    },
+
+    /**
+     * Domain variables
+     */
+
+    GetDomainVariable: function (req, res, next) {
+        try {
+            var dialCollection = db.getCollection(DOMAIN_VAR_DIALPLAN_NAME);
+            Dialplan.getDialplan(req, res, next, dialCollection);
+        } catch (e) {
+            next(e);
+        }
+    },
+
+    InsertOrUpdateDomainVariable: function (req, res, next) {
+        var doc = {
+                "variables": req.body
+            },
+            collection = db.getCollection(DOMAIN_VAR_DIALPLAN_NAME)
+        ;
+        doc['domain'] =  getDomainFromRequest(req, req.query['domain']);
+
+        if (!doc['domain']) {
+            res.status(400).json({
+                "status": "error",
+                "info": "domain is undefined"
+            });
+            return;
+        };
+
+        collection.update({
+                "domain": doc['domain'] },
+            doc,
+            {upsert: true},
+            function (err, result) {
+                if (err) {
+                    return next(err);
+                };
+                res.status(200).json({
+                    "status": "OK",
+                    "data": result
+                })
+            }
+        );
     },
 
     /*
@@ -156,7 +202,7 @@ var Dialplan = {
                 // TODO
                 res.status(200).json({
                     "status": "OK",
-                    "info": result[0]['_id'].toString()
+                    "info": result[0]['_id'] && result[0]['_id'].toString()
                 });
             });
 
