@@ -24,6 +24,20 @@ Domains.broadcast = function (domainName, event) {
                 }
             };
         };
+        //TODO
+        _domain = this.get('root');
+        if (_domain && _domain['users']) {
+            _usersKeys = _domain['users'];
+            for (var key in _usersKeys) {
+                try {
+                    _user = Users.get(_usersKeys[key]);
+                    if (!_user) continue;
+                    Users.sendObject(_user, event);
+                } catch (e) {
+                    log.error(e.message);
+                }
+            };
+        };
     } catch (e) {
         log.error(e.message);
     }

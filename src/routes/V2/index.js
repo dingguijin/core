@@ -73,6 +73,7 @@ module.exports = function (app) {
     app.delete('/api/v2/callcenter/queues/:name', callcenter.Delete);
 
     app.post('/api/v2/callcenter/queues/:queue/tiers', callcenter.PostTier);
+    app.get('/api/v2/callcenter/queues/:queue/tiers', callcenter.GetTier);
     // TODO PATCH !!!
     app.put('/api/v2/callcenter/queues/:queue/tiers/:agent/level', callcenter.PutLevel);
     // TODO PATCH !!!

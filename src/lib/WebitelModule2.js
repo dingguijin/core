@@ -712,8 +712,7 @@ Webitel.prototype.queueUpdateItem = function (_caller, args, cb) {
         ;
 
     for (var key in args['params']) {
-        _params = _params.concat(key, '='
-            , args['params'][key] instanceof Object
+        _params = _params.concat(key, '=' , args['params'][key] instanceof Object
                 ? ''
                 : String(args['params'][key])
             , ',');
@@ -1350,7 +1349,7 @@ Webitel.prototype._parsePlainTableToJSON = function(data, domain, cb) {
 };
 /*  */
 
-Webitel.prototype._parsePlainTableToJSONArray = function(data, cb) {
+Webitel.prototype._parsePlainTableToJSONArray = function(data, cb, _separator) {
     if (!data) {
         cb('Data is undefined!');
         return
@@ -1359,13 +1358,20 @@ Webitel.prototype._parsePlainTableToJSONArray = function(data, cb) {
         var _line,
             _head,
             _json = [],
-            _item;
+            _item,
+            _lineItems,
+            _headCounts,
+            separator = _separator || '\t'
+            ;
 
         _line = data.split('\n');
-        _head = _line[0].split('\t');
-        for (var i = 2; i < _line.length && _line[i] != const_DataSeparator; i++) {
+        _head = _line[0].split(separator);
+        _headCounts = _head.length;
+        for (var i = 1; i < _line.length; i++) {
+            _lineItems = _line[i].split(separator);
+            if (_line[i] == "" || _line[i] == const_DataSeparator || _lineItems.length != _headCounts) continue;
             _item = {};
-            _line[i].split('\t').reduce(function (_item, line, index) {
+            _lineItems.reduce(function (_item, line, index) {
                 _item[_head[index]] = line.trim();
                 return _item;
             }, _item);
