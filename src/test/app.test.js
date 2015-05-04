@@ -1,14 +1,12 @@
 var assert = require('assert');
 var should = require('should');
 var request = require('supertest');
-var MongoClient = require('mongodb').MongoClient;
 var winston = require('winston');
-var config = require('../conf');
 var uuid = require('node-uuid');
 
 describe('Routing', function() {
-    var url = 'http://10.10.10.25:10022';
-    var wsServer = 'ws://10.10.10.25:10022';
+    var url = 'https://pre.webitel.com:10022';
+    var wsServer = 'wss://pre.webitel.com:10022';
     var ROOT_PASSWORD = 'ROOT_PASSWORD';
     var userCredentials = {};
     var testConfig = {
@@ -242,6 +240,29 @@ describe('Routing', function() {
                     });
             });
 
+            it('Создать домен', function (done) {
+                var _r = {
+                    "domain_name": testConfig.domain,
+                    "customer_id": testConfig.domain
+                };
+                request(url)
+                    .post('/api/v2/domains')
+                    .set('x-key', userCredentials.key)
+                    .set('x-access-token', userCredentials.token)
+                    .expect('Content-Type', /json/)
+                    .send(_r)
+                    .end(function (err, res) {
+                        if (err) {
+                            throw err;
+                        };
+                        if (res.body.status === 'OK') {
+                            done();
+                        } else {
+                            throw res.body.info
+                        }
+                    });
+            });
+
             it('Создать очередь.', function (done) {
                 var _r = {
                     name: testConfig.cc.queue
@@ -282,6 +303,23 @@ describe('Routing', function() {
                     });
             });
 
+            it('Удалить домен', function (done) {
+                request(url)
+                    .del('/api/v2/domains/' + testConfig.domain)
+                    .set('x-key', userCredentials.key)
+                    .set('x-access-token', userCredentials.token)
+                    .expect('Content-Type', /json/)
+                    .expect(200, function (err, res) {
+                        if (err) {
+                            throw err;
+                        };
+                        if (res.body.status === 'OK') {
+                            done();
+                        } else {
+                            throw 'Undef response'
+                        }
+                    });
+            });
 
             it('Выход пользователя ROOT', function (done) {
                 request(url)
