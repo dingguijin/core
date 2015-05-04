@@ -7,8 +7,8 @@ var config = require('../conf');
 var uuid = require('node-uuid');
 
 describe('Routing', function() {
-    var url = 'http://10.10.10.25:10022';
-    var wsServer = 'ws://10.10.10.25:10022';
+    var url = 'https://pre.webitel.com:10022';
+    var wsServer = 'wss://pre.webitel.com:10022';
     var ROOT_PASSWORD = 'ROOT_PASSWORD';
     var userCredentials = {};
     var testConfig = {
