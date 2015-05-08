@@ -1372,7 +1372,7 @@ Webitel.prototype._parsePlainTableToJSONArray = function(data, cb, _separator) {
             if (_line[i] == "" || _line[i] == const_DataSeparator || _lineItems.length != _headCounts) continue;
             _item = {};
             _lineItems.reduce(function (_item, line, index) {
-                _item[_head[index]] = line.trim();
+                _item[_head[index].trim()] = line.trim();
                 return _item;
             }, _item);
 

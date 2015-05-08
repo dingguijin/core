@@ -8,7 +8,8 @@ var conf = require('../conf'),
 module.exports = function (wss) {
     wss.on('connection', function(ws) {
         ws['webitelSessionId'] = generateUuid.v4();
-
+        console.log(wss.clients.length);
+        socketTimeUnauthorized = - 1;
         if (socketTimeUnauthorized > 0) {
             setTimeout(function () {
                 if (!ws['upgradeReq']['webitelId']) {
@@ -37,6 +38,9 @@ module.exports = function (wss) {
                 };
 
             } catch (e) {
+                // TODO TEST
+                ws.send(message);
+                return;
                 handleSocketError(ws);
                 log.error('Command error:', e.message);
             };

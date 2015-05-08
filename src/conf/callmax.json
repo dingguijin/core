@@ -1,0 +1,9 @@
+{
+  "callmax":{
+    "host": "http://193.34.145.95:8888/",
+    "srvHost": "193.34.145.95",
+    "username": "hdww",
+    "password": "HDWorldWide951",
+    "defDialplan": "Webitel_DP"
+  }
+}

@@ -5,8 +5,12 @@ var commandEmitter = global.commandEmitter = new CommandEmitter();
 var Webitel = require('./lib/WebitelModule2');
 var log = require('./lib/log')(module);
 var conf = require('./conf');
+
+require("http").globalAgent.maxSockets = Infinity;
 var httpServ = (conf.get('ssl:enabled')) ? require('https') : require('http');
 var fs = require('fs');
+var path = require("path");
+global.__appRoot = path.resolve(__dirname);
 
 require('./middleware/logo')();
 require('./middleware/webitelCommandHandler');
@@ -154,6 +158,8 @@ var express = require('express'),
 app.use(bodyParser.json());
 
 require('./routes')(app);
+//require('./mod/swagger')(app);
+require('./mod/provider/callmax')(app);
 
 try {
     if (conf.get('ssl:enabled')) {
@@ -162,11 +168,11 @@ try {
             cert: fs.readFileSync(conf.get('ssl:ssl_cert'))
         };
         srv = httpServ.createServer(https_options, app).listen(conf.get('server:port'), conf.get('server:host'), function() {
-            console.log('Express server (https) listening on port ' + this.address().port);
+            log.info('Express server (https) listening on port ' + this.address().port);
         });
     } else {
         srv = httpServ.createServer(app).listen(conf.get('server:port'), conf.get('server:host'), function() {
-            console.log('Express server (https) listening on port ' + this.address().port);
+            log.info('Express server (https) listening on port ' + this.address().port);
         });
     };
 } catch (e) {

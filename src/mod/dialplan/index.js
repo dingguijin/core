@@ -26,6 +26,76 @@ function getDomainFromRequest (request, defDomain) {
     };
 };
 
+function removeDialplanFromDomain(collectionName, domain) {
+    try {
+        var dialCollection = db.getCollection(collectionName);
+        dialCollection.remove({"domain": domain}, function (err, result) {
+            if (err) {
+                log.error(err['message']);
+                return;
+            }
+            ;
+            log.debug('Remove %s from domain %s : %s', collectionName, domain, result);
+        });
+    } catch (e) {
+        log.error(e['message']);
+    };
+};
+
+var _root = {
+    attr: {
+        role: {
+            val: 2
+        }
+    }
+};
+
+moduleEventEmitter.on("webitel::DOMAIN_DESTROY", function (evnt) {
+    var domain = evnt['Domain-Name'];
+    if (!domain) {
+        log.error('Domain null!');
+        return;
+    };
+    try {
+        removeDialplanFromDomain(PUBLIC_DIALPLAN_NAME, domain);
+        removeDialplanFromDomain(DEFAULT_DIALPLAN_NAME, domain);
+        removeDialplanFromDomain(EXTENSION_DIALPLAN_NAME, domain);
+        removeDialplanFromDomain(DOMAIN_VAR_DIALPLAN_NAME, domain);
+
+        webitel.showSipGateway(_root, domain, function (res) {
+            if (!res || !res['body']) {
+                log.error('Get gateway from domain error.');
+                return;
+            }
+            ;
+
+            webitel._parsePlainTableToJSONArray(res['body'], function (err, res) {
+                if (err) {
+                    log.error(err['message']);
+                    return;
+                }
+                ;
+                for (var key in res) {
+                    try {
+                        webitel.removeSipGateway(_root, res[key]['Gateway'].replace(/(.*)(\:\:)/, ''), function (res) {
+                            if (res && res['body']) {
+                                log.trace(res['body']);
+                            }
+                            ;
+                        });
+                    } catch (e) {
+                        log.error(e['message']);
+                    }
+                    ;
+                }
+                ;
+            });
+        });
+    } catch (e) {
+        log.error(e['message']);
+    }
+});
+
 var Dialplan = {
     /**
      * Internal extension
