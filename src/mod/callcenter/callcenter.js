@@ -26,23 +26,7 @@ CC.prototype._onEvent = function (e) {
     var jEvent = JSON.parse(e.serialize('json')),
         user = jEvent['CC-Agent'] && jEvent['CC-Agent'].split('@')
         ;
-    //console.dir(jEvent);
-/*
-    switch (jEvent['CC-Action']) {
-        case 'agent-state-change':
-            var _user = Users.get(jEvent['CC-Agent']);
-            if (_user) {
-                _user['state'] = jEvent['CC-Agent-State'];
-            };
-            break;
-        case 'agent-status-change':
-            var _user = Users.get(jEvent['CC-Agent']);
-            if (_user) {
-                _user['status'] = jEvent['CC-Agent-Status'];
-            };
-            break;
-    };
-    */
+
     this.setAttributesEvent(jEvent, user);
     if (jEvent['Event-Name'])
         Domains.broadcast(jEvent['Event-Domain'], jEvent);

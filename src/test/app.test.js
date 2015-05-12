@@ -23,7 +23,7 @@ describe('Routing', function() {
     };
     before(function(done) {
         //new MongoClient(config.get('mongodb:uri'), function () {
-            done();
+        done();
         //});
 
     });
@@ -50,7 +50,7 @@ describe('Routing', function() {
                     //console.dir(userCredentials)
                 });
         });
-        
+
         it('Получить состояние сервера', function (done) {
             request(url)
                 .get('/api/v2/status')
@@ -91,7 +91,7 @@ describe('Routing', function() {
                     }
                 });
         });
-        
+
         it('Создать пользователя', function (done) {
             var _r = {
                 "login": testConfig.user.number,
@@ -116,7 +116,7 @@ describe('Routing', function() {
                     }
                 });
         });
-        
+
         it('Получить список пользователей', function (done) {
             request(url)
                 .get('/api/v2/accounts?domain=' + testConfig.domain)
@@ -136,25 +136,25 @@ describe('Routing', function() {
 
         });
 
-       /* it('Удалить пользователя', function (done) {
-            request(url)
-                .delete('/api/v2/accounts')
-                .set('x-key', userCredentials.key)
-                .set('x-access-token', userCredentials.token)
-                .expect('Content-Type', /json/)
-                .send(_r)
-                .end(function (err, res) {
-                    if (err) {
-                        throw err;
-                    };
-                    if (res.body.status === 'OK') {
-                        done();
-                    } else {
-                        throw res.body.info
-                    }
-                });
-        });
-        */
+        /* it('Удалить пользователя', function (done) {
+         request(url)
+         .delete('/api/v2/accounts')
+         .set('x-key', userCredentials.key)
+         .set('x-access-token', userCredentials.token)
+         .expect('Content-Type', /json/)
+         .send(_r)
+         .end(function (err, res) {
+         if (err) {
+         throw err;
+         };
+         if (res.body.status === 'OK') {
+         done();
+         } else {
+         throw res.body.info
+         }
+         });
+         });
+         */
 
         it('Звонок на номер ' + testConfig.callNumber, function (done) {
             var _r = {
@@ -178,7 +178,7 @@ describe('Routing', function() {
                     }
                 });
         });
-        
+
         it('Удалить домен', function (done) {
             request(url)
                 .del('/api/v2/domains/' + testConfig.domain)
@@ -340,7 +340,7 @@ describe('Routing', function() {
             });
         });
     });
-    
+
     describe('WSS', function () {
         var WebSocket = require('ws'),
             ws,
@@ -369,7 +369,7 @@ describe('Routing', function() {
             ws.on('open', function open() {
                 done();
             });
-            
+
             ws.on('message', onMessage);
 
         });
@@ -441,7 +441,7 @@ describe('Routing', function() {
                 };
             });
         });
-        
+
         it ('Удалить домен', function (done) {
             var _e = {
                 'func': 'api domain remove',

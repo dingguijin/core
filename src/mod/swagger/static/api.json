@@ -1,0 +1,80 @@
+{
+
+  "swaggerVersion": "1.2",
+  "info": {
+    "version": "1.0.0",
+    "title": "Webitel API"
+  },
+  "host": "10.10.10.25:10022",
+  "basePath": "/",
+  "schemes": [
+    "http",
+    "https"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/login": {
+      "post": {
+        "operationId": "LOGIN",
+        "description": "LOGIN",
+        "parameters": [
+          {
+            "name": "body",
+            "description": "order placed for purchasing the pet",
+            "required": true,
+            "type": "Order",
+            "paramType": "body"
+          }
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "localisation": {
+      "type": "object",
+      "required": ["name", "locale"],
+      "properties": {
+        "name":{"type": "string"},
+        "locale":{"type": "string"}
+      }
+    }
+  },
+
+  "models": {
+    "Order": {
+      "id": "Order",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "petId": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "quantity": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "status": {
+          "type": "string",
+          "description": "Order Status",
+          "enum": [
+            "placed",
+            " approved",
+            " delivered"
+          ]
+        },
+        "shipDate": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    }
+  }
+}

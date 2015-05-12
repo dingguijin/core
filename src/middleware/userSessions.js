@@ -21,8 +21,17 @@ Domains.broadcast = function (domainName, event) {
                     Users.sendObject(_user, event);
                 } catch (e) {
                     log.error(e.message);
-                }
+                };
             };
+        };
+        //TODO
+        _user = Users.get('root');
+        if (_user) {
+            try {
+                Users.sendObject(_user, event);
+            } catch (e) {
+                log.error(e.message);
+            }
         };
     } catch (e) {
         log.error(e.message);

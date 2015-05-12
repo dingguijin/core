@@ -1,0 +1,9 @@
+{
+  "callmax":{
+    "host": null,
+    "srvHost": null,
+    "username": null,
+    "password": null,
+    "defDialplan": null
+  }
+}

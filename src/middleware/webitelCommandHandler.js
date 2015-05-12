@@ -183,7 +183,6 @@ commandEmitter.on('wss::' + WebitelCommandTypes.Token.Generate.name, function (e
 });
 
 
-
 commandEmitter.on('wss::' + WebitelCommandTypes.ListUsers.name, function (execId, args, ws) {
     var _caller = doSendWebitelCommand(execId, ws, WebitelCommandTypes.ListUsers);
     if (!_caller) return;
