@@ -6,8 +6,8 @@ var Webitel = require('./lib/WebitelModule2');
 var log = require('./lib/log')(module);
 var conf = require('./conf');
 
-require("http").globalAgent.maxSockets = Infinity;
 var httpServ = (conf.get('ssl:enabled')) ? require('https') : require('http');
+httpServ.globalAgent.maxSockets = Infinity;
 var fs = require('fs');
 var path = require("path");
 global.__appRoot = path.resolve(__dirname);

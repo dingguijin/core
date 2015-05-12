@@ -4,7 +4,7 @@
 var request = require('request'),
     conf = require('../conf'),
     log = require('../../../../lib/log')(module),
-    CALLMAX_HOST = conf.get('callmax:host'),
+    CALLMAX_HOST = conf.get('callmax:apiHost'),
     CALLMAX_USER = conf.get('callmax:username'),
     CALLMAX_PASS = conf.get('callmax:password');
 

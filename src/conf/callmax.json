@@ -1,6 +1,6 @@
 {
   "callmax":{
-    "host": null,
+    "apiHost": null,
     "srvHost": null,
     "username": null,
     "password": null,
