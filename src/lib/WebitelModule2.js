@@ -531,8 +531,7 @@ Webitel.prototype.userUpdate = function(_caller, user, paramName, paramValue, cb
 
     this.api(WebitelCommandTypes.Account.Change, [
             user || '',
-            paramName || '',
-            paramValue || ''
+            (paramName || '') + '=' + (paramValue || '')
     ], cb);
     /*var cmd = new WebitelCommand(WebitelCommandTypes.Account.Change, {
         user: user,
@@ -1235,7 +1234,7 @@ var WebitelCommandTypes = {
     Account: {
         List: 'account list', //
         Create: 'account create',
-        Change: 'account change',
+        Change: 'account  ',
         Remove: 'account remove'
     },
     Device: {

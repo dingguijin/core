@@ -165,6 +165,14 @@ var Calls = {
         eslConn.bgapi(dialString, function (result) {
             sendResponse(result, res, "https://docs.webitel.com/display/SDKRU/REST+API+v1#RESTAPIv1-Создатьканал.");
         });
+    },
+
+    Eavesdrop: function (req, res, next) {
+        var args = req.body;
+        eslConn.bgapi('originate user/' + (args['user'] || '') + ' &eavesdrop(' + (req.params['id'] || '') +
+        ') XML default ' + args['side'] + ' ' + args['side'], function (result) {
+            sendResponse(result, res);
+        });
     }
 };
 

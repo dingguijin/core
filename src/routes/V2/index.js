@@ -33,6 +33,8 @@ module.exports = function (app) {
     app.post('/api/v2/channels', calls.Originate);
     app.post('/api/v2/fake', calls.FakeCall);
     app.delete('/api/v2/channels/:id', calls.KillUuid);
+    app.post('/api/v2/channels/:id/eavesdrop', calls.Eavesdrop);
+
     app.delete('/api/v2/channels/domain/:domain', calls.killChannelsFromDomain);
     // TODO PATCH !!!
     app.put('/api/v2/channels/:id', calls.ChangeState);

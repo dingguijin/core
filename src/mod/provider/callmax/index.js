@@ -10,7 +10,7 @@ var conf = require('./conf'),
     ;
 
 
-module.exports = function (app) {
+module.exports = function () {
 
     moduleEventEmitter.on("webitel::DOMAIN_CREATE", function (evt) {
         try {

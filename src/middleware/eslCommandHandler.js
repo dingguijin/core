@@ -141,7 +141,7 @@ commandEmitter.on('wss::' + WebitelCommandTypes.AttXferCancel.name, function (ex
 
 commandEmitter.on('wss::' + WebitelCommandTypes.Dump.name, function (execId, args, ws) {
     if (!doSendFreeSWITCHCommand(execId, ws)) return;
-    eslConn.bgapi('uuid_dump ' + args['channel-uuid'], function (res) {
+    eslConn.bgapi('uuid_dump ' + args['uuid'] + ' json', function (res) {
         getCommandResponseJSON(ws, execId, res);
     });
 });
