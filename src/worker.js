@@ -7,7 +7,7 @@ var log = require('./lib/log')(module);
 var conf = require('./conf');
 
 var httpServ = (conf.get('ssl:enabled')) ? require('https') : require('http');
-httpServ.globalAgent.maxSockets = Infinity;
+//httpServ.globalAgent.maxSockets = Infinity;
 var fs = require('fs');
 var path = require("path");
 global.__appRoot = path.resolve(__dirname);

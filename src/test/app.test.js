@@ -359,6 +359,8 @@ describe('Routing', function() {
         function onMessage (res) {
             //console.dir(res);
             var _res = JSON.parse(res);
+            if (!_res['exec-uuid'])
+                return;
             var fn = apiQ[_res['exec-uuid']];
             fn(_res);
             delete apiQ[_res['exec-uuid']];
