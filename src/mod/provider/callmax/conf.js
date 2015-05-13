@@ -5,6 +5,8 @@
 var path = require('path');
 var nconf = require(path.join(__appRoot, 'conf'));
 
-//nconf.file('callmax', path.join(__appRoot, 'conf','callmax.json'));
+if (!nconf.get('callmax')) {
+    nconf.file('callmax', path.join(__appRoot, 'conf', 'callmax.json'));
+}
 
 module.exports = nconf;

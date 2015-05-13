@@ -4,6 +4,7 @@
     "srvHost": null,
     "username": null,
     "password": null,
-    "defDialplan": null
+    "defDialplan": null,
+    "defPrice": null
   }
 }

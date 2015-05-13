@@ -362,6 +362,10 @@ describe('Routing', function() {
             if (!_res['exec-uuid'])
                 return;
             var fn = apiQ[_res['exec-uuid']];
+
+            if (!fn)
+                return;
+
             fn(_res);
             delete apiQ[_res['exec-uuid']];
         };
