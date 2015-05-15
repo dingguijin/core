@@ -59,6 +59,10 @@ module.exports.WebitelCommandTypes = {
         name: 'att_xfer_cancel',
         perm: 0
     },
+    VideoRefresh: {
+        name: 'video_refresh',
+        perm: 0
+    },
     Auth: {
         name: 'auth',
         perm: 0

@@ -11,7 +11,7 @@ var conf = require('../conf'),
     result = {
         priceId: null,
         dialId: null,
-        dialName:  PBX_DIALPLAN.toString()
+        dialName:  PBX_DIALPLAN
     }
     ;
 

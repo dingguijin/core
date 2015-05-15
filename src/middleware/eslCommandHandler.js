@@ -49,6 +49,13 @@ commandEmitter.on('wss::' + WebitelCommandTypes.Bridge.name, function (execId, a
     });
 });
 
+commandEmitter.on('wss::' + WebitelCommandTypes.VideoRefresh.name, function (execId, args, ws) {
+    if (!doSendFreeSWITCHCommand(execId, ws)) return;
+    eslConn.bgapi('uuid_video_refresh ' + args['uuid'], function (res) {
+        getCommandResponseJSON(ws, execId, res)
+    });
+});
+
 commandEmitter.on('wss::' + WebitelCommandTypes.Hangup.name, function (execId, args, ws) {
     if (!doSendFreeSWITCHCommand(execId, ws)) return;
     eslConn.bgapi('uuid_kill ' + args['channel-uuid'], function (res) {
