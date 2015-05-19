@@ -56,7 +56,8 @@ commandEmitter.on('wss::' + WebitelCommandTypes.Auth.name, function (execId, arg
                         'login': webitelId,
                         'role': userParam.role.name,
                         'domain': userParam.domain,
-                        'cc-agent': userParam['cc-agent']
+                        'cc-agent': userParam['cc-agent'],
+                        'ws-count': user.ws.length
                     }
                 }));
             } catch (e) {
@@ -212,6 +213,42 @@ commandEmitter.on('wss::' + WebitelCommandTypes.Domain.Remove.name, function (ex
     if (!_caller) return;
     webitel.domainRemove(_caller, args['name'] || '', function(res) {
         getCommandResponseJSON(ws, execId, res);
+    });
+});
+
+commandEmitter.on('wss::' + WebitelCommandTypes.Domain.Item.name, function (execId, args, ws) {
+    var _caller = doSendWebitelCommand(execId, ws, WebitelCommandTypes.Domain.Item);
+    if (!_caller) return;
+    webitel.domainItem(_caller, args['name'] || '', function(res) {
+        var _res = res;
+        try {
+            if (_res['body'] instanceof Object) {
+                _res['body'] = JSON.stringify(_res['body']);
+            }
+        } catch (e) {
+            log.error(e['message']);
+        };
+        getCommandResponseV2JSON(ws, execId, _res);
+    });
+});
+
+commandEmitter.on('wss::' + WebitelCommandTypes.Domain.Update.name, function (execId, args, ws) {
+    var _caller = doSendWebitelCommand(execId, ws, WebitelCommandTypes.Domain.Update);
+    if (!_caller) return;
+    var params = args['params'];
+    webitel.updateDomain(_caller, args['name'] || '', {
+        "type": params && params['type'],
+        "params": params && params['attribute']
+    }, function(res) {
+        var _res = res;
+        try {
+            if (_res['body'] instanceof Object) {
+                _res['body'] = JSON.stringify(_res['body']);
+            }
+        } catch (e) {
+            log.error(e['message']);
+        };
+        getCommandResponseV2JSON(ws, execId, _res);
     });
 });
 

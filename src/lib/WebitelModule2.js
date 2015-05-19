@@ -226,11 +226,15 @@ var ConnectionStatus = {
     Disconnected: 2
 };
 
-Webitel.prototype.domainCreate = function(_caller, name, customerId, parameters, cb) {
+Webitel.prototype.domainCreate = function(_caller, name, customerId, option, cb) {
     var param = '';
-    if (parameters instanceof Array) {
-        param = '[' + parameters.join(',') + ']';
+    if (option && option['parameters'] instanceof Array) {
+        param += '[' + option['parameters'].join(',') + ']';
     };
+    if (option && option['variables'] instanceof Array) {
+        param += '{' + option['variables'].join(',') + '}';
+    };
+
     this.api(WebitelCommandTypes.Domain.Create, [
         param + name,
         customerId || ''
@@ -240,6 +244,40 @@ Webitel.prototype.domainCreate = function(_caller, name, customerId, parameters,
         customerId: customerId
     }, cb);
     command.execute(); */
+};
+
+Webitel.prototype.domainItem = function (_caller, name, cb) {
+    var scope = this;
+
+    if (!_caller || (_caller['attr']['role'].val < COMMAND_TYPES.Domain.Item.perm ||
+        (_caller['attr']['domain'] != name && _caller['attr']['role'].val != ACCOUNT_ROLE.ROOT.val))) {
+        cb({
+            body: PERMISSION_DENIED
+        });
+        return;
+    };
+
+    this.api(WebitelCommandTypes.Domain.Item, [
+        name || ''
+    ], function (res) {
+
+        if (res && res['body'] && res['body'].indexOf('+OK') > 0) {
+            scope._parsePlainCollectionToJSON(res['body'], function (err, resJSON) {
+                if (err) {
+                    log.error(err);
+                    cb({
+                        body: '-ERR ' + err['message']
+                    });
+                    return;
+                };
+                cb({
+                    body: resJSON
+                })
+            });
+        } else {
+            cb(res);
+        }
+    });
 };
 
 Webitel.prototype.domainList = function(_caller, customerId, cb) {
@@ -272,8 +310,65 @@ Webitel.prototype.domainRemove = function(_caller, name, cb) {
     command.execute(); */
 };
 
-Webitel.prototype.updateDomain = function(_caller) {
-    // TODO
+Webitel.prototype.updateDomain = function(_caller, name, option, cb) {
+
+    if (!_caller || (_caller['attr']['role'].val < COMMAND_TYPES.Domain.Update.perm ||
+        (_caller['attr']['domain'] != name && _caller['attr']['role'].val != ACCOUNT_ROLE.ROOT.val))) {
+        cb({
+            body: PERMISSION_DENIED
+        });
+        return;
+    };
+
+    var param = '',
+        scope = this
+        ;
+
+    if (!option || typeof option['type'] != 'string' || !(option['params'] instanceof Array)) {
+        cb({
+            "body": "-ERR: bad parameters."
+        });
+        return;
+    };
+
+    if ('var param'.indexOf(option['type']) === -1) {
+        cb({
+            "body": "Bad request."
+        });
+        return;
+    };
+
+    param += ' ' + option['type'] + ' ';
+
+    option['params'].forEach(function(item) {
+        if (item instanceof Object) {
+            param += item['key'] + '=' + (item['value'] || '');
+        } else {
+            param += item;
+        };
+    });
+
+    this.api(WebitelCommandTypes.Domain.Item, [
+        name || '',
+        param
+    ], function (res) {
+        if (res && res['body'] && res['body'].indexOf('+OK') > 0) {
+            scope._parsePlainCollectionToJSON(res['body'], function (err, resJSON) {
+                if (err) {
+                    log.error(err);
+                    cb({
+                        body: '-ERR ' + err['message']
+                    });
+                    return;
+                };
+                cb({
+                    body: resJSON
+                });
+            });
+        } else {
+            cb(res);
+        };
+    });
 };
 
 Webitel.prototype.list_users = function(_caller, domain, cb, format) {
@@ -568,6 +663,41 @@ Webitel.prototype.userRemove = function(_caller, user, cb) {
     cmd.execute();*/
 };
 
+Webitel.prototype.userItem = function (_caller, user, domain, cb) {
+    var _domain = domain || _caller['attr']['domain'];
+    var scope = this;
+
+    if (!_caller || (_caller['attr']['role'].val < COMMAND_TYPES.Account.Item.perm ||
+        (_caller['attr']['domain'] != _domain && _caller['attr']['role'].val != ACCOUNT_ROLE.ROOT.val))) {
+        cb({
+            body: PERMISSION_DENIED
+        });
+        return;
+    };
+
+    this.api(WebitelCommandTypes.Account.Change, [
+        user + '@' + _domain
+    ], function (res) {
+
+        if (res && res['body'] && res['body'].indexOf('+OK') > 0) {
+            scope._parsePlainCollectionToJSON(res['body'], function (err, resJSON) {
+                if (err) {
+                    log.error(err);
+                    cb({
+                        body: '-ERR ' + err['message']
+                    });
+                    return;
+                };
+                cb({
+                    body: resJSON
+                })
+            });
+        } else {
+            cb(res);
+        }
+    });
+};
+
 Webitel.prototype.queueList = function (_caller, args, cb) {
     args = args || {};
     var _domain = args['domain'] || _caller['attr']['domain'];
@@ -663,7 +793,7 @@ Webitel.prototype.queueItem = function (_caller, args, cb) {
         return;
     };
 
-    var _params = args['name'] + '@' + _domain,
+    var _params = 'queue ' + args['name'] + '@' + _domain,
         self = this
         ;
     this.api(WebitelCommandTypes.CallCenter.Root, [_params], function (res) {
@@ -706,7 +836,7 @@ Webitel.prototype.queueUpdateItem = function (_caller, args, cb) {
         return;
     };
 
-    var _params = args['name'] + '@' + _domain + ' ',
+    var _params = 'queue ' + args['name'] + '@' + _domain + ' ',
         self = this
         ;
 
@@ -788,7 +918,7 @@ Webitel.prototype.queueUpdateItemState = function (_caller, args, cb) {
         return;
     };
 
-    var _params = args['state'] + ' ' + args['name'] + '@' + _domain
+    var _params = 'queue ' + args['state'] + ' ' + args['name'] + '@' + _domain
         ;
     this.api(WebitelCommandTypes.CallCenter.Root, [_params], cb);
 };
@@ -1229,7 +1359,8 @@ var WebitelCommandTypes = {
     Domain: {
         List: 'domain list',
         Create: 'domain create',
-        Remove: 'domain remove'
+        Remove: 'domain remove',
+        Item: 'domain '
     },
     Account: {
         List: 'account list', //
@@ -1255,10 +1386,10 @@ var WebitelCommandTypes = {
     UserData: 'user_data',
 
     CallCenter: {
-        Root: 'callcenter_config queue',
-        List: 'list',
-        Create: 'create',
-        Delete: 'delete',
+        Root: 'callcenter_config',
+        List: 'queue list',
+        Create: 'queue create',
+        Delete: 'queue delete',
         Enable: 'enable',
         Disable: 'disable'
     }
@@ -1397,7 +1528,7 @@ Webitel.prototype._parsePlainCollectionToJSON = function (data, cb) {
             line;
 
         for (var i = 0, len = lines.length; i < len; i++) {
-            line = lines[i].split('=');
+            line = lines[i].split(/=/);
             _json[line[0]] = line[1];
         };
 

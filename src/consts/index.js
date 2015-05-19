@@ -89,6 +89,14 @@ module.exports.WebitelCommandTypes = {
         Remove: {
             name: 'api domain remove',
             perm: 2
+        }, //+
+        Item: {
+            name: 'api domain',
+            perm: 1
+        }, //+
+        Update: {
+            name: 'api domain change',
+            perm: 1
         } //+
     },
     Account: {
@@ -107,7 +115,11 @@ module.exports.WebitelCommandTypes = {
         Remove: {
             name: 'api account remove',
             perm: 1
-        } // +
+        }, // +
+        Item: {
+            name: 'api account',
+            perm: 1
+        }
     },
     Device: {
         List: {
@@ -260,6 +272,11 @@ module.exports.WebitelCommandTypes = {
 
         Busy: {
             name: "cc busy",
+            perm: 0
+        },
+
+        Login: {
+            name: 'cc login',
             perm: 0
         },
 

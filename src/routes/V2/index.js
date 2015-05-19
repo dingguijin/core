@@ -19,10 +19,15 @@ module.exports = function (app) {
     /* DOMAIN */
     app.post('/api/v2/domains', require('./domain').Create);
     app.get('/api/v2/domains', require('./domain').Get);
+    app.get('/api/v2/domains/:name', require('./domain').GetItem);
+    app.put('/api/v2/domains/:name/:type', require('./domain').Update);
     app.delete('/api/v2/domains/:name', require('./domain').Delete);
 
     /* ACCOUNT */
     app.get('/api/v2/accounts?:domain', require('./account').Get);
+    app.post('/api/v2/accounts', require('./account').Create);
+    app.get('/api/v2/accounts/:name', require('./account').GetItem);
+    app.put('/api/v2/accounts/:name/:type', require('./account').Update);
     app.post('/api/v2/accounts', require('./account').Create);
 
     /* CONFIGURE */

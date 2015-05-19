@@ -54,3 +54,23 @@ module.exports.Get = function (req, res, next) {
         };
     }, 'json');
 };
+
+module.exports.GetItem = function (req, res, next) {
+    if (!webitel.doSendCommandV2(res)) return;
+    webitel.userItem(req.webitelUser, req.params['name'], req.query['domain'], function (request) {
+        if (request['body'] instanceof Object) {
+            res.status(200).json({
+                "status": "OK",
+                "data": request['body']
+            });
+        } else {
+            res.status(200).json(rUtil.getRequestObject((request['body'] && request['body'].indexOf('-ERR') == 0)
+                ? "error" : "OK", request['body'], DOCS_LINK_ACCOUNT));
+        };
+    });
+};
+
+module.exports.Update = function (req, res, next) {
+    if (!webitel.doSendCommandV2(res)) return;
+
+};

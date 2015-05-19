@@ -41,6 +41,14 @@ try {
         });
     });
 
+    commandEmitter.on('wss::' + WebitelCommandTypes.CallCenter.Login.name, function (execId, args, ws) {
+        var _caller = doSendCCCommand(execId, ws, WebitelCommandTypes.CallCenter.Login);
+        if (!_caller) return;
+        cc.loginAgent(_caller, {state: args['state']}, function(res) {
+            getCommandResponseJSON(ws, execId, res);
+        });
+    });
+
 } catch (e) {
    log.error(e['message']);
 };
