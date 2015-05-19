@@ -7,7 +7,7 @@ var CC = require('./callcenter'),
 try {
     Users.on('removed', function (e) {
         try {
-            if (e['id'] && e['attr'] && e.attr['cc-agent']) {
+            if (e['id'] && e['attr'] && e.attr['cc-logged']) {
                 cc.logoutUser(e, function (res) {
                     log.trace((res && res['body'] && res.body.indexOf('+OK') === 0)
                         ? "Success logout cc " +  e['id']
@@ -44,7 +44,7 @@ try {
     commandEmitter.on('wss::' + WebitelCommandTypes.CallCenter.Login.name, function (execId, args, ws) {
         var _caller = doSendCCCommand(execId, ws, WebitelCommandTypes.CallCenter.Login);
         if (!_caller) return;
-        cc.loginAgent(_caller, {state: args['state']}, function(res) {
+        cc.loginAgent(_caller, {status: args['status']}, function(res) {
             getCommandResponseJSON(ws, execId, res);
         });
     });

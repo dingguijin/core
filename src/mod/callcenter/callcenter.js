@@ -109,11 +109,12 @@ CC.prototype.loginAgent = function (_user, opt, cb) {
 };
 
 CC.prototype.busyAgent = function (_user, opt, cb) {
-    var state = opt['state']
-        ? "'" + opt['state'] + "'"
-        : "'Idle'";
+    var status = opt['status']
+        ? "'" + opt['status'] + "'"
+        : "'On Break'";
 
-    eslConn.bgapi('callcenter_config agent set state ' + _user['id'] + " " + state, cb);
+    //eslConn.bgapi('callcenter_config agent set state ' + _user['id'] + " " + state, cb);
+    eslConn.bgapi('callcenter_config agent set status ' + _user['id'] + " " + status, cb);
 };
 
 function getResponseOK (res) {
