@@ -5,18 +5,18 @@ var CC = require('./callcenter'),
     log = require('../../lib/log')(module);
 
 try {
-    Users.on('removed', function (e) {
+    Users.on('removed', function (evt) {
         try {
-            if (e['id'] && e['attr'] && e.attr['cc-logged']) {
-                cc.logoutUser(e, function (res) {
+            if (evt['id'] && evt['cc-logged']) {
+                cc.logoutUser(evt, function (res) {
                     log.trace((res && res['body'] && res.body.indexOf('+OK') === 0)
-                        ? "Success logout cc " +  e['id']
+                        ? "Success logout cc " +  evt['id']
                         : "Error: " + res.body);
                 });
             };
         } catch (e){
             log.error(e['message']);
-        }
+        };
     });
 
     commandEmitter.on('sys::esl_create', function () {
