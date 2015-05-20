@@ -33,7 +33,7 @@ var doConnectWebitel = function() {
     });
 
     webitel.on('webitel::socket::close', function (e) {
-        log.error('Webitel error:', e);
+        log.error('Webitel error:', e.toString());
         setTimeout(doConnectWebitel, waitTimeReconnectWebitel);
     });
 
@@ -49,6 +49,8 @@ var doConnectWebitel = function() {
     webitel.on('webitel::event::auth::fail', function () {
         webitel.authed = false;
         log.error('webitel::event::auth::fail');
+        log.trace('Reconnect to webitel...');
+        setTimeout(doConnectWebitel, waitTimeReconnectWebitel);
     });
 
     webitel.on('webitel::end', function () {

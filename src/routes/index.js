@@ -17,4 +17,6 @@ module.exports = function (app) {
     require('./V1')(app);
 
     require('./V2')(app);
+
+    require('./error')(app);
 };

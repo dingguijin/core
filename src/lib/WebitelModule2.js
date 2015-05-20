@@ -76,8 +76,8 @@ Webitel.prototype.connect = function () {
 
 };
 
-Webitel.prototype._onSocketClose = function (err) {
-    this.emit('webitel::socket::close', err);
+Webitel.prototype._onSocketClose = function () {
+    this.emit('webitel::socket::close', new Error('socket close!'));
 };
 
 Webitel.prototype.send = function(command, args) {
@@ -339,8 +339,9 @@ Webitel.prototype.updateDomain = function(_caller, name, option, cb) {
     };
 
     param += ' ' + option['type'] + ' ';
-
-    option['params'].forEach(function(item) {
+    option['params'].forEach(function(item, index) {
+        if (index > 0)
+            param += ',';
         if (item instanceof Object) {
             param += item['key'] + '=' + (item['value'] || '');
         } else {
@@ -1525,11 +1526,17 @@ Webitel.prototype._parsePlainCollectionToJSON = function (data, cb) {
 
         var _json = {},
             lines = data.split('\n'),
-            line;
+            line,
+            attribute,
+            separatorId;
 
         for (var i = 0, len = lines.length; i < len; i++) {
-            line = lines[i].split(/=/);
-            _json[line[0]] = line[1];
+            line = lines[i];
+            separatorId = line.indexOf('=');
+            attribute = line.substring(0, separatorId);
+            if (attribute === '')
+                continue;
+            _json[attribute] = line.substring(separatorId + 1);
         };
 
         cb(null, _json);

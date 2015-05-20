@@ -207,6 +207,17 @@ Parser.prototype._parseEvent = function(headers, body) {
             event.addHeader('Webitel-Reply-OK', reply.substring(4));
         }
     };
+    /*
+        try {
+            if (typeof body === 'string' && body.indexOf('+OK') === 0) {
+                event['resultStatus'] = "OK"
+            } else {
+                event['resultStatus'] = "error"
+            }
+        } catch (e) {
+            log.error(e['message']);
+        }
+    */
 
     this.emit('webitel::event', event, headers, body);
 };

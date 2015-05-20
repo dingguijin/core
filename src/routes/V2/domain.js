@@ -36,7 +36,20 @@ module.exports.GetItem = function (req, res, next) {
         if (domain_name != '') {
             if (!webitel.doSendCommandV2(res)) return;
             webitel.domainItem(req.webitelUser, domain_name, function(request) {
-                res.status(200).json(rUtil.getRequestObject('OK', request.body, DOCS_LINK_DOMAIN));
+                //rUtil.getRequestObject('OK', request.body, DOCS_LINK_DOMAIN
+                if (typeof request['body'] === 'string') {
+                    res.status(200).json({
+                        "status": "error",
+                        "info": request.body,
+                        "more info": DOCS_LINK_DOMAIN
+                    });
+                } else {
+                    res.status(200).json({
+                        "status": "OK",
+                        "data": request.body,
+                        "more info": DOCS_LINK_DOMAIN
+                    });
+                };
             });
         } else {
             res.status(400).json(rUtil.getRequestObject('error', 'domain_name undefined.', DOCS_LINK_DOMAIN));
