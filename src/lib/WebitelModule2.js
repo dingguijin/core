@@ -695,7 +695,7 @@ Webitel.prototype.userItem = function (_caller, user, domain, cb) {
             });
         } else {
             cb(res);
-        }
+        };
     });
 };
 
