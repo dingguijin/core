@@ -87,21 +87,33 @@ var API = {
     GetTier: function (req, res, next) {
         var queue = req.params['queue'] + '@' + (req.webitelUser['attr']['domain'] || req.query['domain']);
         eslConn.bgapi('callcenter_config queue list agents ' + queue, function (result) {
-
-            webitel._parsePlainTableToJSONArray(result['body'], function (err, resJSON) {
-                if (err) {
-                    res.status(500).json({
+            try {
+                if (result['body'] && result['body'].indexOf('-ERR') === 0) {
+                    res.status(200).json({
                         "status": "error",
-                        "info": err['message']
+                        "info": result['body']
                     });
                     return;
                 };
-                res.status(200).json({
-                    "status": "OK",
-                    "info": resJSON
-                });
+                webitel._parsePlainTableToJSONArray(result['body'], function (err, resJSON) {
+                    if (err) {
+                        res.status(500).json({
+                            "status": "error",
+                            "info": err['message']
+                        });
+                        return;
+                    }
+                    ;
+                    res.status(200).json({
+                        "status": "OK",
+                        "info": resJSON
+                    });
 
-            }, '|');
+                }, '|');
+            } catch (e) {
+                log.error(e['message']);
+            };
+
         });
     },
 
