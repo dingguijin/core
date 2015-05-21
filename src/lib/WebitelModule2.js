@@ -493,7 +493,8 @@ Webitel.prototype.userCreate = function(_caller, args, cb) {
 
     if (args['attribute'] instanceof Object) {
         parameters = args.attribute['parameters'];
-        extensions = args.attribute['extensions'];
+        extensions = (typeof args.attribute['extensions'] === 'string' && args.attribute['extensions'] !== '')
+            ? args.attribute['extensions'] : null;
         variables = args.attribute['variables'];
     };
 
@@ -531,7 +532,7 @@ Webitel.prototype.userCreate = function(_caller, args, cb) {
     // TODO возможность задавать масив номера для пользователя
     if (typeof number !== 'string') {
         return cb({
-            "body": "-ERR: bar request (number)!"
+            "body": "-ERR: bad request (number)!"
         });
     };
     Controller.existsNumber(number, _domain, function (err, exists) {

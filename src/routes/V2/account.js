@@ -5,11 +5,11 @@ module.exports.Create = function (req, res, next) {
     try {
         if (!webitel.doSendCommandV2(res)) return;
         var domain = req.body.domain,
-            login = req.body.login,
-            role = req.body.role,
-            password = req.body.password,
-            parameters = req.body.parameters,
-            variables = req.body.variables
+            login = req.body['login'],
+            role = req.body['role'],
+            password = req.body['password'],
+            parameters = req.body['parameters'],
+            variables = req.body['variables']
             ;
 
         if (domain && login && role) {
@@ -26,7 +26,8 @@ module.exports.Create = function (req, res, next) {
                 "param": _param.join(''),
                 "attribute": {
                     "parameters": parameters,
-                    "variables": variables
+                    "variables": variables,
+                    "extensions": req.body['extensions']
                 }
             };
 
@@ -76,5 +77,17 @@ module.exports.GetItem = function (req, res, next) {
 
 module.exports.Update = function (req, res, next) {
     if (!webitel.doSendCommandV2(res)) return;
+    // TODO
+    res.status(404).json({
+        "status": "error"
+    });
+};
 
+module.exports.Delete = function (req, res, next) {
+    if (!webitel.doSendCommandV2(res)) return;
+    var id = req.params['name']
+        // TODO
+        ;
+        //domain = req.query['domain'] || ;
+    webitel.userRemove
 };
