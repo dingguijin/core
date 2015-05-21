@@ -489,7 +489,7 @@ Webitel.prototype.userCreate = function(_caller, args, cb) {
         extensions,
         scope = this;
 
-    if (typeof args['attribute'] === 'object') {
+    if (args['attribute'] instanceof Object) {
         parameters = args.attribute['parameters'];
         extensions = args.attribute['extensions'];
     };
