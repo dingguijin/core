@@ -3,7 +3,40 @@ var HashCollection = require('../lib/HashCollection'),
     Domains = global.Domains = new HashCollection('id'),
     Users = global.Users = new HashCollection('id'),
     ACCOUNT_EVENTS = require('../consts').ACCOUNT_EVENTS,
+    ACCOUNT_ROLE = require('../consts').ACCOUNT_ROLE,
+    db = require('../lib/mongoDrv'),
+    conf = require('../conf'),
     eventsCollection = require('./EventsCollection');
+
+moduleEventEmitter.on('webitel::ACCOUNT_ROLE', function (evnt) {
+    try {
+        var _user = Users.get(evnt['Account-User'] + '@' + evnt['Account-Domain']);
+        if (_user) {
+            _user.attr['role'] = ACCOUNT_ROLE[evnt['Account-Role'].toUpperCase()];
+            var collectionAuth = db.getCollection(conf.get('mongodb:collectionAuth'));
+            collectionAuth.update({
+                "username": _user['id']
+            }, {
+                "$set": {
+                    "role": _user.attr['role'].val
+            }}, {"multi": true}, function (err, result) {
+                if (err) {
+                    log.error('Updated db collectionAuth, user %s: %s', _user['id'], err['message']);
+                    return;
+                };
+                log.debug('Updated db collectionAuth, user %s: %s', _user['id'], result);
+            });
+        };
+    } catch (e) {
+        log.error(e['message']);
+    };
+});
+
+
+// TODO
+//moduleEventEmitter.on('webitel::USER_CHANGE', function (evnt) {
+//    console.dir(evnt)
+//});
 
 Domains.broadcast = function (domainName, event) {
     if (!domainName || !event) return;

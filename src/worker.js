@@ -1,12 +1,12 @@
-var userSessions = require('./middleware/userSessions');
 var CommandEmitter = require('./lib/CommandEmitter');
 var moduleEventEmitter = global.moduleEventEmitter = new CommandEmitter();
+var userSessions = require('./middleware/userSessions');
 var commandEmitter = global.commandEmitter = new CommandEmitter();
 var Webitel = require('./lib/WebitelModule2');
 var log = require('./lib/log')(module);
 var conf = require('./conf');
 
-var httpServ = (conf.get('ssl:enabled')) ? require('https') : require('http');
+var httpServ = (conf.get('ssl:enabled').toString() == 'true') ? require('https') : require('http');
 //httpServ.globalAgent.maxSockets = Infinity;
 var fs = require('fs');
 var path = require("path");
@@ -16,7 +16,7 @@ require('./middleware/logo')();
 require('./middleware/webitelCommandHandler');
 require('./middleware/eslCommandHandler');
 
-if (conf.get('application:callcenter'))
+if (conf.get('application:callcenter').toString() == 'true')
     require('./mod/callcenter');
 
 var webitel = global.webitel = null;
@@ -143,7 +143,7 @@ var doConnectFreeSWITCH = function() {
 
 doConnectFreeSWITCH();
 
-var wsOriginAllow = conf.get('server:socket:originHost');
+var wsOriginAllow = conf.get('server:socket:originHost').toString() == 'true';
 var handleVerifyClient = function (req) {
     if (wsOriginAllow) {
         return (req.origin.indexOf(wsOriginAllow) == -1)
@@ -164,7 +164,7 @@ require('./routes')(app);
 require('./mod/provider/callmax')(app);
 
 try {
-    if (conf.get('ssl:enabled')) {
+    if (conf.get('ssl:enabled').toString() == 'true') {
         var https_options = {
             key: fs.readFileSync(conf.get('ssl:ssl_key')),
             cert: fs.readFileSync(conf.get('ssl:ssl_cert'))

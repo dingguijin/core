@@ -34,7 +34,7 @@ function getLogger(module) {
             })
         ]
     });
-    if (conf.get('application:logstash:enabled')) {
+    if (conf.get('application:logstash:enabled').toString() == 'true') {
         logger.add(winston.transports.Logstash, {
             port: conf.get('application:logstash:port'),
             node_name: conf.get('application:logstash:node_name'),
