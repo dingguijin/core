@@ -1,5 +1,6 @@
 var DOCS_LINK_ACCOUNT = "",
-    rUtil = require('../../lib/requestUtil');
+    rUtil = require('../../lib/requestUtil'),
+    log = require('../../lib/log')(module);
 
 module.exports.Create = function (req, res, next) {
     try {
@@ -85,9 +86,17 @@ module.exports.Update = function (req, res, next) {
 
 module.exports.Delete = function (req, res, next) {
     if (!webitel.doSendCommandV2(res)) return;
-    var id = req.params['name']
-        // TODO
-        ;
-        //domain = req.query['domain'] || ;
-    webitel.userRemove
+    var id = req.params['name'],
+        domain = req.query['domain'] || req.webitelUser.attr['domain'] || '';
+    webitel.userRemove(req.webitelUser, id + '@' + domain, function(result) {
+        try {
+            res.status(200).json({
+                "status": result['body'].indexOf('-ERR') === 0 ? "error" : "OK",
+                "info": result['body']
+            });
+        } catch (e) {
+            log.error(e['message']);
+            next(e);
+        };
+    });
 };
