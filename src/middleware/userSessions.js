@@ -10,33 +10,47 @@ var HashCollection = require('../lib/HashCollection'),
 
 moduleEventEmitter.on('webitel::ACCOUNT_ROLE', function (evnt) {
     try {
-        var _user = Users.get(evnt['Account-User'] + '@' + evnt['Account-Domain']);
+        var _id = evnt['Account-User'] + '@' + evnt['Account-Domain'];
+        var _role = ACCOUNT_ROLE[evnt['Account-Role'].toUpperCase()];
+        var _user = Users.get(_id);
         if (_user) {
-            _user.attr['role'] = ACCOUNT_ROLE[evnt['Account-Role'].toUpperCase()];
-            var collectionAuth = db.getCollection(conf.get('mongodb:collectionAuth'));
-            collectionAuth.update({
-                "username": _user['id']
-            }, {
-                "$set": {
-                    "role": _user.attr['role'].val
-            }}, {"multi": true}, function (err, result) {
-                if (err) {
-                    log.error('Updated db collectionAuth, user %s: %s', _user['id'], err['message']);
-                    return;
-                };
-                log.debug('Updated db collectionAuth, user %s: %s', _user['id'], result);
-            });
+            _user.attr['role'] = _role;
         };
+
+        var collectionAuth = db.getCollection(conf.get('mongodb:collectionAuth'));
+        collectionAuth.update({
+            "username": _id
+        }, {
+            "$set": {
+                "role": _role.val
+            }}, {"multi": true}, function (err, result) {
+            if (err) {
+                log.error('Updated db collectionAuth, user %s: %s', _id, err['message']);
+                return;
+            };
+            log.debug('Updated db collectionAuth, user %s: %s', _id, result);
+        });
+
     } catch (e) {
         log.error(e['message']);
     };
 });
 
-
-// TODO
-//moduleEventEmitter.on('webitel::USER_CHANGE', function (evnt) {
-//    console.dir(evnt)
-//});
+moduleEventEmitter.on('webitel::USER_CHANGE', function (evnt) {
+    if (evnt['changed'] === "password") {
+        var _id = evnt['User-ID'] + '@' + evnt['User-Domain'];
+        var collectionAuth = db.getCollection(conf.get('mongodb:collectionAuth'));
+        collectionAuth.remove({
+            "username": _id
+        }, {"multi": true}, function (err, result) {
+            if (err) {
+                log.error('Remove db collectionAuth, user %s: %s', _id, err['message']);
+                return;
+            };
+            log.debug('Remove db collectionAuth, user %s: %s', _id, result);
+        });
+    };
+});
 
 Domains.broadcast = function (domainName, event) {
     if (!domainName || !event) return;
