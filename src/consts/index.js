@@ -118,7 +118,7 @@ module.exports.WebitelCommandTypes = {
         }, // +
         Item: {
             name: 'api account',
-            perm: 1
+            perm: 0
         }
     },
     Device: {

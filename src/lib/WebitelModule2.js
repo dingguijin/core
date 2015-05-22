@@ -677,9 +677,11 @@ Webitel.prototype.userRemove = function(_caller, user, cb) {
 Webitel.prototype.userItem = function (_caller, user, domain, cb) {
     var _domain = domain || _caller['attr']['domain'];
     var scope = this;
+    var _id = user + '@' + _domain;
 
     if (!_caller || (_caller['attr']['role'].val < COMMAND_TYPES.Account.Item.perm ||
-        (_caller['attr']['domain'] != _domain && _caller['attr']['role'].val != ACCOUNT_ROLE.ROOT.val))) {
+        ((_caller['attr']['domain'] != _domain || (_caller['attr']['role'].val == ACCOUNT_ROLE.USER.val &&
+        _id != _caller['id']))&& _caller['attr']['role'].val != ACCOUNT_ROLE.ROOT.val))) {
         cb({
             body: PERMISSION_DENIED
         });
@@ -687,7 +689,7 @@ Webitel.prototype.userItem = function (_caller, user, domain, cb) {
     };
 
     this.api(WebitelCommandTypes.Account.Change, [
-        user + '@' + _domain
+        _id
     ], function (res) {
 
         if (res && res['body'] && res['body'].indexOf('+OK') > 0) {
