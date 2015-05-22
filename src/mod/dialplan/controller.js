@@ -30,6 +30,7 @@ var Controller = {
     existsNumber: function (number, domain, cb) {
         var collection = db.getCollection(EXTENSION_COLLECTION_NAME);
         var _numberArray;
+        // TODO проверка на пробелы
         if (number instanceof Array) {
             _numberArray = number;
         } else {

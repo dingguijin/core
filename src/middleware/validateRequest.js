@@ -26,6 +26,7 @@ module.exports = function(req, res, next) {
             validateUser(key, function (err, dbUser) {
                 if (dbUser && dbUser.token == token) {
                     req['webitelUser'] = {
+                        "id": dbUser['username'],
                         "attr": {
                             "domain": dbUser['domain'],
                             "role": {

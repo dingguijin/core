@@ -284,6 +284,19 @@ commandEmitter.on('wss::' + WebitelCommandTypes.Account.Remove.name, function (e
     });
 });
 
+commandEmitter.on('wss::' + WebitelCommandTypes.Account.Item.name, function (execId, args, ws) {
+    try {
+        var _caller = doSendWebitelCommand(execId, ws, WebitelCommandTypes.Account.Item);
+        if (!_caller) return;
+        var _user = (args['user'] || '').split('@');
+        webitel.userItem(_caller, _user[0] || '', _user[1] || '', function (res) {
+            getCommandResponseV2JSON(ws, execId, res);
+        });
+    } catch (e) {
+        log.error(e['message']);
+    }
+});
+
 commandEmitter.on('wss::' + WebitelCommandTypes.Device.List.name, function (execId, args, ws) {
     var _caller = doSendWebitelCommand(execId, ws, WebitelCommandTypes.Device.List);
     if (!_caller) return;
@@ -430,6 +443,8 @@ commandEmitter.on('wss::' + WebitelCommandTypes.CDR.RecordCall.name, function (e
 
 var getCommandResponseJSON = function (_ws, id, res) {
     try {
+        if (res['body'] instanceof Object)
+            res['body'] = JSON.stringify(res['body']);
         _ws.send(JSON.stringify({
             'exec-uuid': id,
             'exec-complete': (res['body'].indexOf('-ERR') == 0 || res['body'].indexOf('-USAGE') == 0) ? "-ERR" : "+OK",
@@ -445,6 +460,8 @@ var getCommandResponseJSON = function (_ws, id, res) {
 
 var getCommandResponseV2JSON = function (_ws, id, res) {
     try {
+        if (res['body'] instanceof Object)
+            res['body'] = JSON.stringify(res['body']);
         _ws.send(JSON.stringify({
             'exec-uuid': id,
             'exec-complete': (res['body'].indexOf('-ERR') == 0 || res['body'].indexOf('-USAGE') == 0) ? "-ERR" : "+OK",
