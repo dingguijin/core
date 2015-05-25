@@ -37,18 +37,24 @@ moduleEventEmitter.on('webitel::ACCOUNT_ROLE', function (evnt) {
 });
 
 moduleEventEmitter.on('webitel::USER_CHANGE', function (evnt) {
-    if (evnt['changed'] === "password") {
-        var _id = evnt['User-ID'] + '@' + evnt['User-Domain'];
-        var collectionAuth = db.getCollection(conf.get('mongodb:collectionAuth'));
-        collectionAuth.remove({
-            "username": _id
-        }, {"multi": true}, function (err, result) {
-            if (err) {
-                log.error('Remove db collectionAuth, user %s: %s', _id, err['message']);
-                return;
-            };
-            log.debug('Remove db collectionAuth, user %s: %s', _id, result);
-        });
+    try {
+        if (evnt['changed'] === "password") {
+            var _id = evnt['User-ID'] + '@' + evnt['User-Domain'];
+            var collectionAuth = db.getCollection(conf.get('mongodb:collectionAuth'));
+            collectionAuth.remove({
+                "username": _id
+            }, {"multi": true}, function (err, result) {
+                if (err) {
+                    log.error('Remove db collectionAuth, user %s: %s', _id, err['message']);
+                    return;
+                }
+                ;
+                log.debug('Remove db collectionAuth, user %s: %s', _id, result);
+            });
+        }
+        ;
+    } catch (e) {
+        log.errro(e['message']);
     };
 });
 

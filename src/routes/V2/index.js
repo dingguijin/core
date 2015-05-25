@@ -73,17 +73,20 @@ module.exports = function (app) {
     app.get('/api/v2/callcenter/queues', callcenter.List);
     app.post('/api/v2/callcenter/queues', callcenter.Create);
     app.get('/api/v2/callcenter/queues/:name', callcenter.Item);
-    // TODO PATCH !!!
     app.put('/api/v2/callcenter/queues/:name', callcenter.Update);
-    // TODO PATCH !!!
+    // TODO DELETE PUT !!!
     app.put('/api/v2/callcenter/queues/:name/:state', callcenter.SetState);
+    app.patch('/api/v2/callcenter/queues/:name/:state', callcenter.SetState);
+
     app.delete('/api/v2/callcenter/queues/:name', callcenter.Delete);
 
     app.post('/api/v2/callcenter/queues/:queue/tiers', callcenter.PostTier);
     app.get('/api/v2/callcenter/queues/:queue/tiers', callcenter.GetTier);
-    // TODO PATCH !!!
+    // TODO DELETE PUT !!!
     app.put('/api/v2/callcenter/queues/:queue/tiers/:agent/level', callcenter.PutLevel);
-    // TODO PATCH !!!
+    app.patch('/api/v2/callcenter/queues/:queue/tiers/:agent/level', callcenter.PutLevel);
+    // TODO DELETE PUT !!!
     app.put('/api/v2/callcenter/queues/:queue/tiers/:agent/position', callcenter.PutPosition);
+    app.patch('/api/v2/callcenter/queues/:queue/tiers/:agent/position', callcenter.PutPosition);
     app.delete('/api/v2/callcenter/queues/:queue/tiers/:agent', callcenter.DeleteTier);
 };

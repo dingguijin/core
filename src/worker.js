@@ -7,7 +7,7 @@ var log = require('./lib/log')(module);
 var conf = require('./conf');
 
 var httpServ = (conf.get('ssl:enabled').toString() == 'true') ? require('https') : require('http');
-//httpServ.globalAgent.maxSockets = Infinity;
+httpServ.globalAgent.maxSockets = Infinity;
 var fs = require('fs');
 var path = require("path");
 global.__appRoot = path.resolve(__dirname);
@@ -92,10 +92,11 @@ var doConnectFreeSWITCH = function() {
             log.info('Connect freeSWITCH - OK');
             this.apiCallbackQueue.length = 0;
             eslConnected = true;
-
+            /*
             eslConn.bgapi('global_getvar', function (res) {
                 mod_dialplan.setupGlobalVariable(res);
-            })
+            });
+            */
         });
 
     eslConn.on('error', function(e) {
@@ -174,7 +175,7 @@ try {
         });
     } else {
         srv = httpServ.createServer(app).listen(conf.get('server:port'), conf.get('server:host'), function() {
-            log.info('Express server (https) listening on port ' + this.address().port);
+            log.info('Express server (http) listening on port ' + this.address().port);
         });
     };
 } catch (e) {

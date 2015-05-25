@@ -1,25 +1,11 @@
-var amqp = require('amqp');
+var WebSocketServer = require('ws').Server
+  , wss = new WebSocketServer({ port: 10022 });
 
-var connection = amqp.createConnection({
-    host: '194.44.216.235'
-    , port: 5672
-    , login: 'guest'
-    , password: 'guest'
-});
-
-// Wait for connection to become established.
-connection.on('ready', function () {
-    // Use the default 'amq.topic' exchange
-    connection.queue('my-queue', function (q) {
-        // Catch all messages
-        q.bind('TAP.Events', function () {
-            console.log('BIND OK');
-        });
-
-        // Receive messages
-        q.subscribe(function (message) {
-            // Print messages to stdout
-            console.log(message);
-        });
-    });
+wss.on('connection', function connection(ws) {
+  ws.on('message', function incoming(message) {
+    console.log('received: %s', message);
+	var msg = JSON.parse(message);
+	ws.send(JSON.stringify({"exec-uuid":msg['exec-uuid'],"exec-complete":"+OK","exec-response":{"response":"Successfuly logged in."}}))
+  });
+  
 });
