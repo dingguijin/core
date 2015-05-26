@@ -11,7 +11,7 @@ try {
                 cc.logoutUser(evt, function (res) {
                     log.trace((res && res['body'] && res.body.indexOf('+OK') === 0)
                         ? "Success logout cc " +  evt['id']
-                        : "Error: " + res.body);
+                        : "Error: " + (res['body'] || '').trim());
                 });
             };
         } catch (e){

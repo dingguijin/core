@@ -483,99 +483,112 @@ Webitel.prototype.userList = function(_caller, domain, cb) {
 // TODO mod_cc
 
 Webitel.prototype.userCreate = function(_caller, args, cb) {
-    var _id = args['param'] || '',
-        role = '',
-        _str = '',
-        parameters,
-        extensions,
-        variables,
-        scope = this;
+    try {
+        var _id = args['param'] || '',
+            role = '',
+            _str = '',
+            parameters,
+            extensions,
+            variables,
+            scope = this;
 
-    if (args['attribute'] instanceof Object) {
-        parameters = args.attribute['parameters'];
-        extensions = (typeof args.attribute['extensions'] === 'string' && args.attribute['extensions'] !== '')
-            ? args.attribute['extensions'] : null;
-        variables = args.attribute['variables'];
-    };
+        if (args['attribute'] instanceof Object) {
+            parameters = args.attribute['parameters'];
+            extensions = (typeof args.attribute['extensions'] === 'string' && args.attribute['extensions'] !== '')
+                ? args.attribute['extensions'] : null;
+            variables = args.attribute['variables'];
+        }
+        ;
 
-    var _domain = _id.split('@')[1];
+        var _domain = _id.split('@')[1];
 
-    if (!_caller || (_caller['attr']['role'].val < COMMAND_TYPES.Account.Create.perm ||
-        (_caller['attr']['domain'] != _domain && _caller['attr']['role'].val != ACCOUNT_ROLE.ROOT.val))) {
-        cb({
-            body: PERMISSION_DENIED
-        });
-        return;
-    };
+        if (!_caller || (_caller['attr']['role'].val < COMMAND_TYPES.Account.Create.perm ||
+            (_caller['attr']['domain'] != _domain && _caller['attr']['role'].val != ACCOUNT_ROLE.ROOT.val))) {
+            cb({
+                body: PERMISSION_DENIED
+            });
+            return;
+        }
+        ;
 
-    if (args['role'] != 'admin' && args['role'] != 'user') {
-        cb({
-            body: "ROLE is require."
-        });
-        return;
-    } else {
-        role = args['role'] + ',webrtc';
-    };
+        if (!args['role'] || (args['role'].indexOf('admin') == -1 && args['role'].indexOf('user') == -1)) {
+            cb({
+                body: "ROLE is require."
+            });
+            return;
+        } else {
+            role = (args['role'] instanceof Array ? args['role'].join(',') : args['role'])  + ',webrtc';
+        }
+        ;
 
-    if (parameters instanceof Array) {
-        _str += '[' + parameters.join(',') + ']';
-    };
-    if (variables  instanceof Array) {
-        _str += '{' + variables.join(',') + '}';
-    };
+        if (parameters instanceof Array) {
+            _str += '[' + parameters.join(',') + ']';
+        }
+        ;
+        if (variables  instanceof Array) {
+            _str += '{' + variables.join(',') + '}';
+        }
+        ;
 
-    role = _str + role;
+        role = _str + role;
 
-    var _refUser = _id.split(/\:|@/)[0];
-    var number = extensions || _refUser;
+        var _refUser = _id.split(/\:|@/)[0];
+        var number = extensions || _refUser;
 
-    // TODO возможность задавать масив номера для пользователя
-    if (typeof number !== 'string') {
-        return cb({
-            "body": "-ERR: bad request (number)!"
-        });
-    };
-    Controller.existsNumber(number, _domain, function (err, exists) {
-        try {
-            if (err) {
-                return cb({
-                    "body": "-ERR: " + err['message']
-                });
-            }
-            ;
-            if (exists) {
-                log.debug('Add number: %s in extension collection exists.', number);
-                return cb({
-                    "body": "-ERR: Number exists"
-                });
-            }
-            ;
-
-            scope.api(WebitelCommandTypes.Account.Create, [
-                role,
-                _id
-            ], function (res) {
-                try {
-                    if (res && res['body'] && res['body'].indexOf('+OK') == 0) {
-                        Controller.createNumber(_refUser, number, _domain, function (err) {
-                            if (err)
-                                return log.error(err['message']);
-                            log.debug('User save DB: %s', _id);
-                        });
-                    }
-                    ;
-                } catch (e) {
+        // TODO возможность задавать масив номера для пользователя
+        if (typeof number !== 'string') {
+            return cb({
+                "body": "-ERR: bad request (number)!"
+            });
+        }
+        ;
+        Controller.existsNumber(number, _domain, function (err, exists) {
+            try {
+                if (err) {
                     return cb({
-                        "body": '-ERR: ' + e['message']
+                        "body": "-ERR: " + err['message']
                     });
                 }
-                cb(res);
-            });
+                ;
+                if (exists) {
+                    log.debug('Add number: %s in extension collection exists.', number);
+                    return cb({
+                        "body": "-ERR: Number exists"
+                    });
+                }
+                ;
+
+                scope.api(WebitelCommandTypes.Account.Create, [
+                    role,
+                    _id
+                ], function (res) {
+                    try {
+                        if (res && res['body'] && res['body'].indexOf('+OK') == 0) {
+                            Controller.createNumber(_refUser, number, _domain, function (err) {
+                                if (err)
+                                    return log.error(err['message']);
+                                log.debug('User save DB: %s', _id);
+                            });
+                        }
+                        ;
+                    } catch (e) {
+                        return cb({
+                            "body": '-ERR: ' + e['message']
+                        });
+                    }
+                    cb(res);
+                });
 
             } catch (e) {
                 log.error(e['message'])
             }
         });
+    } catch (e) {
+        cb({
+            "body": e['message']
+        });
+        log.error(e['message']);
+    };
 
 
    /* var cmd = new WebitelCommand(WebitelCommandTypes.Account.Create, {
