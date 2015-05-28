@@ -25,8 +25,8 @@ module.exports = function (wss) {
         };
 
         ws.on('message', function(message) {
-            log.trace('received: %s', message);
             try {
+                log.trace('received: %s', message);
                 var msg = JSON.parse(message);
                 var execId = msg['exec-uuid'];
                 var args = msg['exec-args'] || {};
@@ -34,7 +34,6 @@ module.exports = function (wss) {
                 if (msg['exec-func']) {
                     commandEmitter.emit('wss::' + msg['exec-func'], execId, args, ws);
                 };
-
             } catch (e) {
                 handleSocketError(ws);
                 log.error('Command error:', e.message);

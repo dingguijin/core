@@ -84,15 +84,18 @@ Webitel.prototype._onSocketClose = function () {
 };
 
 Webitel.prototype.send = function(command, args) {
-    var self = this;
+    var self = this,
+        cmdStr;
     var _command = [];
     try {
         _command.push(command);
         for (var key in args) {
             _command.push(args[key]);
         };
-        log.debug('Execute: ' + _command.join(' '));
-        self.socket.write(_command.join(' ') + '\n\n');
+        cmdStr = _command.join(' ');
+
+        self.socket.write(cmdStr + '\n\n');
+        log.debug('Execute: ' + cmdStr);
     }
     catch(e) {
         self.emit('error', e);
@@ -490,7 +493,7 @@ Webitel.prototype.userCreate = function(_caller, args, cb) {
         var _id = args['param'] || '',
             role = '',
             _str = '',
-            parameters,
+            parameters = [],
             extensions,
             variables,
             scope = this;

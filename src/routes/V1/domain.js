@@ -2,7 +2,7 @@ module.exports.Create = function (req, res, next) {
     try {
         var domain_name = req.body.domain_name,
             customer_id = req.body.customer_id,
-            parameters = req.body.parameters
+            parameters = req.body
         ;
         if (domain_name && customer_id) {
             if (!webitel.doSendCommand(res)) return;

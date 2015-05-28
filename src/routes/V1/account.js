@@ -4,7 +4,8 @@ module.exports.Create = function (req, res, next) {
             login = req.body.login,
             role = req.body.role,
             password = req.body.password,
-            parameters = req.body.parameters
+            parameters = req.body.parameters,
+            variables = req.body.variables
             ;
 
         if (domain && login && role) {
@@ -19,7 +20,10 @@ module.exports.Create = function (req, res, next) {
             var q = {
                 "role": role,
                 "param": _param.join(''),
-                "parameters": parameters
+                "attribute": {
+                    "parameters": parameters,
+                    "variables": variables
+                }
             };
 
             // TODO _caller - сделать когда будет логин работать

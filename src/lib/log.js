@@ -42,7 +42,22 @@ function getLogger(module) {
             level: conf.get('application:loglevel')
         });
     };
+    //(\"secret\"\:\"[^\"]*\")|(password=[^,|"]*)|(\bauth\b[^.]*)
+    logger.addFilter(function (msg, meta) {
+        return maskSecrets(msg, meta);
+    });
     return logger;
 };
+
+function maskSecrets(msg, meta) {
+    if (/secret|password|\bauth\b/) {
+        msg = msg.replace(/(\"secret\"\:\"[^\"]*\")|(password=[^,|"]*)|(\sauth\s[^.]*)|("password","value":"[^"]*)/g, '*****');
+    };
+
+    return {
+        msg: msg,
+        meta: meta
+    };
+}
 
 module.exports = getLogger;
