@@ -156,7 +156,7 @@ describe('Routing', function() {
          });
          */
 
-        it('Звонок на номер ' + testConfig.callNumber, function (done) {
+      /*  it('Звонок на номер ' + testConfig.callNumber, function (done) {
             var _r = {
                 calledId: testConfig.callNumber,
                 callerId: testConfig.user.number + '@' + testConfig.domain
@@ -177,7 +177,7 @@ describe('Routing', function() {
                         throw res.body.info
                     }
                 });
-        });
+        }); */
 
         it('Удалить домен', function (done) {
             request(url)
