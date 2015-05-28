@@ -27,7 +27,7 @@ module.exports = function (app) {
     app.get('/api/v2/accounts?:domain', require('./account').Get);
     app.post('/api/v2/accounts', require('./account').Create);
     app.get('/api/v2/accounts/:name', require('./account').GetItem);
-    //app.put('/api/v2/accounts/:name/:type?', require('./account').Update);
+    app.put('/api/v2/accounts/:name?', require('./account').Update);
     app.delete('/api/v2/accounts/:name', require('./account').Delete);
 
     /* CONFIGURE */

@@ -78,9 +78,13 @@ module.exports.GetItem = function (req, res, next) {
 
 module.exports.Update = function (req, res, next) {
     if (!webitel.doSendCommandV2(res)) return;
-    // TODO
-    res.status(404).json({
-        "status": "error"
+    var userId = req.params['name'];
+
+    webitel.userUpdateV2(req.webitelUser, userId, req.query['domain'],  req['body'], function (result) {
+        res.status(200).json({
+            "status": "OK",
+            "info": (result && result['body']) || "ERROR"
+        });
     });
 };
 

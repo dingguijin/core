@@ -269,11 +269,24 @@ commandEmitter.on('wss::' + WebitelCommandTypes.Account.Create.name, function (e
 });
 
 commandEmitter.on('wss::' + WebitelCommandTypes.Account.Change.name, function (execId, args, ws) {
-    var _caller = doSendWebitelCommand(execId, ws, WebitelCommandTypes.Account.Change);
-    if (!_caller) return;
-    webitel.userUpdate(_caller, args['user'] || '', args['param'] || '', args['value'] || '', function(res) {
-        getCommandResponseJSON(ws, execId, res);
-    });
+    try {
+        var _caller = doSendWebitelCommand(execId, ws, WebitelCommandTypes.Account.Change);
+        if (!_caller) return;
+        if (args['param'] instanceof Object) {
+            var _user = (typeof args['user'] === 'string' ? args['user'] : "").split('@');
+            webitel.userUpdateV2(_caller, _user[0], _user[1], args['param'], function (res) {
+                getCommandResponseJSON(ws, execId, res);
+            });
+        } else {
+            // TODO del userUpdate
+            webitel.userUpdate(_caller, args['user'] || '', args['param'] || '', args['value'] || '', function (res) {
+                getCommandResponseJSON(ws, execId, res);
+            });
+        }
+        ;
+    } catch (e) {
+        log.error(e['message']);
+    }
 });
 
 commandEmitter.on('wss::' + WebitelCommandTypes.Account.Remove.name, function (execId, args, ws) {

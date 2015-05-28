@@ -6,7 +6,10 @@ var EventEmitter2 = require('eventemitter2').EventEmitter2,
     PERMISSION_DENIED = '-ERR permission denied!',
     ACCOUNT_ROLE = require('../consts').ACCOUNT_ROLE,
     Controller = require('../mod/dialplan/controller'),
+    async = require('async'),
     COMMAND_TYPES = require('../consts').WebitelCommandTypes;
+
+var VARIABLE_EXTENSION_NAME = 'webitel-extensions';
 
 var Webitel = module.exports = function (parameters) {
     EventEmitter2.call(this, {
@@ -493,9 +496,7 @@ Webitel.prototype.userCreate = function(_caller, args, cb) {
             scope = this;
 
         if (args['attribute'] instanceof Object) {
-            parameters = args.attribute['parameters'];
-            extensions = (typeof args.attribute['extensions'] === 'string' && args.attribute['extensions'] !== '')
-                ? args.attribute['extensions'] : null;
+            parameters = args.attribute['parameters'] || [];
             variables = args.attribute['variables'];
         }
         ;
@@ -521,16 +522,14 @@ Webitel.prototype.userCreate = function(_caller, args, cb) {
         }
         ;
 
-        if (parameters instanceof Array) {
-            _str += '[' + parameters.join(',') + ']';
-        }
-        ;
-        if (variables  instanceof Array) {
-            _str += '{' + variables.join(',') + '}';
-        }
-        ;
-
-        role = _str + role;
+        var _ext;
+        for (var key in parameters) {
+            _ext = parameters[key];
+            if (_ext && _ext.indexOf(VARIABLE_EXTENSION_NAME + '=') == 0) {
+                extensions = _ext.replace(VARIABLE_EXTENSION_NAME + '=', '');
+                break;
+            }
+        };
 
         var _refUser = _id.split(/\:|@/)[0];
         var number = extensions || _refUser;
@@ -542,6 +541,19 @@ Webitel.prototype.userCreate = function(_caller, args, cb) {
             });
         }
         ;
+        parameters.push(VARIABLE_EXTENSION_NAME + '=' + number);
+
+        if (parameters instanceof Array) {
+            _str += '[' + parameters.join(',') + ']';
+        }
+        ;
+        if (variables  instanceof Array) {
+            _str += '{' + variables.join(',') + '}';
+        }
+        ;
+
+        role = _str + role;
+
         Controller.existsNumber(number, _domain, function (err, exists) {
             try {
                 if (err) {
@@ -598,6 +610,124 @@ Webitel.prototype.userCreate = function(_caller, args, cb) {
     cmd.execute(); */
 };
 
+Webitel.prototype.userUpdateV2 = function (_caller, user, domain, option, cb) {
+    try {
+        var _domain = domain || _caller['attr']['domain'];
+
+        if ((_caller['attr']['role'].val < COMMAND_TYPES.Account.Change.perm ||
+            ((_caller['attr']['domain'] != _domain || (_caller['attr']['role'].val == ACCOUNT_ROLE.USER.val &&
+            user != _caller['id']))&& _caller['attr']['role'].val != ACCOUNT_ROLE.ROOT.val))) {
+            cb({
+                body: PERMISSION_DENIED
+            });
+            return;
+        };
+
+        var params = option['parameters'];
+        var variables = option['variables'];
+        var extensions;
+        var scope = this;
+
+        if (!_domain || ( !(params instanceof Array) && !(variables instanceof Array) )) {
+            cb({
+                "body": "-ERR: Bad request."
+            });
+            return;
+        };
+        
+        var setParamsOrVars = function (callback) {
+            var cmd = '';
+
+            if (params instanceof Array && params.length > 0) {
+                cmd += '[' + params.join(',') + ']';
+            };
+
+            if (variables instanceof Array && variables.length > 0) {
+                cmd += '{' + variables.join(',') + '}';
+            };
+
+            scope.api(WebitelCommandTypes.Account.Change, [
+                user + '@' + _domain,
+                cmd
+            ], function (res) {
+
+                if (res && res['body'] && res['body'].indexOf('+OK') > 0) {
+                    scope._parsePlainCollectionToJSON(res['body'], function (err, resJSON) {
+                        if (err) {
+                            log.error(err);
+                            callback(err);
+                            return;
+                        };
+                        callback(null, resJSON);
+                    });
+                } else {
+                    callback(new Error(res['body']));
+                };
+            });
+        };
+        
+        var setExtensions = function (callback) {
+            Controller.existsNumber(extensions, _domain, function (err, exists) {
+                if (err) {
+                    callback(err);
+                }
+                ;
+                if (exists) {
+                    log.debug('Add number: %s in extension collection exists.', user);
+                    callback(new Error('-ERR Number reserved.'));
+                    return;
+                }
+                ;
+
+                Controller.updateOrInsertNumber(user, extensions, _domain, function (err) {
+                    if (err) {
+                        callback(err);
+                        return log.error(err['message']);
+                    };
+                    callback(null, 'User update DB: ' + user);
+                    log.debug('User update DB: %s', user);
+                });
+            });
+        };
+
+        var task = [];
+
+        if (params) {
+            var _ext;
+            for (var key in params) {
+                _ext = params[key];
+                if (_ext && _ext.indexOf(VARIABLE_EXTENSION_NAME + '=') == 0) {
+                    extensions = _ext.replace(VARIABLE_EXTENSION_NAME + '=', '');
+                    task.push(setExtensions);
+                    break;
+                }
+            };
+        };
+
+        if (variables || params) {
+            task.push(setParamsOrVars);
+        };
+
+        async.series(task, function (err, res) {
+            if (err) {
+                cb({
+                    "body": err['message']
+                });
+                return;
+            };
+
+            cb({
+                "body": (res[0] instanceof Object) ? res[0] : res[1]
+            })
+        });
+
+    } catch (e) {
+        cb({
+            "body": '-ERR:' + e['message']
+        });
+    };
+};
+
 Webitel.prototype.userUpdate = function(_caller, user, paramName, paramValue, cb) {
     var _domain = user.split('@')[1];
 
@@ -606,6 +736,13 @@ Webitel.prototype.userUpdate = function(_caller, user, paramName, paramValue, cb
             user != _caller['id']))&& _caller['attr']['role'].val != ACCOUNT_ROLE.ROOT.val))) {
         cb({
             body: PERMISSION_DENIED
+        });
+        return;
+    };
+
+    if (paramName == '' || paramValue == '') {
+        cb({
+            body: '-ERR Bad request!'
         });
         return;
     };
