@@ -99,7 +99,8 @@ function getTemplateExtension(id, number, domain) {
         "version": 2,
         "callflow": [
             {
-                "setVar": [ "ringback=$${us-ring}", "transfer_ringback=$${uk-ring}"]
+                "setVar": [ "ringback=$${us-ring}", "transfer_ringback=$${uk-ring}","hangup_after_bridge=true",
+                    "continue_on_fail=true"]
             },
             {
                 "recordSession": "start"
@@ -110,6 +111,17 @@ function getTemplateExtension(id, number, domain) {
                         "name": number,
                         "type": "user"
                     }]
+                }
+            },
+            {
+                "answer": ""
+            },
+            {
+                "sleep": "1000"
+            },
+            {
+                "voicemail": {
+                    "user": number
                 }
             }
         ]

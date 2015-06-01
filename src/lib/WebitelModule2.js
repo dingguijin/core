@@ -701,6 +701,12 @@ Webitel.prototype.userUpdateV2 = function (_caller, user, domain, option, cb) {
                 _ext = params[key];
                 if (_ext && _ext.indexOf(VARIABLE_EXTENSION_NAME + '=') == 0) {
                     extensions = _ext.replace(VARIABLE_EXTENSION_NAME + '=', '');
+                    if (extensions == '') {
+                        cb({
+                            "body": "-ERR: Bad request (webitel-extensions)."
+                        });
+                        return;
+                    }
                     task.push(setExtensions);
                     break;
                 }
