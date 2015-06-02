@@ -160,6 +160,7 @@ var express = require('express'),
     srv;
 app.use(bodyParser.json());
 
+require('./mod/dashboard')(app);
 require('./routes')(app);
 //require('./mod/swagger')(app);
 require('./mod/provider/callmax')(app);
@@ -195,6 +196,7 @@ var WebSocketServer = require('ws').Server
     });
 
 require('./middleware/webSocketHandler')(wss);
+
 wss.broadcast = function(data) {
     for (var i in this.clients)
         this.clients[i].send(data);

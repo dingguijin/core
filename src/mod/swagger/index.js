@@ -2,7 +2,8 @@
  * Created by i.n on 04.05.2015.
  */
 var serveStatic = require('serve-static');
+var path = require('path');
 
 module.exports = function (app) {
-    app.use('/api/docs', serveStatic( __dirname + '/static'));
+    app.use('/api/docs/', serveStatic(path.join(__dirname, '/static')));
 };

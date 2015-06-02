@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Dashboard</title>
+
+    <!-- build:css css/sample.min.css -->
+    <!-- Bootstrap core CSS -->
+    <link href="components/bootstrap/dist/css/bootstrap.css" rel="stylesheet">
+
+    <!-- dashboard style -->
+    <link href="sys/styles/main.css" rel="stylesheet">
+    <link href="widgets/clock/src/style.css" rel="stylesheet">
+    <!-- endbuild -->
+
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+      <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+    <![endif]-->
+
+    <!--[if lte IE 8]>
+      <script>
+        document.createElement('adf-dashboard');
+        document.createElement('adf-widget');
+        document.createElement('adf-widget-content');
+        document.createElement('adf-dashboard-row');
+        document.createElement('adf-dashboard-column');
+
+        document.createElement('highchart');
+      </script>
+    <![endif]-->
+
+    <!-- inlince css -->
+    <style type="text/css">
+      body {
+        padding-top: 60px;
+      }
+      /* fixe for modal-backdrop*/
+      .modal-backdrop {
+        bottom: 0;
+        /* some fixes appear to use this, too: */
+        position: fixed;
+      }
+    </style>
+  </head>
+
+  <body ng-app="webitel" ng-controller="ApplicationController">
+
+    <div class="container">
+
+      <div ng-view />
+
+    </div>
+
+    <!-- build:js js/angular.min.js -->
+    <script type="text/javascript" src="components/angular/angular.js"></script>
+    <!-- endbuild -->
+
+    <!-- build:js js/angular-route.min.js -->
+    <script type="text/javascript" src="components/angular-route/angular-route.js"></script>
+    <!-- endbuild -->
+
+    <!-- build:js js/sample.min.js -->
+    <!-- Sortable -->
+    <script type="text/javascript" src="components/Sortable/Sortable.js"></script>
+
+    <!-- angular-bootstrap -->
+    <script type="text/javascript" src="components/angular-bootstrap/ui-bootstrap.js"></script>
+    <script type="text/javascript" src="components/angular-bootstrap/ui-bootstrap-tpls.js"></script>
+
+    <!-- scripts -->
+
+    <script type="text/javascript" src="sys/scripts/adf.js"></script>
+    <script type="text/javascript" src="sys/scripts/webitelModule.js"></script>
+    <script type="text/javascript" src="sys/scripts/webitelServices.js"></script>
+    <script type="text/javascript" src="sys/scripts/provider.js"></script>
+    <script type="text/javascript" src="sys/scripts/widget-content.js"></script>
+    <script type="text/javascript" src="sys/scripts/widget.js"></script>
+    <script type="text/javascript" src="sys/scripts/dashboard.js"></script>
+    <script type="text/javascript" src="sys/scripts/column.js"></script>
+    <script type="text/javascript" src="sys/scripts/row.js"></script>
+
+    <!-- local storage -->
+    <script type="text/javascript" src="components/angular-local-storage/dist/angular-local-storage.js"></script>
+
+    <!-- app -->
+    <script type="text/javascript" src="scripts/webitel.js"></script>
+    <script type="text/javascript" src="scripts/auth.js"></script>
+    <script type="text/javascript" src="scripts/board-01.js"></script>
+    <script type="text/javascript" src="scripts/board-02.js"></script>
+    <script type="text/javascript" src="scripts/board-03.js"></script>
+    <script type="text/javascript" src="scripts/board-04.js"></script>
+
+    <!-- structures -->
+    <script type="text/javascript" src="structures/base/src/base.js"></script>
+
+    <!-- news widget -->
+    <script type="text/javascript" src="widgets/news/src/news.js"></script>
+
+    <!-- weather widget -->
+    <script type="text/javascript" src="widgets/weather/src/weather.js"></script>
+
+    <!-- linklist widget -->
+    <script type="text/javascript" src="widgets/linklist/src/linklist.js"></script>
+
+    <!-- markdown widget -->
+    <script type="text/javascript" src="widgets/markdown/components/showdown/src/showdown.js"></script>
+    <script type="text/javascript" src="widgets/markdown/components/angular-markdown-directive/markdown.js"></script>
+    <script type="text/javascript" src="widgets/markdown/src/markdown.js"></script>
+
+    <!-- randommsg widget -->
+    <script type="text/javascript" src="widgets/randommsg/src/randommsg.js"></script>
+
+    <!-- github widget -->
+    <script type="text/javascript" src="widgets/github/components/highcharts/adapters/standalone-framework.src.js"></script>
+    <script type="text/javascript" src="widgets/github/components/highcharts/highcharts.js"></script>
+    <script type="text/javascript" src="widgets/github/components/highcharts-ng/dist/highcharts-ng.js"></script>
+    <script type="text/javascript" src="widgets/github/src/github.js"></script>
+    <script type="text/javascript" src="widgets/github/src/service.js"></script>
+    <script type="text/javascript" src="widgets/github/src/authorController.js"></script>
+    <script type="text/javascript" src="widgets/github/src/historyController.js"></script>
+
+    <!-- version widget -->
+    <script type="text/javascript" src="widgets/version/src/version.js"></script>
+
+    <!-- clock widget -->
+    <script type="text/javascript" src="widgets/clock/components/moment/moment.js"></script>
+    <script type="text/javascript" src="widgets/clock/src/clock.js"></script>
+
+    <!-- inject:js -->
+    <!-- endinject -->
+
+    <!-- endbuild -->
+  </body>
+</html>
