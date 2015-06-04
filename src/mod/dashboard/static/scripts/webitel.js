@@ -4,7 +4,7 @@ angular.module('webitel', [
   'adf', 'adf.structures.base', 'adf.widget.news',
   /*'adf.widget.randommsg',*/ 'adf.widget.weather',
   'adf.widget.markdown', 'adf.widget.linklist',
-  'adf.widget.github', //'adf.widget.version',
+  'adf.widget.github', 'adf.widget.accounts',
   'adf.widget.clock', 'LocalStorageModule',
   'board-01', 'board-02', 'board-03',
   'board-04', 'ngRoute' , 'auth', 'webitelService'

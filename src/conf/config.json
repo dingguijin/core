@@ -23,7 +23,7 @@
         "collectionFile": "cdrFile"
     },
     "webitelServer": {
-        "host": "10.10.10.139",
+        "host": "10.10.10.159",
         "port": "6873",
         "account": "root",
         "secret": "ROOT_PASSWORD",

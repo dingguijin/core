@@ -22,6 +22,33 @@
  THE SOFTWARE.
 */
 
+.account-online {
+    background-color: #9cc96b;
+    width: 100%;
+    height: 100%;
+    /*color: #101010;*/
+}
+.account-offline {
+     background-color: #f76c51;
+     width: 100%;
+     height: 100%;
+    /*color: #2c2c2c;*/
+ }
+.account-status {
+    width: 100%;
+    height: 100%;
+    /*background-color: #a9a9a9;*/
+}
+
+.account-status.nonreg {
+    background-color: #e3e8ee;
+}
+.account-status.onhook {
+    background-color: #9cc96b;
+}
+.account-status.isbusy {
+    background-color: #ebaa4b;
+}
 
 [ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {
   display: none !important;
