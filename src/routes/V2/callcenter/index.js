@@ -175,6 +175,37 @@ var API = {
             && request['body'].indexOf('-ERR') == 0)
                 ? "error" : "OK", request['body'], ''));
         });
+    },
+    
+    GetAgentList: function (req, res, next) {
+        //TODO придумать как с фильтром получить операторов!!!
+        var domain = req.webitelUser.attr['domain'] || req.query['domain'];
+
+        eslConn.bgapi('callcenter_config agent list', function (result) {
+            try {
+                webitel._parsePlainTableToJSONArray(result['body'], function (err, json) {
+                    if (err) {
+                        res.status(500).json({
+                            "status": "error",
+                            "info": err['message']
+                        });
+                        return;
+                    };
+                    var operators = [];
+                    for (var key in json) {
+                        if (json[key] && json[key]['name'].replace(/.*@/,'') == domain) {
+                            operators.push(json[key]); //json.splice(key, 1);
+                        };
+                    };
+
+                    res.status(200).json({
+                        "data": operators
+                    })
+                }, '|');
+            } catch (e) {
+
+            };
+        });
     }
 };
 

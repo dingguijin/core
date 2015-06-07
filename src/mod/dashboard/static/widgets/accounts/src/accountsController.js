@@ -3,7 +3,7 @@ angular.module('adf.widget.accounts')
   .controller('accountsGridCtrl', function($scope){
 
   })
-    .directive("keditor", function (webitelService, $rootScope) {
+    .directive("keditor", function (webitelService, $rootScope, Domain) {
         return {
             template:  function (el, attr) {
                 return '<table class="display" cellspacing="0" width="100%"></table>';
@@ -23,7 +23,7 @@ angular.module('adf.widget.accounts')
                         _fn();
                     };
                 });
-                webitelService.userList('10.10.10.144', function (res) {
+                webitelService.userList(Domain, function (res) {
                     try {
                         var data = JSON.parse(res.response.response),
                             result = [];

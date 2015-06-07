@@ -1,0 +1,210 @@
+<form role="form" class="form-horizontal" ng-controller="selectCHartTypeCtrl">
+
+    <tabset justified="true">
+        <tab heading="General">
+            <div style="margin-top: 10px">
+                <div class="form-group">
+                    <label for="input-cdr-title" class="col-sm-2 control-label">Name</label>
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control" ng-model="config.chartTitle" id="input-cdr-title" placeholder="Title">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="input-cdr-time" class="col-sm-2 control-label">Time</label>
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control" ng-model="config.timeUpdate" id="input-cdr-time" placeholder="Auto update time">
+                    </div>
+                </div>
+            </div>
+        </tab>
+        <tab heading="Chart" >
+
+            <div class="content" style="margin-top: 10px">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label for="input-cdr-chart-type" class="col-sm-2 control-label">Type</label>
+                            <div class="col-sm-10">
+                                <select ng-model="config.chartType"
+                                        ng-options="obj.id as obj.title for obj in chartTypes"
+                                        style="width: 100%" class="btn dropdown-toggle selectpicker btn-default" id="input-cdr-chart-type"></select>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label for="input-cdr-chart-stack" class="col-sm-2 control-label">Stack</label>
+                            <div class="col-sm-10">
+                                <select ng-model="config.chartStack"
+                                        ng-options="obj.id as obj.title for obj in chartStack"
+                                        style="width: 100%" class="btn dropdown-toggle selectpicker btn-default" id="input-cdr-chart-stack"></select>
+
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="panel panel-bordered-info">
+                    <!--<div class="panel-heading">-->
+                        <!--<h3 class="panel-title">Series</h3>-->
+                    <!--</div>-->
+                    <div class="panel-body">
+                        <tabset>
+                            <tab heading="{{chartSerie.name}}" ng-repeat="chartSerie in config.chartSeries">
+
+                                <div class="row" style="margin-top: 10px">
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label for="input-cdr-chart-series-{{$index}}" class="col-sm-2 control-label">Name</label>
+                                            <div class="col-sm-10">
+                                                <input type="text" class="form-control" ng-model="chartSerie.name" id="input-cdr-chart-series-{{$index}}" placeholder="Name">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label for="input-cdr-chart-series-type-{{$index}}" class="col-sm-2 control-label">Type</label>
+                                            <div class="col-sm-10">
+                                                <select ng-model="chartSerie.type"
+                                                        ng-options="obj.id as obj.title for obj in chartTypes"
+                                                        style="width: 100%" class="btn dropdown-toggle selectpicker btn-default" id="input-cdr-chart-series-type-{{$index}}"></select>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label for="input-cdr-chart-series-color-{{$index}}" class="col-sm-2 control-label">Color</label>
+
+                                            <div class="col-sm-10">
+                                                <div class="input-group">
+                                                    <span style="background-color: {{chartSerie.color}}" class="input-group-addon" id="basic-addon1-{{$index}}"></span>
+                                                    <input colorpicker="rgb" type="text" placeholder="Color" class="form-control"
+                                                           ng-model="chartSerie.color" aria-describedby="basic-addon1-{{$index}}">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <div class="col-sm-10">
+                                                <label class="checkbox">
+                                                    Legend
+                                                    <input style="margin-left: 7px;" type="checkbox" ng-model="chartSerie.showInLegend">
+                                                </label>
+                                            </div>
+                                            <div class="col-sm-10">
+                                                <label class="checkbox">
+                                                    Labels
+                                                    <input style="margin-left: 7px;" type="checkbox" ng-model="chartSerie.dataLabels.enabled">
+                                                </label>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                                <tabset>
+                                    <tab heading="Query">
+                                        <div class="form-group">
+                                            <label for="input-cdr-query-{{$index}}" class="col-sm-2 control-label">Query</label>
+                                            <div class="col-sm-10">
+                                                <textarea class="form-control" ng-model="chartSerie.query" id="input-cdr-query-{{$index}}" rows="7"></textarea>
+                                            </div>
+                                        </div>
+                                    </tab>
+                                    <tab heading="xAxis">
+                                        <div class="row" style="margin-top: 8px;">
+                                            <div class="col-sm-6">
+                                                <div class="form-group">
+                                                    <label for="input-cdr-chart-series-xAxis-{{$index}}" class="col-sm-2 control-label">Marker</label>
+                                                    <div class="col-sm-10">
+                                                        <input type="text" class="form-control" ng-model="chartSerie._c_xAxis.dataMarker" id="input-cdr-chart-series-xAxis-{{$index}}">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </tab>
+                                    <tab heading="yAxis">
+                                        <div class="row" style="margin-top: 8px;">
+
+                                            <div class="col-sm-6">
+                                                <div class="form-group">
+                                                    <label for="input-cdr-chart-series-yAxis-{{$index}}" class="col-sm-2 control-label">Marker</label>
+                                                    <div class="col-sm-10">
+                                                        <input type="text" class="form-control" ng-model="chartSerie._c_yAxis.dataMarker" id="input-cdr-chart-series-yAxis-{{$index}}">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </tab>
+                                    <tab heading="Plot">
+                                        TODO
+                                    </tab>
+                                    <tab heading="Advenced">
+                                        <div class="row" style="margin-top: 10px">
+                                            <div class="row" ng-if="chartSerie.type=='pie'">
+                                                <div class="col-sm-6">
+                                                    <div class="form-group">
+                                                        <label for="input-cdr-chart-series-adv-from{{$index}}" class="col-sm-2 control-label">Center</label>
+                                                        <div class="col-sm-10">
+                                                            <input type="number" name="input" ng-model="chartSerie.center[0]"
+                                                                   min="0" required style="width: 100%" class="form-control" id="input-cdr-chart-series-adv-from{{$index}}">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-sm-6">
+                                                    <div class="form-group">
+                                                        <label for="input-cdr-chart-series-adv-to{{$index}}" class="col-sm-2 control-label">To</label>
+                                                        <div class="col-sm-10">
+                                                            <input type="number" name="input" ng-model="chartSerie.center[1]"
+                                                                   min="0"  required style="width: 100%" class="form-control" id="input-cdr-chart-series-adv-to{{$index}}">
+
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row" ng-if="chartSerie.type=='pie'">
+                                                <div class="col-sm-6">
+                                                    <div class="form-group">
+                                                        <label for="input-cdr-chart-series-adv-size{{$index}}" class="col-sm-2 control-label">Size</label>
+                                                        <div class="col-sm-10">
+                                                            <input type="number" name="input" ng-model="chartSerie.size"
+                                                                   min="0"  required style="width: 100%" class="form-control" id="input-cdr-chart-series-adv-size{{$index}}">
+
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                        </div>
+
+                                    </tab>
+                                </tabset>
+
+                                <button type="button" class="btn btn-warning" ng-click="removeSeries($index)">
+                                    <i class="fa fa-minus"></i> Remove
+                                </button>
+                            </tab>
+                        </tabset>
+                    </div>
+                    <button type="button" class="btn btn-success" ng-click="addSeries($index)">
+                        <i class="fa fa-plus"></i> Add
+                    </button>
+                </div>
+            </div>
+
+        </tab>
+        <tab heading="Advanced">content</tab>
+    </tabset>
+</form>

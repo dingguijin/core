@@ -16,6 +16,7 @@
         "collectionPublic": "public",
         "collectionDefault": "default",
         "collectionSystem": "global",
+        "collectionStatus": "userStatus",
         "collectionExtension": "extension",
         "collectionDomainVar": "domainVariables",
         "collectionAuth": "authToken",
@@ -36,7 +37,7 @@
         "reconnect": 5
     },
     "cdrServer": {
-        "host": "CDR_HTTP://CDR_SERVER"
+        "host": "https://pre.webitel.com:10023"
     },
     "application": {
         "loglevel": "trace",
@@ -48,7 +49,7 @@
             "node_name": "core_dev_25"
         },
         "auth": {
-            "tokenSecretKey": "TOKEN_KEY",
+            "tokenSecretKey": "iuyIO!@uieywqi!@##uid21",
             "expiresDays": 7
         },
         "socketTimeUnauthorized": 5,

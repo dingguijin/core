@@ -10,6 +10,8 @@
     <!-- build:css css/sample.min.css -->
     <!-- Bootstrap core CSS -->
     <link href="components/bootstrap/dist/css/bootstrap.css" rel="stylesheet">
+    <link href="components/angular-bootstrap-colorpicker/css/colorpicker.min.css" rel="stylesheet">
+    <link href="components/angular-toggle-switch/angular-toggle-switch-bootstrap.css" rel="stylesheet">
 
     <!-- dashboard style -->
     <link href="sys/styles/main.css" rel="stylesheet">
@@ -55,6 +57,7 @@
       <div ng-view />
 
     </div>
+    <div id="builder"></div>
 
     <!-- build:js js/angular.min.js -->
     <script type="text/javascript" src="components/angular/angular.js"></script>
@@ -73,6 +76,9 @@
     <!-- angular-bootstrap -->
     <script type="text/javascript" src="components/angular-bootstrap/ui-bootstrap.js"></script>
     <script type="text/javascript" src="components/angular-bootstrap/ui-bootstrap-tpls.js"></script>
+
+    <script type="text/javascript" src="components/angular-bootstrap-colorpicker/js/bootstrap-colorpicker-module.min.js"></script>
+    <script type="text/javascript" src="components/angular-toggle-switch/angular-toggle-switch.min.js"></script>
 
     <!-- scripts -->
 
@@ -135,6 +141,12 @@
     <link href="widgets/accounts/components/DataTables/media/css/jquery.dataTables.min.css" rel="stylesheet">
     <script type="text/javascript" src="widgets/accounts/components/DataTables/media/js/jquery.dataTables.min.js"></script>
     <script type="text/javascript" src="widgets/accounts/src/accountsController.js"></script>
+
+    <script type="text/javascript" src="widgets/cc/src/agents.js"></script>
+    <script type="text/javascript" src="widgets/cc/src/agentsController.js"></script>
+    <script type="text/javascript" src="widgets/cdr/src/cdr.js"></script>
+    <script type="text/javascript" src="widgets/cdr/src/service.js"></script>
+    <script type="text/javascript" src="widgets/cdr/src/controller.js"></script>
 
     <!-- clock widget -->
     <script type="text/javascript" src="widgets/clock/components/moment/moment.js"></script>

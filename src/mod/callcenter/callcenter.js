@@ -17,6 +17,15 @@ var CC = function (conn) {
 CC.prototype._subscribeESL = function () {
     this.connection.filter('CC-Action', 'agent-state-change');
     this.connection.filter('CC-Action', 'agent-status-change');
+
+    this.connection.filter('CC-Action', 'agent-offering');
+    this.connection.filter('CC-Action', 'bridge-agent-start');
+    this.connection.filter('CC-Action', 'bridge-agent-end');
+    this.connection.filter('CC-Action', 'bridge-agent-fail');
+    this.connection.filter('CC-Action', 'members-count');
+    this.connection.filter('CC-Action', 'member-queue-start');
+    this.connection.filter('CC-Action', 'member-queue-end');
+    this.connection.filter('CC-Action', 'agent-add');
 };
 
 CC.prototype._onEvent = function (e) {
@@ -29,7 +38,7 @@ CC.prototype._onEvent = function (e) {
 
     this.setAttributesEvent(jEvent, user);
     if (jEvent['Event-Name'])
-        Domains.broadcast(jEvent['Event-Domain'], jEvent);
+        Domains.broadcast(jEvent['Event-Domain'] || jEvent['variable_domain_name'], jEvent);
 
 };
 
@@ -50,7 +59,8 @@ CC.prototype.setAttributesEvent = function (ccEvent, user) {
             // TODO new status set
         };
     } else {
-        ccEvent['Event-Name'] = null;
+        ccEvent['webitel-event-name'] = 'cc';
+        ccEvent['Event-Name'] = ccEvent['CC-Action'];
     };
 };
 

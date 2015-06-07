@@ -2,14 +2,15 @@
 
 angular.module('webitel', [
   'adf', 'adf.structures.base', 'adf.widget.news',
-  /*'adf.widget.randommsg',*/ 'adf.widget.weather',
+  'adf.widget.cc.agents', 'adf.widget.weather',
   'adf.widget.markdown', 'adf.widget.linklist',
-  'adf.widget.github', 'adf.widget.accounts',
+  'adf.widget.github', 'adf.widget.accounts', 'adf.widget.cdr',
   'adf.widget.clock', 'LocalStorageModule',
   'board-01', 'board-02', 'board-03',
-  'board-04', 'ngRoute' , 'auth', 'webitelService'
+  'board-04', 'ngRoute' , 'auth', 'webitelService', 'toggle-switch'
 ])
-.config(function(dashboardProvider, $routeProvider, localStorageServiceProvider, USER_ROLES){
+.value('Domain', '10.10.10.144')
+.config(function(dashboardProvider, $httpProvider, $routeProvider, localStorageServiceProvider, USER_ROLES){
   dashboardProvider.widgetsPath('widgets/');
   localStorageServiceProvider.setPrefix('adf');
 
@@ -109,8 +110,10 @@ angular.module('webitel', [
     }
   };
 })
-.service('Session', function ($location, localStorageService) {
+.service('Session', function ($location, localStorageService, $http) {
   this.create = function (option) {
+    $http.defaults.headers.common['x-key'] = option['key'];
+    $http.defaults.headers.common['x-access-token'] = option['token'];
     this.id = option['key'];
     this.expires = option['expires'];
     this.userId = option['key'];
