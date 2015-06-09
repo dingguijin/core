@@ -289,6 +289,31 @@ commandEmitter.on('wss::' + WebitelCommandTypes.Show.Channel.name, function (exe
     });
 });
 
+commandEmitter.on('wss::' + WebitelCommandTypes.Chat.Send.name, function (execId, args, ws) {
+    if (!doSendFreeSWITCHCommand(execId, ws)) return;
+    try {
+        var profile = args['profile'] || 'verto';
+        var from = ws['upgradeReq']['webitelId'];
+        var to = args['to'];
+        var message = args['message'];
+
+        if (!from || !to || !message){
+            getCommandResponseJSON(ws, execId, {
+                "body": "-ERR Bad request"
+            });
+            return;
+        };
+
+        var data = [].concat(profile, from, to, message).join('|');
+        eslConn.bgapi('chat ' + data, function (res) {
+            getCommandResponseJSON(ws, execId, res)
+        });
+
+    } catch (e) {
+        log.error(e['message']);
+    };
+});
+
 var doSendFreeSWITCHCommand = function (id, socket) {
     if (!eslConn['authed']) {
         try {

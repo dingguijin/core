@@ -313,6 +313,13 @@ module.exports.WebitelCommandTypes = {
             name: "cdr_get_record_link",
             perm: 0
         }
+    },
+
+    Chat: {
+        Send: {
+            name: "chat_send",
+            perm: 0
+        }
     }
 };
 
