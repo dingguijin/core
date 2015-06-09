@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('adf.widget.cdr')
-    .service('cdrPost', function ($q, $http) {
+    .service('cdrPost', function ($q, $http, Session) {
         return {
             postAggregate: function (query) {
                 var deferred = $q.defer()
@@ -9,12 +9,12 @@ angular.module('adf.widget.cdr')
                 query = eval(query);
                 var postData = {
                     "aggr": query,
-                    "x_key": "da8feb13-a9c4-48fd-b60a-f5e156197cd7", //Session.id,
-                    "access_token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE0MzQxMTY4OTUxNjl9.NUvwZfrcu8zLNV3BfBigkMrmjfAKAFv8cpxAjWePNpU" //Session.token
+                    "x_key": Session.id, // "da8feb13-a9c4-48fd-b60a-f5e156197cd7"
+                    "access_token": Session.token //"eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE0MzQxMTY4OTUxNjl9.NUvwZfrcu8zLNV3BfBigkMrmjfAKAFv8cpxAjWePNpU" //
                 };
                 postData = JSON.stringify(postData);
                 $http
-                    .post('https://pre.webitel.com:10023/api/v2/cdr/aggregates', postData)
+                    .post('http://10.10.10.25:10021/api/v2/cdr/aggregates ', postData)
                     //.post('/api/v2/cdr/aggregates', postData)
                     .then(function (res) {
                         deferred.resolve(res.data);

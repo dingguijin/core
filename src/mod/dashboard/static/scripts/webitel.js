@@ -7,7 +7,7 @@ angular.module('webitel', [
   'adf.widget.github', 'adf.widget.accounts', 'adf.widget.cdr',
   'adf.widget.clock', 'LocalStorageModule',
   'board-01', 'board-02', 'board-03',
-  'board-04', 'ngRoute' , 'auth', 'webitelService', 'toggle-switch'
+  'board-04', 'ngRoute' , 'auth', 'webitelService', 'toggle-switch', 'nvd3'
 ])
 .value('Domain', '10.10.10.144')
 .config(function(dashboardProvider, $httpProvider, $routeProvider, localStorageServiceProvider, USER_ROLES){

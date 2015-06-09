@@ -5,6 +5,8 @@
 var conf = require('../../../conf'),
     CDR_SERVER_HOST = conf.get('cdrServer:host');
 
+//var request = require('request');
+
 if (CDR_SERVER_HOST) {
     CDR_SERVER_HOST = CDR_SERVER_HOST.replace(/\/$/g, '');
 };
@@ -16,7 +18,13 @@ module.exports.Redirect = function (req, res, next) {
             "info": "Not config CDR_SERVER_HOST"
         });
     };
-    res.redirect(307, CDR_SERVER_HOST + req.originalUrl);
+
+    //request[req.method.toLowerCase()]({ url: CDR_SERVER_HOST + req.originalUrl, headers: req.headers, body: req.body, json: true }, function(err, remoteResponse, remoteBody) {
+    //    if (err) { return res.status(500).end('Error'); }
+    //
+    //    res.status(200).end();
+    //});
+   res.redirect(307, CDR_SERVER_HOST + req.originalUrl);
 };
 
 module.exports.GetRedirectUrl = function (req, res, next) {

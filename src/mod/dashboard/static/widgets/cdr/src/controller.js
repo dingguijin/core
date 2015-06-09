@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('adf.widget.cdr')
-  .controller('CDRCtrl', function($scope, config, CDRData){
+  .controller('CDRCtrl', function($scope, config, CDRData, cdrSrvice){
 
       function getArrayFromAttribute(attr) {
         var res = [];
@@ -28,87 +28,115 @@ angular.module('adf.widget.cdr')
               startAngle: -180,
               endAngle: 90,
               dataLabels: {
-                //enabled: false,
-                //format: '<b>{point.name}</b>: {point.percentage:.1f} %',
-                //style: {
-                //  color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black'
-                //},
-                //connectorColor: 'silver'
+                enabled: false,
+                format: '<b>{point.name}</b>: {point.percentage:.1f} %',
+                style: {
+                  color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black'
+                },
+                connectorColor: 'red' // PIE!!!!
               }
             }
           }
         },
+
+        legend:{
+          layout:'vertical',
+          align:'right',
+          verticalAlign:'top',
+          backgroundColor:'#fff',
+          borderColor:'#ccc',
+          borderWidth:.5,
+          y:30,
+          x:0,
+          itemWidth:150,
+          itemStyle:{
+            fontWeight:'bold'
+          },
+          itemHiddenStyle:{
+            fontWeight:'bold'
+          }
+        },
+
         yAxis: config['_c_yAxis'],
         xAxis: {
           categories: []
         },
-        series: config.chartSeries,
+        series: config.chartSeries || [],
         title: {
           text: config.chartTitle
         }
       };
 
-      angular.forEach(config.chartSeries, function (ser) {
-        ser.data = [];
-        var xDM = ser['_c_xAxis'] && ser['_c_xAxis'].dataMarker;
-        var yDM = ser['_c_yAxis'] && ser['_c_yAxis'].dataMarker;
 
-        if (ser.type == 'pie') {
-          var currentX = '';
-          var currentY = '';
-          //ser.center = [100, 0];
-          //ser.size = 100;
-          angular.forEach(ser.srvData, function (point) {
-            currentX = point;
-            xDM.split('.').forEach(function(token) {
-              currentX = currentX && currentX[token];
-            });
-
-            currentY = point;
-            yDM.split('.').forEach(function(token) {
-              currentY = currentY && currentY[token];
-            });
-
-            ser.data.push({
-              "name": currentX,
-              "y": currentY
-            });
-          });
-        } else {
-          var currentX = '';
-          var currentY = '';
-
-          angular.forEach(ser.srvData, function (point) {
-            currentX = point;
-            xDM.split('.').forEach(function(token) {
-              currentX = currentX && currentX[token];
-            });
-
-            currentY = point;
-            yDM.split('.').forEach(function(token) {
-              currentY = currentY && currentY[token];
-            });
-
-            ser.data.push(currentX);
-            _chart.xAxis.categories.push(currentY)
-          });
-        }
-
-      });
 
       $scope.updateData = function () {
-        //_chart.series[0].data[0]++;
+        angular.forEach(config.chartSeries, function (ser) {
+          ser.data = [];
+          var xDM = ser['_c_xAxis'] && ser['_c_xAxis'].dataMarker;
+          var yDM = ser['_c_yAxis'] && ser['_c_yAxis'].dataMarker;
+
+          if (ser.type == 'pie') {
+            var currentX = '';
+            var currentY = '';
+            //ser.center = [100, 0];
+            //ser.size = 100;
+            angular.forEach(ser.srvData, function (point) {
+              currentX = point;
+              xDM.split('.').forEach(function(token) {
+                currentX = currentX && currentX[token];
+              });
+
+              currentY = point;
+              yDM.split('.').forEach(function(token) {
+                currentY = currentY && currentY[token];
+              });
+
+              ser.data.push({
+                "name": currentX,
+                "y": currentY
+              });
+            });
+          } else {
+            var currentX = '';
+            var currentY = '';
+
+            angular.forEach(ser.srvData, function (point) {
+              currentX = point;
+              xDM.split('.').forEach(function(token) {
+                currentX = currentX && currentX[token];
+              });
+
+              currentY = point;
+              yDM.split('.').forEach(function(token) {
+                currentY = currentY && currentY[token];
+              });
+
+              ser.data.push(currentX);
+              _chart.xAxis.categories.push(currentY)
+            });
+          }
+
+        });
         $scope.chartConfig = _chart;
       };
 
-      console.log(_chart)
+      $scope.updateData();
+      
+      $scope.$on('destroy', function () {
+        debugger;
+      });
 
-      //setInterval(function () {
-      //
-      //}, 1000)
+      setInterval(function () {
+        cdrSrvice.getData(config.chartSeries)
+            .then(function () {
+              $scope.updateData();
+            });
+      }, (config.timeUpdate || 10) * 1000 );
 
-  })
+
+    })
     .controller('selectCHartTypeCtrl', function ($scope) {
+
       $scope.chartTypes = [
         {"id": "line", "title": "Line"},
         {"id": "spline", "title": "Smooth line"},
@@ -146,6 +174,8 @@ angular.module('adf.widget.cdr')
       };
       
       $scope.addSeries = function () {
+        if (!$scope.$parent.config.chartSeries)
+          $scope.$parent.config.chartSeries = [];
         var seriesArray = $scope.$parent.config.chartSeries;
         seriesArray.push({"name": "Series " + seriesArray.length, "data": [], type: ""})
       };

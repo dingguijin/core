@@ -12,6 +12,8 @@
     <link href="components/bootstrap/dist/css/bootstrap.css" rel="stylesheet">
     <link href="components/angular-bootstrap-colorpicker/css/colorpicker.min.css" rel="stylesheet">
     <link href="components/angular-toggle-switch/angular-toggle-switch-bootstrap.css" rel="stylesheet">
+    <link href="components/nvd3/build/nv.d3.min.css" rel="stylesheet">
+
 
     <!-- dashboard style -->
     <link href="sys/styles/main.css" rel="stylesheet">
@@ -39,7 +41,7 @@
     <!-- inlince css -->
     <style type="text/css">
       body {
-        padding-top: 60px;
+        /*padding-top: 60px;*/
       }
       /* fixe for modal-backdrop*/
       .modal-backdrop {
@@ -52,7 +54,7 @@
 
   <body ng-app="webitel" ng-controller="ApplicationController">
 
-    <div class="container">
+    <div class="container" style="width: 100%">
 
       <div ng-view />
 
@@ -79,6 +81,10 @@
 
     <script type="text/javascript" src="components/angular-bootstrap-colorpicker/js/bootstrap-colorpicker-module.min.js"></script>
     <script type="text/javascript" src="components/angular-toggle-switch/angular-toggle-switch.min.js"></script>
+    <script type="text/javascript" src="components/d3/d3.min.js"></script>
+    <script type="text/javascript" src="components/nvd3/build/nv.d3.min.js"></script>
+    <script type="text/javascript" src="components/angular-nvd3/dist/angular-nvd3.min.js"></script>
+
 
     <!-- scripts -->
 
