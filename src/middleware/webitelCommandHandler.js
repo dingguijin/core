@@ -398,6 +398,44 @@ commandEmitter.on('wss::' + WebitelCommandTypes.Gateway.Down.name, function (exe
     });
 });
 
+commandEmitter.on('wss::' + WebitelCommandTypes.Sys.Message.name, function (execId, args, ws) {
+    var _caller = doSendWebitelCommand(execId, ws, WebitelCommandTypes.Sys.Message);
+    if (!_caller) return;
+
+    try {
+        if (!args || !args['to'] || !args['body']) {
+            getCommandResponseV2JSON(ws, execId, {
+                "body": "-ERR bad request"
+            });
+            return;
+        };
+
+        var _to = Users.get(args['to']);
+        if (!_to) {
+            getCommandResponseV2JSON(ws, execId, {
+                "body": "-ERR user not found"
+            });
+            return;
+        };
+
+        var msg = {
+            to: _to['id'],
+            from: _caller['id'],
+            body: args['body'],
+            'webitel-event-name': 'WEBITEL-CUSTOM',
+            'Event-Name': 'WEBITEL-CUSTOM-MESSAGE'
+        };
+
+        Users.sendObject(_to, msg);
+
+        getCommandResponseV2JSON(ws, execId, {
+            "body": "-OK send"
+        });
+    } catch (e) {
+        log.error(e['message']);
+    }
+});
+
 commandEmitter.on('wss::' + WebitelCommandTypes.Gateway.Down.name, function (execId, args, ws) {
     var _caller = doSendWebitelCommand(execId, ws, WebitelCommandTypes.Gateway.Down);
     if (!_caller) return;

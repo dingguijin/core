@@ -320,6 +320,13 @@ module.exports.WebitelCommandTypes = {
             name: "chat_send",
             perm: 0
         }
+    },
+
+    Sys: {
+        Message: {
+            name: "sys_msg",
+            perm: 0
+        }
     }
 };
 
