@@ -4,11 +4,29 @@
 
 var conf = require('../../conf'),
     log = require('../../lib/log')(module),
+    HashCollection = require('../../lib/HashCollection'),
+    Queue = require('./queueItem'),
+    async = require('async'),
+    //CCCollection = new HashCollection('id'),
+    webitelEvent = require('../../middleware/EventsCollection'),
+    TiersCollection = new HashCollection('id'),
     WEBITEL_EVENT_NAME_TYPE = require('../../consts').WEBITEL_EVENT_NAME_TYPE
     ;
 
 log.info('Call center load.');
+
+var _srvEvents = [
+    'agent-offering',
+    'bridge-agent-start',
+    'bridge-agent-end',
+    'bridge-agent-fail',
+    'members-count',
+    'member-queue-start',
+    'member-queue-end'
+];
+
 var CC = function (conn) {
+    this.tiersCollection = TiersCollection;
     this.connection = conn;
     this.connection.on('esl::event::auth::success', this._onAuth.bind(this));
     this.connection.on('esl::event::CUSTOM::*', this._onEvent.bind(this));
@@ -17,6 +35,38 @@ var CC = function (conn) {
 CC.prototype._subscribeESL = function () {
     this.connection.filter('CC-Action', 'agent-state-change');
     this.connection.filter('CC-Action', 'agent-status-change');
+
+    for (var key in _srvEvents) {
+        if (_srvEvents.hasOwnProperty(key)) {
+            this.connection.filter('CC-Action', _srvEvents[key]);
+            webitelEvent.register('CC::' + _srvEvents[key].toUpperCase());
+        };
+    };
+};
+
+CC.prototype._userInQueue = function (user, e) {
+    try {
+        var queues = this.tiersCollection.get(user.id);
+        return queues && queues.existsKey(e['CC-Queue']);
+    } catch (e) {
+        log.error('userInQueue: %s', e['message']);
+        return false
+    };
+};
+
+CC.prototype._onCustomEvent = function (eObj) {
+    var domain = eObj['CC-Queue'].split('@')[1],
+        eventName = 'CC::' + eObj['CC-Action'].toUpperCase();
+    eObj['Event-Name'] = eventName;
+    if (domain) {
+        webitelEvent.fire(
+            eventName,
+            domain,
+            eObj,
+            function() {},
+            this._userInQueue.bind(this)
+        );
+    };
 };
 
 CC.prototype._onEvent = function (e) {
@@ -26,6 +76,11 @@ CC.prototype._onEvent = function (e) {
     var jEvent = JSON.parse(e.serialize('json')),
         user = jEvent['CC-Agent'] && jEvent['CC-Agent'].split('@')
         ;
+
+    if (_srvEvents.indexOf(jEvent['CC-Action']) > -1) {
+        this._onCustomEvent(jEvent);
+        return;
+    };
 
     this.setAttributesEvent(jEvent, user);
     if (jEvent['Event-Name'])
@@ -139,7 +194,107 @@ CC.prototype.setWebitelUserAttribute = function (event, domainName, userId) {
 
 CC.prototype._onAuth = function () {
     this._subscribeESL();
+    this._init();
 };
 
+CC.prototype._init = function () {
+
+    async.waterfall([
+        function (next) {
+            TiersCollection.removeAll();
+            next();
+        },
+        function (next) {
+            eslConn.bgapi('callcenter_config tier list', function (result) {
+
+                webitel._parsePlainTableToJSONArray(result['body'], function (err, resJSON) {
+                    if (err) {
+                        next(err);
+                        return;
+                    }
+                    ;
+
+                    var item,
+                        agent,
+                        queue,
+                        queueId;
+                    for (var key in resJSON) {
+                        if (resJSON.hasOwnProperty(key)) {
+                            agent = resJSON[key]['agent'];
+                            queueId = resJSON[key]['queue'];
+
+                            item = TiersCollection.get(agent);
+                            if (!item) {
+                                item = TiersCollection.add(agent, new HashCollection('id'));
+                            };
+
+                            queue = item.get(queueId);
+                            if (!queue) {
+                                item.add(queueId, resJSON[key]);
+                            };
+                        };
+                    };
+
+                    next();
+                }, '|');
+            });
+        }],
+        function (err) {
+            if (err) {
+                return log.error('Load tiers: ', err);
+            };
+
+            log.trace('Loaded tiers.');
+    });
+
+    /*
+    eslConn.bgapi('callcenter_config queue list', function (result) {
+        webitel._parsePlainTableToJSONArray(result['body'], function (err, resJSON) {
+            if (err) {
+                log.error(err);
+                return;
+            };
+
+            var queueParam,
+                domainName,
+                queue,
+                domain;
+            for (var key in resJSON) {
+                if (resJSON.hasOwnProperty(key)) {
+                    queueParam = resJSON[key]['name'].split('@');
+                    domainName = queueParam[1];
+                    queue = new Queue(queueParam[0], resJSON[key]);
+
+                    domain = CCCollection.get(domainName);
+                    if (!domain) {
+                        domain = CCCollection.add(domainName, new HashCollection('id'));
+                    };
+
+                    domain.add(queue.id, queue);
+
+                };
+            };
+
+
+            console.dir(CCCollection);
+
+        }, '|');
+    });
+
+    eslConn.bgapi('callcenter_config tier list', function (result) {
+
+        webitel._parsePlainTableToJSONArray(result['body'], function (err, resJSON) {
+            if (err) {
+                log.error(err);
+                return;
+            }
+            ;
+            console.dir(resJSON);
+
+        }, '|');
+    });
+
+    */
+};
 
 module.exports = CC;

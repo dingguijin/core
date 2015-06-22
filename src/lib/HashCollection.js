@@ -19,6 +19,11 @@ var HashCollection = module.exports = function() {
             length++;
             this.emit('added', element);
         };
+        return this.collection[key];
+    };
+
+    this.existsKey = function (key) {
+        return !!this.collection[key];
     };
 
     this.length = function() {
@@ -36,6 +41,11 @@ var HashCollection = module.exports = function() {
             length--;
             this.emit('removed', removedElement);
         };
+    };
+
+    this.removeAll = function () {
+        length = 0;
+        this.collection = {};
     };
 
     this.getKeys = function () {

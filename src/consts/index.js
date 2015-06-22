@@ -286,6 +286,10 @@ module.exports.WebitelCommandTypes = {
         },
 
         Tier: {
+            List: {
+                name: 'cc tier from user',
+                perm: 0
+            },
             Create: {
                 name: "cc tier create",
                 perm: 1

@@ -14,6 +14,21 @@ var db = require('../../lib/mongoDrv'),
 
 var Controller = {
 
+    setUserCallForward: function (userId, domainName, number, cb) {
+        var collection = db.getCollection(EXTENSION_COLLECTION_NAME);
+        collection.findOne({
+            "domain": domainName,
+            "userRef": userId + '@' + domainName
+        }, function (err, res) {
+            if (err) {
+                cb(err);
+                return;
+            };
+
+            console.dir(res);
+        });
+    },
+
     createUser: function (userId, number, domain, cb) {
         Controller.existsNumber(number, domain, function (err, exists) {
             if (err) {
@@ -126,6 +141,24 @@ function getTemplateExtension(id, number, domain) {
             }
         ]
     }
+};
+
+function getTemplateExtensionCallForwarding(id, domain, number, cfNumber) {
+    return {
+        "destination_number": number,
+        "domain": domain,
+        "userRef": id + '@' + domain,
+        "name": "ext_" + number,
+        "version": 2,
+        "callflow": [
+            {
+                "setUser": number
+            },
+            {
+                "goto": "default:" + cfNumber
+            }
+        ]
+    };
 }
 
 module.exports = Controller;
@@ -137,3 +170,18 @@ moduleEventEmitter.on('webitel::USER_DESTROY', function (e) {
         log.debug('Remove number %s (%s) db: %s',e['User-ID'], e['User-Domain'], res);
     });
 });
+
+//moduleEventEmitter.on('webitel::ACCOUNT_STATUS', function (e) {
+//    var user = Users.get(e['Account-User'] + '@' + e['Account-Domain']);
+//    if (!user) return;
+//
+//    if (e['Account-Status'] == 'CALLFORWARD' && e['Account-Status-Descript']) {
+//        log.info('ENABLE CALLFORWARD');
+//        Controller.setUserCallForward(e['Account-User'], )
+//
+//    } else if (user['status'] == 'CALLFORWARD') {
+//        log.info('DISABLE CALLFORWARD');
+//    };
+//    user['status'] = e['Account-Status'];
+//});
+

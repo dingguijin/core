@@ -117,6 +117,40 @@ var API = {
         });
     },
 
+
+    GetMembers: function (req, res, next) {
+        var queue = req.params['queue'] + '@' + (req.webitelUser['attr']['domain'] || req.query['domain']);
+        eslConn.bgapi('callcenter_config queue list members ' + queue, function (result) {
+            try {
+                if (result['body'] && result['body'].indexOf('-ERR') === 0) {
+                    res.status(200).json({
+                        "status": "error",
+                        "info": result['body']
+                    });
+                    return;
+                };
+                webitel._parsePlainTableToJSONArray(result['body'], function (err, resJSON) {
+                    if (err) {
+                        res.status(500).json({
+                            "status": "error",
+                            "info": err['message']
+                        });
+                        return;
+                    }
+                    ;
+                    res.status(200).json({
+                        "status": "OK",
+                        "info": resJSON
+                    });
+
+                }, '|');
+            } catch (e) {
+                log.error(e['message']);
+            };
+
+        });
+    },
+
     PostTier: function (req, res, next) {
         if (!webitel.doSendCommandV2(res)) return;
         var _q = {

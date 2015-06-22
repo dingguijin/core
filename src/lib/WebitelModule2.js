@@ -1123,7 +1123,17 @@ Webitel.prototype.tierCreate = function (_caller, args, cb) {
     if (args['position'])
         _params += ' ' + args['position']
         ;
-    this.api(WebitelCommandTypes.CallCenter.Root, [_params], cb);
+    this.api(WebitelCommandTypes.CallCenter.Root, [_params], function (res) {
+        if (res['body'].indexOf('+OK') === 0)
+            moduleEventEmitter.emit('cc::TIER_CREATE', {
+                "domain": _domain,
+                "queue": args['queue'],
+                "agent": args['agent']
+            });
+
+        if (cb)
+            cb(res)
+    });
 };
 
 Webitel.prototype.tierSetLvl = function (_caller, args, cb) {
@@ -1198,7 +1208,17 @@ Webitel.prototype.tierRemove = function (_caller, args, cb) {
     var _params = 'tier del '.concat(args['queue'], '@', _domain, ' ', args['agent'],
         '@', _domain);
 
-    this.api(WebitelCommandTypes.CallCenter.Root, [_params], cb);
+    this.api(WebitelCommandTypes.CallCenter.Root, [_params], function (res) {
+        if (res['body'].indexOf('+OK') === 0)
+            moduleEventEmitter.emit('cc::TIER_REMOVE', {
+                "domain": _domain,
+                "queue": args['queue'],
+                "agent": args['agent']
+            });
+
+        if (cb)
+            cb(res);
+    });
 };
 
 // TODO mod_cc END

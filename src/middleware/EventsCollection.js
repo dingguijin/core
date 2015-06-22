@@ -88,8 +88,8 @@ var _eventsModule = {
         if (cb)
             cb(null, '+OK: unsubscribe ' + eventName);
     }, 
-    
-    fire: function (eventName, domainId, event, cb) {
+    // TODO existsCb переделать
+    fire: function (eventName, domainId, event, cb, existsFn) {
         if (typeof eventName != 'string' || !(event instanceof Object)) {
             if (cb)
                 cb(new Error('Bad parameters'));
@@ -103,7 +103,8 @@ var _eventsModule = {
             return;
         };
 
-        var _domain = _event.domains.get(domainId);
+        var _domain = _event.domains.get(domainId),
+            tmpUsr;
         if (!_domain) {
             if (cb)
                 cb(new Error('Not subscribes'));
@@ -111,12 +112,16 @@ var _eventsModule = {
         };
         event['webitel-event-name'] = 'server';
         _domain.subscribes.forEach(function (userId) {
-            // TODO
-            var _userId = userId.split(':')[0],
-                sessionId = userId.split(':')[1];
+            tmpUsr = userId.split(':');
+            var _userId = tmpUsr[0],
+                sessionId = tmpUsr[1];
             var user = Users.get(_userId);
 
             if (!user) return;
+
+            if (existsFn && !existsFn(user, event)) {
+                return;
+            };
 
             for (var key = 0, len = user.ws.length; key < len; key ++ ) {
                 try {
@@ -137,6 +142,26 @@ var _eventsModule = {
                 };
             };
         });
+    },
+
+    getEventSubscribers: function (evtName, domainName) {
+        var res = [];
+        try {
+            var _e = eventsCollection.get(evtName),
+                domain;
+            if (_e) {
+                domain = _e.domains.get(domainName);
+                if (domain) {
+                    res = domain['subscribes'];
+                }
+                ;
+            }
+            ;
+        } catch (e) {
+            log.error(e['message']);
+        } finally {
+            return res;
+        };
     },
 
     removeUserSubscribe: function (userName, domainName) {

@@ -123,6 +123,8 @@ var Dialplan = {
         };
 
         for (var key in req.body) {
+            if (key == 'callflow')
+                Dialplan.replaceExpression(req.body[key]);
             extension.$set[key] = req.body[key];
         };
 
