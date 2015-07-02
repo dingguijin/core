@@ -129,6 +129,9 @@ function getTemplateExtension(id, number, domain) {
                 }
             },
             {
+                "recordSession": "stop"
+            },
+            {
                 "answer": ""
             },
             {
