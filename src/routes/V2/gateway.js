@@ -6,6 +6,7 @@ var log = require('../../lib/log')(module);
 
 module.exports = {
     Create: function (req, res, next) {
+        if (!webitel.doSendCommandV2(res)) return;
         /*option = {
             domain: "10.10.10.144",
             name: gateway,
@@ -21,11 +22,52 @@ module.exports = {
             profile: "external",
             realm: hostIP
         }*/
-        res.send('TODO').end();
+        webitel.createSipGateway(
+            req.webitelUser,
+            req['body'],
+            function (result) {
+                try {
+                    if (result['body'] && result['body'].indexOf('-ERR') === 0) {
+                        res.status(200).json({
+                            "status": "error",
+                            "info": result['body']
+                        });
+                        return;
+                    };
+                    res.status(200).json({
+                        "status": "OK",
+                        "info": result['body']
+                    });
+                } catch (e) {
+                    log.error(e['message']);
+                };
+            }
+        );
     },
     
     Destroy: function (req, res, next) {
-        
+        if (!webitel.doSendCommandV2(res)) return;
+        webitel.removeSipGateway(
+            req.webitelUser,
+            req.params['name'],
+            function (result) {
+                try {
+                    if (result['body'] && result['body'].indexOf('-ERR') === 0) {
+                        res.status(200).json({
+                            "status": "error",
+                            "info": result['body']
+                        });
+                        return;
+                    };
+                    res.status(200).json({
+                        "status": "OK",
+                        "info": result['body']
+                    });
+                } catch (e) {
+                    log.error(e['message']);
+                };
+            }
+        )
     },
     
     Item: function (req, res, next) {

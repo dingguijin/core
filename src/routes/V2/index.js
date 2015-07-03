@@ -101,4 +101,5 @@ module.exports = function (app) {
     app.get('/api/v2/gateway', gateway.List);
     app.get('/api/v2/gateway/:name', gateway.Item);
     app.post('/api/v2/gateway', gateway.Create);
+    app.delete('/api/v2/gateway/:name', gateway.Destroy);
 };
