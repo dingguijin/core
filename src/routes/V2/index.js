@@ -5,7 +5,8 @@ var auth = require('./auth'),
     calls = require('./calls'),
     dialplan = require('../../mod/dialplan'),
     calendar = require('../../mod/calendar'),
-    callcenter = require('./callcenter')
+    callcenter = require('./callcenter'),
+    gateway = require('./gateway')
     ;
 
 module.exports = function (app) {
@@ -92,4 +93,12 @@ module.exports = function (app) {
     app.put('/api/v2/callcenter/queues/:queue/tiers/:agent/position', callcenter.PutPosition);
     app.patch('/api/v2/callcenter/queues/:queue/tiers/:agent/position', callcenter.PutPosition);
     app.delete('/api/v2/callcenter/queues/:queue/tiers/:agent', callcenter.DeleteTier);
+
+
+    /**
+     * Gateway
+     */
+    app.get('/api/v2/gateway', gateway.List);
+    app.get('/api/v2/gateway/:name', gateway.Item);
+    app.post('/api/v2/gateway', gateway.Create);
 };

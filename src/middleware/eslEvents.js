@@ -13,7 +13,6 @@ module.exports.eventsHandle = function (event) {
             callHandler.onHandleCallCreate(jsonEvent);
         };
 
-        //console.dir(jsonEvent);
 
         if (jsonEvent['Channel-Presence-ID']) {
             if ((jsonEvent['Event-Name'] == 'CHANNEL_EXECUTE_COMPLETE' && jsonEvent['Application'] != 'att_xfer')
@@ -58,6 +57,7 @@ module.exports.eventsHandle = function (event) {
                     "variable_originating_leg_uuid": jsonEvent["variable_originating_leg_uuid"],
                     "variable_webitel_att_xfer": jsonEvent["variable_webitel_att_xfer"],
                     "variable_cc_queue": jsonEvent['variable_cc_queue'],
+                    "variable_cc_member_session_uuid": jsonEvent['variable_cc_member_session_uuid'],
                     "variable_webitel_data": "'" + jsonEvent['variable_webitel_data'] + "'"
                 };
 
