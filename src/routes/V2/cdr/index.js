@@ -58,6 +58,7 @@ module.exports.Redirect = function (request, response, next) {
     if (request.headers.hasOwnProperty('x-key')) {
         options.headers['x-key'] = request.headers['x-key']
     };
+    console.dir(options);
 
     var req = https.request(options, function (res) {
         console.dir('statusCode:');
@@ -76,6 +77,7 @@ module.exports.Redirect = function (request, response, next) {
 
     req.on('error', function(e) {
         log.error(e);
+        console.dir(e);
         next(e);
     });
 
