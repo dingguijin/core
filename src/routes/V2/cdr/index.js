@@ -26,9 +26,9 @@ var CDR_SERVER = {
 module.exports.Redirect = function (request, response, next) {
     var postData = JSON.stringify(request.body);
     var options = {
-        hostname: 'www.google.ru',
-        port: 443,
-        path: '#newwindow=1&q=dsa', //request.originalUrl,
+        hostname: 'pre.webitel.com',
+        port: 10023,
+        path: '/api/v2/cdr', //request.originalUrl,
         headers: {
 
         },
@@ -87,7 +87,7 @@ module.exports.Redirect = function (request, response, next) {
         req.end();
     });
     request.pipe(req);
-    //req.end();
+    req.end();
 };
 
 module.exports.GetRedirectUrl = function (req, res, next) {
