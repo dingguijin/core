@@ -28,13 +28,31 @@ module.exports.Redirect = function (request, response, next) {
         hostname: CDR_SERVER.hostName,
         port: CDR_SERVER.port,
         path: request.originalUrl,
+        headers: {
+
+        },
         method: request.method,
-        headers: request.headers,
         rejectUnauthorized: false
+    };
+
+    if (request.headers.hasOwnProperty('content-type')) {
+        options.headers['content-type'] = request.headers['content-type']
+    };
+    if (request.headers.hasOwnProperty('content-length')) {
+        options.headers['content-length'] = request._body
+            ? Buffer.byteLength(postData)
+            : request.headers['content-length'];
+    };
+    if (request.headers.hasOwnProperty('x-access-token')) {
+        options.headers['x-access-token'] = request.headers['x-access-token']
+    };
+    if (request.headers.hasOwnProperty('x-key')) {
+        options.headers['x-key'] = request.headers['x-key']
     };
 
     var req = client(options, function(res) {
         try {
+
             res.on('end', function () {
                 res.destroy();
             });
@@ -62,6 +80,8 @@ module.exports.Redirect = function (request, response, next) {
     });
     request.pipe(req);
     req.pipe(request);
+    //req.end();
+
 };
 
 module.exports.GetRedirectUrl = function (req, res, next) {
