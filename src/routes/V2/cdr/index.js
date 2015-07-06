@@ -49,11 +49,19 @@ module.exports.Redirect = function (request, response, next) {
     if (request.headers.hasOwnProperty('x-key')) {
         options.headers['x-key'] = request.headers['x-key']
     };
+    console.dir('CDR_SERVER:');
+    console.dir(CDR_SERVER);
+
     console.dir(options.headers);
 
     var req = client(options, function(res) {
         try {
+            console.dir('statusCode:');
+            console.dir(res.statusCode);
+            console.dir('headers:');
             console.dir(res.headers);
+            console.dir('BODY:');
+            console.dir(res.body);
 
             res.on('end', function () {
                 res.destroy();
