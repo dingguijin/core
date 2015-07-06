@@ -26,7 +26,7 @@ var CDR_SERVER = {
 var fs = require('fs');
 
 module.exports.Redirect = function (request, response, next) {
-    console.log('Cert file: ' + __appRoot + '/' + CERT_CDR);
+
     var postData = JSON.stringify(request.body);
     var options = {
         host: CDR_SERVER.hostName,
@@ -34,7 +34,8 @@ module.exports.Redirect = function (request, response, next) {
         headers: {},
         method: request.method,
         path: request.originalUrl,
-        ca: [ fs.readFileSync(CERT_CDR) ],
+        key: fs.readFileSync(CERT_CDR) ,
+        cert: fs.readFileSync(CERT_CDR) ,
         checkServerIdentity: function (host, cert) {
             console.log(host);
             return true;
