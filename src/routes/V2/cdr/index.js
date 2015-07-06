@@ -34,7 +34,7 @@ module.exports.Redirect = function (request, response, next) {
         headers: {},
         method: request.method,
         path: request.originalUrl,
-        ca: [ fs.readFileSync(__appRoot + '/' + CERT_CDR) ],
+        ca: [ fs.readFileSync(CERT_CDR) ],
         checkServerIdentity: function (host, cert) {
             console.log(host);
             return true;

@@ -37,7 +37,7 @@
     },
     "cdrServer": {
         "host": "CDR_HTTP://CDR_SERVER",
-        "sslFile": "/cert/cdr.pem"
+        "sslFile": "/core/cert/cdr.pem"
     },
     "application": {
         "loglevel": "LOGLEVEL",
