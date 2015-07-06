@@ -36,8 +36,7 @@
         "reconnect": 5
     },
     "cdrServer": {
-        "host": "CDR_HTTP://CDR_SERVER",
-        "sslFile": "/core/cert/cdr.pem"
+        "host": "CDR_HTTP://CDR_SERVER"
     },
     "application": {
         "loglevel": "LOGLEVEL",

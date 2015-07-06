@@ -126,6 +126,7 @@ var doConnectFreeSWITCH = function() {
         eslConnected = false;
         eslConn['authed'] = false;
         log.error('FreeSWITCH: socket close.');
+        setTimeout(doConnectFreeSWITCH, waitTimeReconnectFreeSWITCH);
     });
 
     eslConn.on('esl::event::disconnect::notice', function() {
