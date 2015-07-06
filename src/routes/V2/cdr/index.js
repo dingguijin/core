@@ -3,7 +3,6 @@
  */
 
 var conf = require('../../../conf'),
-    CERT_CDR = conf.get('cdrServer:sslFile'),
     http = require('http'),
     https = require('https'),
     url = require('url'),
@@ -20,14 +19,14 @@ var client = cdrHostInfo.protocol === 'https:' ? https.request : http.request;
 
 var CDR_SERVER = {
     hostName: cdrHostInfo.hostname,
-    port: cdrHostInfo.port
+    port: parseInt(cdrHostInfo.port)
 };
 
 module.exports.Redirect = function (request, response, next) {
     var postData = JSON.stringify(request.body);
     var options = {
-        hostname: 'pre.webitel.com',
-        port: 10023,
+        hostname: CDR_SERVER.hostName,
+        port: CDR_SERVER.port,
         path: request.originalUrl,
         headers: {
 
@@ -50,8 +49,6 @@ module.exports.Redirect = function (request, response, next) {
     if (request.headers.hasOwnProperty('x-key')) {
         options.headers['x-key'] = request.headers['x-key']
     };
-
-    console.dir(options);
 
     var req = client(options, function(res) {
         try {
@@ -87,7 +84,7 @@ module.exports.Redirect = function (request, response, next) {
         req.end();
     });
     request.pipe(req);
-    req.end();
+    //req.end();
 };
 
 module.exports.GetRedirectUrl = function (req, res, next) {
