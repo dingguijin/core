@@ -49,9 +49,11 @@ module.exports.Redirect = function (request, response, next) {
     if (request.headers.hasOwnProperty('x-key')) {
         options.headers['x-key'] = request.headers['x-key']
     };
+    console.dir(options.headers);
 
     var req = client(options, function(res) {
         try {
+            console.dir(res.headers);
 
             res.on('end', function () {
                 res.destroy();
@@ -73,9 +75,11 @@ module.exports.Redirect = function (request, response, next) {
 
 // write data to request body
     if (request._body) {
+        console.dir('Send body');
         req.write(postData);
     };
     request.on('end', function () {
+        console.dir('End request');
        req.end();
     });
     request.pipe(req);
