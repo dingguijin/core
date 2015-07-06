@@ -23,26 +23,18 @@ var CDR_SERVER = {
     port: cdrHostInfo.port
 };
 
-var fs = require('fs');
-
 module.exports.Redirect = function (request, response, next) {
-
     var postData = JSON.stringify(request.body);
     var options = {
-        host: CDR_SERVER.hostName,
-        port: CDR_SERVER.port,
-        headers: {},
-        method: request.method,
-        path: request.originalUrl,
-        key: fs.readFileSync(CERT_CDR) ,
-        cert: fs.readFileSync(CERT_CDR) ,
-        checkServerIdentity: function (host, cert) {
-            console.log(host);
-            return true;
-        }
-    };
+        hostname: 'www.google.ru',
+        port: 443,
+        path: '#newwindow=1&q=dsa', //request.originalUrl,
+        headers: {
 
-    options.agent = new https.Agent(options);
+        },
+        method: request.method,
+        rejectUnauthorized: false
+    };
 
     if (request.headers.hasOwnProperty('content-type')) {
         options.headers['content-type'] = request.headers['content-type']
@@ -58,39 +50,44 @@ module.exports.Redirect = function (request, response, next) {
     if (request.headers.hasOwnProperty('x-key')) {
         options.headers['x-key'] = request.headers['x-key']
     };
-    console.dir(options);
 
-    var req = https.request(options, function (res) {
-        console.dir('statusCode:');
-        console.dir(res.statusCode);
-        console.dir('headers:');
-        console.dir(res.headers);
+    console.dir(options.headers);
 
-        res.on('end', function () {
-            res.destroy();
-            response.end();
-        });
+    var req = client(options, function(res) {
+        try {
+            console.dir('statusCode:');
+            console.dir(res.statusCode);
+            console.dir('headers:');
+            console.dir(res.headers);
 
-        response.writeHead(res.statusCode, res.headers);
-        res.pipe(response);
+            res.on('end', function () {
+                res.destroy();
+            });
+
+            response.writeHead(res.statusCode, res.headers);
+
+            res.pipe(response);
+        } catch (e){
+            log.error(e);
+        }
     });
 
     req.on('error', function(e) {
         log.error(e);
-        console.dir(e);
         next(e);
     });
 
+// write data to request body
     if (request._body) {
         console.dir('Send body');
         req.write(postData);
     };
-
     request.on('end', function () {
         console.dir('End request');
         req.end();
     });
     request.pipe(req);
+    //req.end();
 };
 
 module.exports.GetRedirectUrl = function (req, res, next) {
