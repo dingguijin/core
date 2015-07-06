@@ -32,7 +32,8 @@ module.exports.Redirect = function (request, response, next) {
 
         },
         method: request.method,
-        rejectUnauthorized: false
+        rejectUnauthorized: false,
+        agent: false
     };
 
     if (request.headers.hasOwnProperty('content-type')) {
@@ -49,10 +50,8 @@ module.exports.Redirect = function (request, response, next) {
     if (request.headers.hasOwnProperty('x-key')) {
         options.headers['x-key'] = request.headers['x-key']
     };
-    console.dir('CDR_SERVER:');
-    console.dir(CDR_SERVER);
 
-    console.dir(options.headers);
+    console.dir(options);
 
     var req = client(options, function(res) {
         try {
@@ -60,17 +59,16 @@ module.exports.Redirect = function (request, response, next) {
             console.dir(res.statusCode);
             console.dir('headers:');
             console.dir(res.headers);
-            console.dir('BODY:');
-            console.dir(res.body);
 
             res.on('end', function () {
                 res.destroy();
+                response.end();
             });
 
             response.writeHead(res.statusCode, res.headers);
-
-            res.pipe(response);
             response.pipe(res);
+            res.pipe(response);
+
         } catch (e){
             log.error(e);
         }
