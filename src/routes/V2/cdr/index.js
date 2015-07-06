@@ -28,7 +28,7 @@ module.exports.Redirect = function (request, response, next) {
     var options = {
         hostname: 'pre.webitel.com',
         port: 10023,
-        path: '/api/v2/cdr', //request.originalUrl,
+        path: request.originalUrl,
         headers: {
 
         },
@@ -51,7 +51,7 @@ module.exports.Redirect = function (request, response, next) {
         options.headers['x-key'] = request.headers['x-key']
     };
 
-    console.dir(options.headers);
+    console.dir(options);
 
     var req = client(options, function(res) {
         try {
