@@ -169,8 +169,24 @@ var Calls = {
 
     Eavesdrop: function (req, res, next) {
         var args = req.body;
-        eslConn.bgapi('originate user/' + (args['user'] || '') + ' &eavesdrop(' + (req.params['id'] || '') +
-        ') XML default ' + args['side'] + ' ' + args['side'], function (result) {
+        var user = args['user'] || req.webitelUser.id,
+            domain = req.webitelUser.attr['domain'];
+
+        if (domain) {
+            user = (user + '').split('@')[0] + '@' + domain;
+        };
+
+        if (req.params['id'] === 'all' && req.webitelUser.id !== 'root') {
+            res.status(403).json({
+                'status': 'error',
+                'info': 'Permission denied.'
+            });
+            return;
+        };
+        eslConn.bgapi('originate user/' + user + ' &eavesdrop(' + (req.params['id'] || '') + ') XML default '
+            + args['side'] + ' ' + args['side'] ,
+
+            function (result) {
             sendResponse(result, res);
         });
     }
