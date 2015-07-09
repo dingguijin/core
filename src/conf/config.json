@@ -20,7 +20,8 @@
         "collectionDomainVar": "domainVariables",
         "collectionAuth": "authToken",
         "collectionCalendar": "calendar",
-        "collectionFile": "cdrFile"
+        "collectionFile": "cdrFile",
+        "collectionEmail": "emailConfig"
     },
     "webitelServer": {
         "host": "CONSOLE_HOST",

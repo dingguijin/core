@@ -6,7 +6,8 @@ var auth = require('./auth'),
     dialplan = require('../../mod/dialplan'),
     calendar = require('../../mod/calendar'),
     callcenter = require('./callcenter'),
-    gateway = require('./gateway')
+    gateway = require('./gateway'),
+    emailSettings = require('./email').EmailSettings
     ;
 
 module.exports = function (app) {
@@ -102,4 +103,16 @@ module.exports = function (app) {
     app.get('/api/v2/gateway/:name', gateway.Item);
     app.post('/api/v2/gateway', gateway.Create);
     app.delete('/api/v2/gateway/:name', gateway.Destroy);
+
+    /**
+     * Email
+     * https://github.com/andris9/Nodemailer
+     * root ?domain=xx
+     */
+    app.get('/api/v2/email/settings', emailSettings.get);
+    app.post('/api/v2/email/settings', emailSettings.set);
+    app.put('/api/v2/email/settings', emailSettings.update);
+    app.delete('/api/v2/email/settings', emailSettings.delete);
+    app.post('/api/v2/email/settings/test/:to', emailSettings.sendHelloMessage);
+
 };
