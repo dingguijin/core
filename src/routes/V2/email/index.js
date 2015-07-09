@@ -183,7 +183,7 @@ var EmailSettings = {
                 "html": "<h1>Helo from <img href=\"webitel.com\" src=\"cid:logoID\"/> </h1>",
                 "attachments": [{
                     "filename": "logo768.png",
-                    "path": "src/resource/img/logo.png",
+                    "path": "/core/resource/img/logo.png",
                     "cid": "logoID"
                 }]
             },
