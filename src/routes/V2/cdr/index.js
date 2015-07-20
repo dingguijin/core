@@ -7,7 +7,8 @@ var conf = require('../../../conf'),
     https = require('https'),
     url = require('url'),
     log = require('../../../lib/log')(module),
-    CDR_SERVER_HOST = conf.get('cdrServer:host');
+    CDR_SERVER_HOST = conf.get('cdrServer:host'),
+    sslServerListener = conf.get('ssl:enabled');
 
 if (CDR_SERVER_HOST) {
     CDR_SERVER_HOST = CDR_SERVER_HOST.replace(/\/$/g, '');
@@ -15,7 +16,7 @@ if (CDR_SERVER_HOST) {
 
 var cdrHostInfo = url.parse(CDR_SERVER_HOST);
 
-var client = cdrHostInfo.protocol === 'https:' ? https.request : http.request;
+var client = sslServerListener.toString() === 'false' ? http.request : https.request;
 
 var CDR_SERVER = {
     hostName: cdrHostInfo.hostname,
@@ -52,11 +53,6 @@ module.exports.Redirect = function (request, response, next) {
 
     var req = client(options, function(res) {
         try {
-            console.dir('statusCode:');
-            console.dir(res.statusCode);
-            console.dir('headers:');
-            console.dir(res.headers);
-
             res.on('end', function () {
                 res.destroy();
             });
@@ -76,11 +72,9 @@ module.exports.Redirect = function (request, response, next) {
 
 // write data to request body
     if (request._body) {
-        console.dir('Send body');
         req.write(postData);
     };
     request.on('end', function () {
-        console.dir('End request');
         req.end();
     });
     request.pipe(req);
