@@ -7,7 +7,8 @@ var auth = require('./auth'),
     calendar = require('../../mod/calendar'),
     callcenter = require('./callcenter'),
     gateway = require('./gateway'),
-    emailSettings = require('./email').EmailSettings
+    emailSettings = require('./email').EmailSettings,
+    blackList = require('../../mod/blacklist/routes')
     ;
 
 module.exports = function (app) {
@@ -66,6 +67,19 @@ module.exports = function (app) {
     app.put('/api/v2/routes/default/:id', dialplan.UpdateDefaultDialplan);
     app.put('/api/v2/routes/default/:id/setOrder', dialplan.setOrderDefault);
     app.put('/api/v2/routes/default/:domainName/incOrder', dialplan.incOrderDefault);
+
+    /**
+     * BlackList
+     */
+    app.get('/api/v2/routes/blacklists', blackList.getNames);
+    app.post('/api/v2/routes/blacklists/searches', blackList.search);
+    app.post('/api/v2/routes/blacklists/:name', blackList.post);
+    // ?domain=&page=&order=&orderValue=1&limit=40
+    app.get('/api/v2/routes/blacklists/:name', blackList.getFromName);
+    app.get('/api/v2/routes/blacklists/:name/:number', blackList.getNumberFromName);
+    app.delete('/api/v2/routes/blacklists/:name', blackList.removeName);
+    app.delete('/api/v2/routes/blacklists/:name/:number', blackList.removeNumber);
+
 
     app.post('/api/v2/calendar', calendar.post);
 
