@@ -207,7 +207,10 @@ var Dialplan = {
 
         try {
             if (!dialplan['domain']) {
-                res.status(400).send('domain is undefined');
+                res.status(400).json({
+                    "staus": "error",
+                    "info": "Domain is required."
+                });
                 return;
             };
 
@@ -215,7 +218,12 @@ var Dialplan = {
 
             dialCollection.insert(dialplan, function (err, result) {
                 if (err) {
-                    res.status(500).send(err.message);
+                    res.status(200).json({
+                        "status": "error",
+                        "code": err['code'],
+                        "info": err.message
+                    });
+                    //res.status(500).send(err.message);
                     return;
                 };
                 res.status(200).json({
@@ -224,7 +232,10 @@ var Dialplan = {
                 });
             });
         } catch (e) {
-            res.status(500).send(e.message)
+            res.status(500).json({
+                "status": "error",
+                "info": e.message
+            });
         }
     },
 
@@ -262,13 +273,21 @@ var Dialplan = {
 
         try {
             if (!dialplan['domain']) {
-                res.status(400).send('domain is undefined');
+                res.status(400).json({
+                    "status": "error",
+                    "info": 'Domain is required.'
+                });
                 return;
             };
 
             dialCollection.insert(dialplan, function (err, result) {
                 if (err) {
-                    res.status(500).send(err.message);
+                    res.status(200).json({
+                        "status": "error",
+                        "code": err['code'],
+                        "info": err.message
+                    });
+                    //res.status(500).send(err.message);
                     return;
                 };
                 // TODO
@@ -280,7 +299,10 @@ var Dialplan = {
 
 
         } catch (e) {
-            res.status(500).send(e.message)
+            res.status(500).json({
+                "status": "error",
+                "info": e.message
+            });
         };
     },
     
