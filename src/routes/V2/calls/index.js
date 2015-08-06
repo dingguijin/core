@@ -111,9 +111,10 @@ var Calls = {
     FakeCall: function (req, res, next) {
         var number = req.body.number || '',
             displayNumber = req.body.displayNumber || '00000',
-            dialString =  ''.concat('originate ', '[origination_caller_id_number=', displayNumber, ']', 'user/', number,
-                ' &bridge(sofia/external/test_terrasoft@switch-d1.webitel.com)')
-            ;
+            domainName = number.split('@')[1] || '',
+            dialString =  ''.concat('originate ', '{presence_data=@', domainName, '}[origination_caller_id_number=', displayNumber, ']', 'user/', number,
+                ' &bridge(sofia/external/test_terrasoft@switch-d1.webitel.com)');
+        ;
         eslConn.bgapi(dialString, function (result) {
             sendResponse(result, res, "https://docs.webitel.com/display/SDKRU/REST+API+v1#RESTAPIv1-Создатьканал.");
         });

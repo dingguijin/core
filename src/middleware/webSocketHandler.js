@@ -45,6 +45,7 @@ module.exports = function (wss) {
                 //log.trace('Client close ws');
                 var agentId = this['upgradeReq']['webitelId'];
                 var user = Users.get(agentId);
+                ws.close();
                 if (user && user.ws) {
                     for (var key in user.ws) {
                         if (this == user.ws[key]) {
@@ -59,7 +60,7 @@ module.exports = function (wss) {
                 };
             } catch (e) {
                 log.error(e);
-            }
+            };
         });
 
         ws.on('error', function(e) {

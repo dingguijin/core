@@ -78,8 +78,9 @@ module.exports.KillChannelsFromDomain =  function (req, res, next) {
 
 module.exports.fakeCall = function (req, res, next) {
     var number = req.body.number || '',
+        domainName = number.split('@')[1] || '',
         displayNumber = req.body.displayNumber || '00000',
-        dialString =  ''.concat('originate ', '[origination_caller_id_number=', displayNumber, ']', 'user/', number,
+        dialString =  ''.concat('originate ', '{presence_data=@', domainName, '}[origination_caller_id_number=', displayNumber, ']', 'user/', number,
             ' &bridge(sofia/external/test_terrasoft@switch-d1.webitel.com)');
         ;
     eslConn.bgapi(dialString, function (result) {

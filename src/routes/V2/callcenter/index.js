@@ -116,6 +116,28 @@ var API = {
 
         });
     },
+    
+    GetMembersCount: function (req, res) {
+        var queue = req.params['queue'] + '@' + (req.webitelUser['attr']['domain'] || req.query['domain']);
+        eslConn.bgapi('callcenter_config queue count members ' + queue, function (result) {
+            try {
+                if (result['body'] && result['body'].indexOf('-ERR') === 0) {
+                    res.status(200).json({
+                        "status": "error",
+                        "info": result['body']
+                    });
+                    return;
+                };
+                return res.status(200).json({
+                    "status": "OK",
+                    "info": result['body']
+                })
+            } catch (e) {
+                log.error(e['message']);
+            };
+
+        });
+    },
 
 
     GetMembers: function (req, res, next) {
