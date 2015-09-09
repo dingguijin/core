@@ -41,14 +41,30 @@ var BlackList = {
                 return cb(new Error('Bad request: domain, name or number is required.'));
             };
 
-            collection.update({
-                    "domain": data['domain'],
-                    "name": data['name'],
-                    "number": data['number']
-                },
-                data,
-                {upsert: true},
-                cb);
+            var number = data['number'];
+            if (number instanceof Array) {
+                var batch = collection.initializeUnorderedBulkOp();
+
+                for (var i = 0, len = number.length; i < len; i++) {
+                    batch.insert(
+                        {
+                            "domain": data['domain'],
+                            "name": data['name'],
+                            "number": number[i].toString()
+                        }
+                    );
+                };
+                batch.execute(cb);
+            } else {
+                collection.update({
+                        "domain": data['domain'],
+                        "name": data['name'],
+                        "number": data['number']
+                    },
+                    data,
+                    {upsert: true},
+                    cb);
+            }
             return;
         } catch (e) {
             cb(e);
