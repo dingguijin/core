@@ -362,7 +362,7 @@ commandEmitter.on('wss::' + WebitelCommandTypes.Gateway.Create.name, function (e
     var _caller = doSendWebitelCommand(execId, ws, WebitelCommandTypes.Gateway.Create);
     if (!_caller) return;
     webitel.createSipGateway(_caller, args, function (res) {
-        getCommandResponseJSON(ws, execId, res);
+        getCommandResponseV2JSON(ws, execId, res);
     });
 });
 

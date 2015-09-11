@@ -9,7 +9,10 @@
 var db = require('../../lib/mongoDrv'),
     log = require('../../lib/log')(module),
     conf = require('../../conf'),
-    EXTENSION_COLLECTION_NAME = conf.get('mongodb:collectionExtension')
+    EXTENSION_COLLECTION_NAME = conf.get('mongodb:collectionExtension'),
+    PUBLIC_DIALPLAN_NAME = conf.get("mongodb:collectionPublic"),
+    DEFAULT_DIALPLAN_NAME = conf.get("mongodb:collectionDefault"),
+    Dialplan = require('./index')
     ;
 
 var Controller = {
@@ -95,6 +98,56 @@ var Controller = {
         } catch (e) {
             cb(e);
         };
+    },
+
+    createDefault: function (dialplan, domain, cb) {
+        try {
+            var dialCollection = db.getCollection(DEFAULT_DIALPLAN_NAME);
+            Dialplan.replaceExpression(dialplan);
+            dialplan['createdOn'] = new Date().toString();
+
+            dialplan['domain'] = domain;
+
+            if (!dialplan['order']) {
+                dialplan['order'] = 0;
+            };
+            dialplan['version'] = 2;
+
+            if (!dialplan['domain']) {
+                return cb(new Error('Bad domain name'));
+            };
+
+            dialCollection.insert(dialplan, cb);
+        } catch (e) {
+            return cb(e);
+        };
+    },
+
+    createPublic: function (dialplan, domain, cb) {
+        try {
+            var dialCollection = db.getCollection(PUBLIC_DIALPLAN_NAME);
+            Dialplan.replaceExpression(dialplan);
+            dialplan['createdOn'] = new Date().toString();
+
+            // TODO проверка на номер
+            /**
+             ALPHA / DIGIT / "-" / "_" / "." / "+" / "="
+             The US-ASCII coded character set
+             is defined by ANSI X3.4-1986.
+             **/
+
+            dialplan['domain'] =  domain;
+
+            if (!dialplan['domain']) {
+                return cb(new Error('Bad domain name'));
+            };
+
+            dialplan['version'] = 2;
+
+            dialCollection.insert(dialplan, cb);
+        } catch (e) {
+            return cb(e);
+        }
     },
 
     /**

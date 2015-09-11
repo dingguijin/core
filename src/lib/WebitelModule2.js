@@ -1373,6 +1373,8 @@ Webitel.prototype.showSipGateway = function (_caller, domain, cb) {
     ], _cb);
 };
 
+var DialplanController = require('../mod/dialplan/controller');
+
 Webitel.prototype.createSipGateway = function (_caller, gateway, cb) {
     if (typeof gateway !== 'object' || !gateway['name'] || typeof gateway['username'] !== 'string' ||
         /\s/g.test(gateway['username'])) {
@@ -1439,9 +1441,60 @@ Webitel.prototype.createSipGateway = function (_caller, gateway, cb) {
         _commandsLine = _commandsLine.concat(' ', 'up external');
     };
 
+    var routes = gateway['routes'] || {};
+
     this.api(WebitelCommandTypes.Gateway.Index, [
         _commandsLine
-    ], cb);
+    ], function (res) {
+        if (res && typeof res['body'] == 'string' && res['body'].indexOf('-ERR') == 0) {
+            return cb({
+                body: {
+                    "gateway": res['body']
+                }
+            });
+        };
+        var routesExec = [];
+        
+        if (routes['default'] instanceof Object) {
+            var _fnCreateDefault = function (next) {
+                DialplanController.createDefault(routes['default'], _domain, next);
+            };
+            routesExec.push(_fnCreateDefault);
+        };
+
+        if (routes['public'] instanceof Object) {
+            var _fnCreatePublic = function (next) {
+                DialplanController.createPublic(routes['public'], _domain, next);
+            };
+            routesExec.push(_fnCreatePublic);
+        };
+
+        if (routesExec.length > 0) {
+            async.parallel(routesExec, function (err, result) {
+                var response = {
+                    "body": {
+                        "gateway": res['body'],
+                        "routes": {}
+                    }
+                };
+                if (err) {
+                    response.body.routes['err'] = err;
+                };
+
+                if (result) {
+                    response.body.routes['result'] = result;
+                };
+
+                return cb(response);
+            });
+        } else {
+            return cb({
+                "body": {
+                    "gateway": res['body']
+                }
+            });
+        };
+    });
 };
 
 Webitel.prototype.changeSipGateway = function (_caller, gateway_id, type, params, cb) {
