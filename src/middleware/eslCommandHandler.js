@@ -11,7 +11,6 @@ commandEmitter.on('wss::' + WebitelCommandTypes.Call.name, function (execId, arg
     var _originatorParam = new Array('w_jsclient_originate_number=' + args['extension'], "rtp_secure_media=" + args['secure_media'] == 'true' ? 'true': 'false'),
         _autoAnswerParam = [].concat( args['auto_answer_param'] || []),
         _param = '[' + _originatorParam.concat(_autoAnswerParam).join(',') + ']';
-    //rtp_secure_media=true
 
     eslConn.bgapi(('originate ' + _param + 'user/' + args['user'] + ' ' + args['extension'] +
     ' xml default ' + args['user'] + ' ' + args['user']), function (res) {
