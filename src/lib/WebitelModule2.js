@@ -1555,7 +1555,7 @@ Webitel.prototype.upSipGateway = function (_caller, gateway_id, profile, cb) {
 
     // TODO удалить external
     this.api(WebitelCommandTypes.Gateway.Index, [
-        gateway_id + ' up ' + 'external'
+        gateway_id + ' up ' + (profile || 'external')
     ], cb);
 };
 
