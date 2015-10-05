@@ -22,7 +22,8 @@
         "collectionCalendar": "calendar",
         "collectionFile": "cdrFile",
         "collectionEmail": "emailConfig",
-        "collectionBlackList": "blackList"
+        "collectionBlackList": "blackList",
+        "collectionAgentStatus": "agentStatus"
     },
     "webitelServer": {
         "host": "CONSOLE_HOST",

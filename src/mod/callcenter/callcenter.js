@@ -95,6 +95,7 @@ CC.prototype.setAttributesEvent = function (ccEvent, user) {
         var _user = Users.get(user[0] + '@' + user[1]);
         if (_user && _user.setState(ccEvent['CC-Agent-State'])) {
             // TODO new status set
+            //console.dir(_user);
         };
 
     } else if (ccEvent['CC-Action'] == 'agent-status-change') {
@@ -103,6 +104,7 @@ CC.prototype.setAttributesEvent = function (ccEvent, user) {
         var _user = Users.get(user[0] + '@' + user[1]);
         if (_user && _user.setStatus(ccEvent['CC-Agent-Status'])) {
             // TODO new status set
+            //console.log(_user);
         };
     } else {
         ccEvent['Event-Name'] = null;

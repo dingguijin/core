@@ -20,18 +20,20 @@ module.exports = function (app) {
     app.get('/api/v2/status', require('./status')); // +
 
     /* DOMAIN */
-    app.post('/api/v2/domains', require('./domain').Create);
-    app.get('/api/v2/domains', require('./domain').Get);
-    app.get('/api/v2/domains/:name', require('./domain').GetItem);
-    app.put('/api/v2/domains/:name/:type', require('./domain').Update);
-    app.delete('/api/v2/domains/:name', require('./domain').Delete);
+    app.post('/api/v2/domains', require('./domain').Create); //+
+    app.get('/api/v2/domains', require('./domain').Get); //+
+    app.get('/api/v2/domains/:name', require('./domain').GetItem); //+
+    app.put('/api/v2/domains/:name/:type', require('./domain').Update); //+
+    app.delete('/api/v2/domains/:name', require('./domain').Delete); //+
 
     /* ACCOUNT */
-    app.get('/api/v2/accounts?:domain', require('./account').Get);
-    app.post('/api/v2/accounts', require('./account').Create);
-    app.get('/api/v2/accounts/:name', require('./account').GetItem);
+    app.get('/api/v2/accounts?:domain', require('./account').Get); //+
+    app.post('/api/v2/accounts', require('./account').Create); //+
+    app.get('/api/v2/accounts/:name', require('./account').GetItem); //+
     app.put('/api/v2/accounts/:name?', require('./account').Update);
     app.delete('/api/v2/accounts/:name', require('./account').Delete);
+
+    app.get('/api/v2/history/status', require('./userStatus').Get);
 
     /* CONFIGURE */
     app.get('/api/v2/reloadxml', require('./configure').ReloadXml);
@@ -88,38 +90,38 @@ module.exports = function (app) {
     app.all(/^\/api\/v2\/r\/(cdr|files|media)/, require('./cdr').GetRedirectUrl); // +
     app.all(/^\/api\/v2\/(cdr|files|media)/, require('./cdr').Redirect); // +
 
-    app.get('/api/v2/callcenter/queues', callcenter.List);
-    app.post('/api/v2/callcenter/queues', callcenter.Create);
-    app.get('/api/v2/callcenter/queues/:name', callcenter.Item);
-    app.put('/api/v2/callcenter/queues/:name', callcenter.Update);
+    app.get('/api/v2/callcenter/queues', callcenter.List); //+
+    app.post('/api/v2/callcenter/queues', callcenter.Create); //+
+    app.get('/api/v2/callcenter/queues/:name', callcenter.Item); //+
+    app.put('/api/v2/callcenter/queues/:name', callcenter.Update); //+
     // TODO DELETE PUT !!!
-    app.put('/api/v2/callcenter/queues/:name/:state', callcenter.SetState);
-    app.patch('/api/v2/callcenter/queues/:name/:state', callcenter.SetState);
+    app.put('/api/v2/callcenter/queues/:name/:state', callcenter.SetState); //+
+    app.patch('/api/v2/callcenter/queues/:name/:state', callcenter.SetState); //+
 
-    app.delete('/api/v2/callcenter/queues/:name', callcenter.Delete);
+    app.delete('/api/v2/callcenter/queues/:name', callcenter.Delete);//+
 
-    app.post('/api/v2/callcenter/queues/:queue/tiers', callcenter.PostTier);
+    app.post('/api/v2/callcenter/queues/:queue/tiers', callcenter.PostTier); //+
     app.get('/api/v2/callcenter/queues/:queue/tiers', callcenter.GetTier); //+
 
     app.get('/api/v2/callcenter/queues/:queue/members', callcenter.GetMembers); //+
     app.get('/api/v2/callcenter/queues/:queue/members/count', callcenter.GetMembersCount); //+
 
     // TODO DELETE PUT !!!
-    app.put('/api/v2/callcenter/queues/:queue/tiers/:agent/level', callcenter.PutLevel);
-    app.patch('/api/v2/callcenter/queues/:queue/tiers/:agent/level', callcenter.PutLevel);
+    app.put('/api/v2/callcenter/queues/:queue/tiers/:agent/level', callcenter.PutLevel); //+
+    app.patch('/api/v2/callcenter/queues/:queue/tiers/:agent/level', callcenter.PutLevel); // +
     // TODO DELETE PUT !!!
-    app.put('/api/v2/callcenter/queues/:queue/tiers/:agent/position', callcenter.PutPosition);
-    app.patch('/api/v2/callcenter/queues/:queue/tiers/:agent/position', callcenter.PutPosition);
-    app.delete('/api/v2/callcenter/queues/:queue/tiers/:agent', callcenter.DeleteTier);
+    app.put('/api/v2/callcenter/queues/:queue/tiers/:agent/position', callcenter.PutPosition); //+
+    app.patch('/api/v2/callcenter/queues/:queue/tiers/:agent/position', callcenter.PutPosition); //+
+    app.delete('/api/v2/callcenter/queues/:queue/tiers/:agent', callcenter.DeleteTier); //+
 
 
     /**
      * Gateway
      */
-    app.get('/api/v2/gateway', gateway.List);
-    app.get('/api/v2/gateway/:name', gateway.Item);
-    app.post('/api/v2/gateway', gateway.Create);
-    app.delete('/api/v2/gateway/:name', gateway.Destroy);
+    app.get('/api/v2/gateway', gateway.List); //+
+    app.get('/api/v2/gateway/:name', gateway.Item); //+
+    app.post('/api/v2/gateway', gateway.Create); //+
+    app.delete('/api/v2/gateway/:name', gateway.Destroy); //+
 
     /**
      * Email

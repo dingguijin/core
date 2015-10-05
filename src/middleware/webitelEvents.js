@@ -5,6 +5,7 @@ module.exports.eventsHandle = function (events) {
         var jsonEvent = JSON.parse(events.serialize('json'));
         if (userNotExistsWebitelGroup(jsonEvent))
             return;
+        //console.log(jsonEvent);
         log.debug(jsonEvent['Event-Name'] + ' -> ' + jsonEvent['Event-Domain']);
         jsonEvent['webitel-event-name'] = 'user';
         Domains.broadcast(jsonEvent['Event-Domain'], jsonEvent);

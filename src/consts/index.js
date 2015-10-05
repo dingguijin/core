@@ -157,6 +157,9 @@ module.exports.WebitelCommandTypes = {
         name: 'logout',
         perm: 0
     },
+    SetStatus: {
+        "name": 'setStatus'
+    },
     ReloadAgents: {
         name: 'reloadAgents',
         perm: 1
@@ -383,4 +386,4 @@ module.exports.ACCOUNT_STATE_TYPE = {
 module.exports.WEBITEL_EVENT_NAME_TYPE = {
     USER_STATE: "CC_AGENT_STATE",
     USER_STATUS: "CC_AGENT_STATUS"
-}
+};

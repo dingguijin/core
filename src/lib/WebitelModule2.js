@@ -547,11 +547,11 @@ Webitel.prototype.userCreate = function(_caller, args, cb) {
         parameters.push(VARIABLE_EXTENSION_NAME + '=' + number);
 
         if (parameters instanceof Array) {
-            _str += '[' + parameters.join(',') + ']';
+            _str += '[' + encodeURI(parameters) + ']';
         }
         ;
         if (variables  instanceof Array) {
-            _str += '{' + variables.join(',') + '}';
+            _str += '{' + encodeURI(variables) + '}';
         }
         ;
 
@@ -642,11 +642,11 @@ Webitel.prototype.userUpdateV2 = function (_caller, user, domain, option, cb) {
             var cmd = '';
 
             if (params instanceof Array && params.length > 0) {
-                cmd += '[' + params.join(',') + ']';
+                cmd += '[' + encodeURI(params) + ']';
             };
 
             if (variables instanceof Array && variables.length > 0) {
-                cmd += '{' + variables.join(',') + '}';
+                cmd += '{' + encodeURI(variables) + '}';
             };
 
             scope.api(WebitelCommandTypes.Account.Change, [
@@ -1438,7 +1438,7 @@ Webitel.prototype.createSipGateway = function (_caller, gateway, cb) {
     };
 
     if (typeof gateway['profile'] == 'string') {
-        _commandsLine = _commandsLine.concat(' ', 'up external');
+        _commandsLine = _commandsLine.concat(' up ', (gateway['profile'] || 'external'));
     };
 
     var routes = gateway['routes'] || {};
@@ -1553,7 +1553,6 @@ Webitel.prototype.upSipGateway = function (_caller, gateway_id, profile, cb) {
         return;
     };
 
-    // TODO удалить external
     this.api(WebitelCommandTypes.Gateway.Index, [
         gateway_id + ' up ' + (profile || 'external')
     ], cb);
@@ -1780,7 +1779,7 @@ Webitel.prototype._parsePlainCollectionToJSON = function (data, cb) {
             attribute = line.substring(0, separatorId);
             if (attribute === '')
                 continue;
-            _json[attribute] = line.substring(separatorId + 1);
+            _json[attribute] = decodeURI(line.substring(separatorId + 1));
         };
 
         cb(null, _json);

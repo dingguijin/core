@@ -9,8 +9,37 @@ var WebitelCommandTypes = require('../consts').WebitelCommandTypes,
     eventCollection = require('./EventsCollection'),
     ACCOUNT_EVENTS = require('../consts').ACCOUNT_EVENTS,
     handleSocketError = require('../middleware/handleSocketError'),
+    handleUserStatus = require('./userStatus'),
     User = require('../lib/User');
 
+commandEmitter.on('wss::' + WebitelCommandTypes.SetStatus.name, function (execId, args, ws) {
+    console.dir(args);
+    try {
+        var _caller = doSendWebitelCommand(execId, ws, WebitelCommandTypes.Account.Change);
+        if (!_caller) return;
+
+        var _value = args['status'];
+        if (!_value || !args['userId']) {
+            // TODO RESPONSE bad request
+            return;
+        };
+        if (args['tag']) {
+            _value += ' (' + args['tag'] + ')';
+        };
+        webitel.userUpdate(_caller, args['userId'], 'status', _value, function (res) {
+            getCommandResponseJSON(ws, execId, res);
+        });
+
+        eslConn.bgapi('callcenter_config agent set state ' + args['userId'] + " 'Waiting'", function (res) {
+            console.log(res.body)
+        });
+
+    } catch (e) {
+        log.error(e['message']);
+    };
+});
+
+//+
 commandEmitter.on('wss::' + WebitelCommandTypes.Auth.name, function (execId, args, ws) {
     checkUser(args['account'], args['secret'], function (err, userParam) {
         if (err) {
@@ -68,6 +97,7 @@ commandEmitter.on('wss::' + WebitelCommandTypes.Auth.name, function (execId, arg
 });
 
 // TODO перенести в модуль eventCollection
+//+
 commandEmitter.on('wss::' + WebitelCommandTypes.Event.On.name, function (execId, args, ws) {
     var _caller = doSendWebitelCommand(execId, ws, WebitelCommandTypes.Event.On);
     if (!_caller) return;
@@ -81,7 +111,7 @@ commandEmitter.on('wss::' + WebitelCommandTypes.Event.On.name, function (execId,
             getCommandResponseJSON(ws, execId, res);
         });
 });
-
+//+
 commandEmitter.on('wss::' + WebitelCommandTypes.Event.Off.name, function (execId, args, ws) {
     var _caller = doSendWebitelCommand(execId, ws, WebitelCommandTypes.Event.Off);
     if (!_caller) return;
@@ -96,7 +126,7 @@ commandEmitter.on('wss::' + WebitelCommandTypes.Event.Off.name, function (execId
         });
 });
 // END TODO
-
+//+
 commandEmitter.on('wss::' + WebitelCommandTypes.Logout.name, function (execId, args, ws) {
     ws['upgradeReq']['logged'] = false;
     var jsonEvent,
@@ -124,7 +154,7 @@ commandEmitter.on('wss::' + WebitelCommandTypes.Logout.name, function (execId, a
         });
     };
 });
-
+//+
 commandEmitter.on('wss::' + WebitelCommandTypes.Login.name, function (execId, args, ws) {
     ws['upgradeReq']['logged'] = true;
     var jsonEvent,
@@ -152,7 +182,7 @@ commandEmitter.on('wss::' + WebitelCommandTypes.Login.name, function (execId, ar
         });
     };
 });
-
+//+
 commandEmitter.on('wss::' + WebitelCommandTypes.Token.Generate.name, function (execId, args, ws) {
     var username = ws['upgradeReq']['webitelId'];
     if (!username) {
@@ -183,7 +213,7 @@ commandEmitter.on('wss::' + WebitelCommandTypes.Token.Generate.name, function (e
     });
 });
 
-
+//+
 commandEmitter.on('wss::' + WebitelCommandTypes.ListUsers.name, function (execId, args, ws) {
     var _caller = doSendWebitelCommand(execId, ws, WebitelCommandTypes.ListUsers);
     if (!_caller) return;
@@ -191,7 +221,7 @@ commandEmitter.on('wss::' + WebitelCommandTypes.ListUsers.name, function (execId
         getCommandResponseJSON(ws, execId, res);
     });
 });
-
+//+
 commandEmitter.on('wss::' + WebitelCommandTypes.Domain.List.name, function (execId, args, ws) {
     var _caller = doSendWebitelCommand(execId, ws, WebitelCommandTypes.Domain.List);
     if (!_caller) return;
@@ -199,7 +229,7 @@ commandEmitter.on('wss::' + WebitelCommandTypes.Domain.List.name, function (exec
         getCommandResponseJSON(ws, execId, res);
     });
 });
-
+//+
 commandEmitter.on('wss::' + WebitelCommandTypes.Domain.Create.name, function (execId, args, ws) {
     var _caller = doSendWebitelCommand(execId, ws, WebitelCommandTypes.Domain.Create);
     if (!_caller) return;
@@ -207,7 +237,7 @@ commandEmitter.on('wss::' + WebitelCommandTypes.Domain.Create.name, function (ex
         getCommandResponseJSON(ws, execId, res);
     });
 });
-
+//+
 commandEmitter.on('wss::' + WebitelCommandTypes.Domain.Remove.name, function (execId, args, ws) {
     var _caller = doSendWebitelCommand(execId, ws, WebitelCommandTypes.Domain.Remove);
     if (!_caller) return;
@@ -215,7 +245,7 @@ commandEmitter.on('wss::' + WebitelCommandTypes.Domain.Remove.name, function (ex
         getCommandResponseJSON(ws, execId, res);
     });
 });
-
+//+
 commandEmitter.on('wss::' + WebitelCommandTypes.Domain.Item.name, function (execId, args, ws) {
     var _caller = doSendWebitelCommand(execId, ws, WebitelCommandTypes.Domain.Item);
     if (!_caller) return;
@@ -231,7 +261,7 @@ commandEmitter.on('wss::' + WebitelCommandTypes.Domain.Item.name, function (exec
         getCommandResponseV2JSON(ws, execId, _res);
     });
 });
-
+//+
 commandEmitter.on('wss::' + WebitelCommandTypes.Domain.Update.name, function (execId, args, ws) {
     var _caller = doSendWebitelCommand(execId, ws, WebitelCommandTypes.Domain.Update);
     if (!_caller) return;
@@ -251,7 +281,7 @@ commandEmitter.on('wss::' + WebitelCommandTypes.Domain.Update.name, function (ex
         getCommandResponseV2JSON(ws, execId, _res);
     });
 });
-
+//+
 commandEmitter.on('wss::' + WebitelCommandTypes.Account.List.name, function (execId, args, ws) {
     var _caller = doSendWebitelCommand(execId, ws, WebitelCommandTypes.Account.List);
     if (!_caller) return;
@@ -259,7 +289,7 @@ commandEmitter.on('wss::' + WebitelCommandTypes.Account.List.name, function (exe
         getCommandResponseJSON(ws, execId, res);
     });
 });
-
+//+
 commandEmitter.on('wss::' + WebitelCommandTypes.Account.Create.name, function (execId, args, ws) {
     var _caller = doSendWebitelCommand(execId, ws, WebitelCommandTypes.Account.Create);
     if (!_caller) return;
@@ -267,7 +297,7 @@ commandEmitter.on('wss::' + WebitelCommandTypes.Account.Create.name, function (e
         getCommandResponseJSON(ws, execId, res);
     });
 });
-
+//+
 commandEmitter.on('wss::' + WebitelCommandTypes.Account.Change.name, function (execId, args, ws) {
     try {
         var _caller = doSendWebitelCommand(execId, ws, WebitelCommandTypes.Account.Change);
@@ -288,7 +318,7 @@ commandEmitter.on('wss::' + WebitelCommandTypes.Account.Change.name, function (e
         log.error(e['message']);
     }
 });
-
+//+
 commandEmitter.on('wss::' + WebitelCommandTypes.Account.Remove.name, function (execId, args, ws) {
     var _caller = doSendWebitelCommand(execId, ws, WebitelCommandTypes.Account.Remove);
     if (!_caller) return;
@@ -296,7 +326,7 @@ commandEmitter.on('wss::' + WebitelCommandTypes.Account.Remove.name, function (e
         getCommandResponseJSON(ws, execId, res);
     });
 });
-
+//+
 commandEmitter.on('wss::' + WebitelCommandTypes.Account.Item.name, function (execId, args, ws) {
     try {
         var _caller = doSendWebitelCommand(execId, ws, WebitelCommandTypes.Account.Item);
@@ -349,7 +379,7 @@ commandEmitter.on('wss::' + WebitelCommandTypes.ReloadAgents.name, function (exe
         getCommandResponseJSON(ws, execId, res);
     });
 });
-
+//+
 commandEmitter.on('wss::' + WebitelCommandTypes.Gateway.List.name, function (execId, args, ws) {
     var _caller = doSendWebitelCommand(execId, ws, WebitelCommandTypes.Gateway.List);
     if (!_caller) return;
@@ -357,7 +387,7 @@ commandEmitter.on('wss::' + WebitelCommandTypes.Gateway.List.name, function (exe
         getCommandResponseJSON(ws, execId, res);
     });
 });
-
+//+
 commandEmitter.on('wss::' + WebitelCommandTypes.Gateway.Create.name, function (execId, args, ws) {
     var _caller = doSendWebitelCommand(execId, ws, WebitelCommandTypes.Gateway.Create);
     if (!_caller) return;
@@ -365,7 +395,7 @@ commandEmitter.on('wss::' + WebitelCommandTypes.Gateway.Create.name, function (e
         getCommandResponseV2JSON(ws, execId, res);
     });
 });
-
+//+
 commandEmitter.on('wss::' + WebitelCommandTypes.Gateway.Change.name, function (execId, args, ws) {
     var _caller = doSendWebitelCommand(execId, ws, WebitelCommandTypes.Gateway.Create);
     if (!_caller) return;
@@ -373,7 +403,7 @@ commandEmitter.on('wss::' + WebitelCommandTypes.Gateway.Change.name, function (e
         getCommandResponseJSON(ws, execId, res);
     });
 });
-
+//+
 commandEmitter.on('wss::' + WebitelCommandTypes.Gateway.Remove.name, function (execId, args, ws) {
     var _caller = doSendWebitelCommand(execId, ws, WebitelCommandTypes.Gateway.Remove);
     if (!_caller) return;
@@ -381,7 +411,7 @@ commandEmitter.on('wss::' + WebitelCommandTypes.Gateway.Remove.name, function (e
         getCommandResponseJSON(ws, execId, res);
     });
 });
-
+//+
 commandEmitter.on('wss::' + WebitelCommandTypes.Gateway.Up.name, function (execId, args, ws) {
     var _caller = doSendWebitelCommand(execId, ws, WebitelCommandTypes.Gateway.Up);
     if (!_caller) return;
@@ -389,7 +419,7 @@ commandEmitter.on('wss::' + WebitelCommandTypes.Gateway.Up.name, function (execI
         getCommandResponseJSON(ws, execId, res);
     });
 });
-
+//+
 commandEmitter.on('wss::' + WebitelCommandTypes.Gateway.Down.name, function (execId, args, ws) {
     var _caller = doSendWebitelCommand(execId, ws, WebitelCommandTypes.Gateway.Down);
     if (!_caller) return;
@@ -397,7 +427,7 @@ commandEmitter.on('wss::' + WebitelCommandTypes.Gateway.Down.name, function (exe
         getCommandResponseJSON(ws, execId, res);
     });
 });
-
+//+
 commandEmitter.on('wss::' + WebitelCommandTypes.Sys.Message.name, function (execId, args, ws) {
     var _caller = doSendWebitelCommand(execId, ws, WebitelCommandTypes.Sys.Message);
     if (!_caller) return;
@@ -436,17 +466,8 @@ commandEmitter.on('wss::' + WebitelCommandTypes.Sys.Message.name, function (exec
     }
 });
 
-commandEmitter.on('wss::' + WebitelCommandTypes.Gateway.Down.name, function (execId, args, ws) {
-    var _caller = doSendWebitelCommand(execId, ws, WebitelCommandTypes.Gateway.Down);
-    if (!_caller) return;
-    webitel.downSipGateway(_caller, args['name'], function (res) {
-        getCommandResponseJSON(ws, execId, res);
-    });
-});
-
-
 var cdr = require('./cdr');
-
+//+
 commandEmitter.on('wss::' + WebitelCommandTypes.CDR.RecordCall.name, function (execId, args, ws) {
     var _caller = doSendWebitelCommand(execId, ws, WebitelCommandTypes.CDR.RecordCall);
     if (!_caller) return;

@@ -187,7 +187,7 @@ commandEmitter.on('wss::' + WebitelCommandTypes.Displace.name, function (execId,
         getCommandResponseJSON(ws, execId, res);
     });
 });
-
+//+
 commandEmitter.on('wss::' + WebitelCommandTypes.Gateway.Kill.name, function (execId, args, ws) {
     // Пока нету смысла делать поиск пользователя для всех команд freeSWITCH
     var _user = Users.get(ws['upgradeReq']['webitelId']);
@@ -207,7 +207,7 @@ commandEmitter.on('wss::' + WebitelCommandTypes.Gateway.Kill.name, function (exe
         getCommandResponseJSON(ws, execId, res);
     });
 });
-
+//+
 commandEmitter.on('wss::' + WebitelCommandTypes.SipProfile.List.name, function (execId, args, ws) {
     // Пока нету смысла делать поиск пользователя для всех команд freeSWITCH
     var _user = Users.get(ws['upgradeReq']['webitelId']);
@@ -238,7 +238,7 @@ commandEmitter.on('wss::' + WebitelCommandTypes.SipProfile.List.name, function (
         })
     });
 });
-
+//+
 commandEmitter.on('wss::' + WebitelCommandTypes.SipProfile.Rescan.name, function (execId, args, ws) {
     // Пока нету смысла делать поиск пользователя для всех команд freeSWITCH
     var _user = Users.get(ws['upgradeReq']['webitelId']);
@@ -259,7 +259,7 @@ commandEmitter.on('wss::' + WebitelCommandTypes.SipProfile.Rescan.name, function
         getCommandResponseJSON(ws, execId, res);
     });
 });
-
+//+
 commandEmitter.on('wss::' + WebitelCommandTypes.Show.Channel.name, function (execId, args, ws) {
     var username = ws['upgradeReq']['webitelId'];
     if (!username) {
@@ -288,7 +288,7 @@ commandEmitter.on('wss::' + WebitelCommandTypes.Show.Channel.name, function (exe
         getCommandResponseJSON(ws, execId, _res);
     });
 });
-
+//+
 commandEmitter.on('wss::' + WebitelCommandTypes.Chat.Send.name, function (execId, args, ws) {
     if (!doSendFreeSWITCHCommand(execId, ws)) return;
     try {
