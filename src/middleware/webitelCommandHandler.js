@@ -9,7 +9,6 @@ var WebitelCommandTypes = require('../consts').WebitelCommandTypes,
     eventCollection = require('./EventsCollection'),
     ACCOUNT_EVENTS = require('../consts').ACCOUNT_EVENTS,
     handleSocketError = require('../middleware/handleSocketError'),
-    handleUserStatus = require('./userStatus'),
     User = require('../lib/User');
 
 commandEmitter.on('wss::' + WebitelCommandTypes.SetStatus.name, function (execId, args, ws) {
@@ -86,6 +85,9 @@ commandEmitter.on('wss::' + WebitelCommandTypes.Auth.name, function (execId, arg
                         'role': userParam.role.name,
                         'domain': userParam.domain,
                         'cc-agent': userParam['cc-agent'],
+                        'state': userParam['state'],
+                        'status': userParam['status'],
+                        'description': userParam['description'],
                         'ws-count': user.ws.length
                     }
                 }));

@@ -1,17 +1,33 @@
 var log = require('../lib/log')(module);
+var handleStatusDb = require('./userStatus');
 
 module.exports.eventsHandle = function (events) {
     try {
+
         var jsonEvent = JSON.parse(events.serialize('json'));
-        if (userNotExistsWebitelGroup(jsonEvent))
-            return;
         //console.log(jsonEvent);
+        //if (userNotExistsWebitelGroup(jsonEvent))
+        //    return;
         log.debug(jsonEvent['Event-Name'] + ' -> ' + jsonEvent['Event-Domain']);
         jsonEvent['webitel-event-name'] = 'user';
         Domains.broadcast(jsonEvent['Event-Domain'], jsonEvent);
 
         if (jsonEvent['Event-Name']);
             moduleEventEmitter.emit('webitel::' + jsonEvent['Event-Name'], jsonEvent);
+
+        if (events.type == 'ACCOUNT_STATUS') {
+            var data = {
+                "domain": jsonEvent['Account-Domain'],
+                "account": jsonEvent['Account-User'],
+                "status": jsonEvent['Account-Status'],
+                "state": jsonEvent['Account-User-State'],
+                // TODO
+                "description": jsonEvent['Account-Status-Descript'] ? decodeURI(decodeURI(jsonEvent['Account-Status-Descript'])) : '',
+                "online": Users.existsKey(jsonEvent['Account-User'] + '@' + jsonEvent['Account-Domain']),
+                "date": Date.now()
+            };
+            handleStatusDb(data);
+        };
 
     } catch (e) {
         log.error(e.message);

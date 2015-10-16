@@ -22,7 +22,9 @@ var _srvEvents = [
     'bridge-agent-fail',
     'members-count',
     'member-queue-start',
-    'member-queue-end'
+    'member-queue-end',
+    'agent-state-change',
+    'agent-status-change'
 ];
 
 var CC = function (conn) {
@@ -33,9 +35,6 @@ var CC = function (conn) {
 };
 
 CC.prototype._subscribeESL = function () {
-    this.connection.filter('CC-Action', 'agent-state-change');
-    this.connection.filter('CC-Action', 'agent-status-change');
-
     for (var key in _srvEvents) {
         if (_srvEvents.hasOwnProperty(key)) {
             this.connection.filter('CC-Action', _srvEvents[key]);
@@ -55,18 +54,23 @@ CC.prototype._userInQueue = function (user, e) {
 };
 
 CC.prototype._onCustomEvent = function (eObj) {
-    var domain = eObj['CC-Queue'].split('@')[1],
-        eventName = 'CC::' + eObj['CC-Action'].toUpperCase();
-    eObj['Event-Name'] = eventName;
-    if (domain) {
-        webitelEvent.fire(
-            eventName,
-            domain,
-            eObj,
-            function() {},
-            this._userInQueue.bind(this)
-        );
-    };
+    try {
+        var domain = (eObj['CC-Queue'] || eObj['CC-Agent'] || '').split('@')[1],
+            eventName = 'CC::' + eObj['CC-Action'].toUpperCase();
+        eObj['Event-Name'] = eventName;
+        if (domain) {
+            webitelEvent.fire(
+                eventName,
+                domain,
+                eObj,
+                function () {
+                },
+                this._userInQueue.bind(this)
+            );
+        };
+    } catch (e) {
+        log.error(e);
+    }
 };
 
 CC.prototype._onEvent = function (e) {
@@ -81,11 +85,6 @@ CC.prototype._onEvent = function (e) {
         this._onCustomEvent(jEvent);
         return;
     };
-
-    this.setAttributesEvent(jEvent, user);
-    if (jEvent['Event-Name'])
-        Domains.broadcast(jEvent['Event-Domain'], jEvent);
-
 };
 
 CC.prototype.setAttributesEvent = function (ccEvent, user) {
@@ -117,13 +116,7 @@ CC.prototype.readyAgent = function (_user, opt, cb) {
         : " 'Available'";
 
     eslConn.bgapi('callcenter_config agent set status ' + _user['id'] + status, function (res) {
-        if (getResponseOK(res)) {
-            eslConn.bgapi('callcenter_config agent set state ' + _user['id'] + " 'Waiting'", function (res) {
-                cb(res);
-            });
-        } else {
-            cb(res);
-        }
+        cb(res);
     });
 };
 
@@ -132,8 +125,6 @@ CC.prototype.loginAgent = function (_user, opt, cb) {
         if (!_user['cc-logged']) {
             this.readyAgent(_user, opt, function (res) {
                 if (getResponseOK(res)) {
-                    _user.delEventGroup('webitel');
-
                     _user['cc-logged'] = true;
                     _user['cc'] = {};
                 }

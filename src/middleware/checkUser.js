@@ -27,7 +27,7 @@ module.exports = function (login, password, cb) {
             return
         };
 
-        webitel.userDara(login, 'global', ['a1-hash', 'account_role', 'cc-agent'], function (res) {
+        webitel.userDara(login, 'global', ['a1-hash', 'account_role', 'cc-agent', 'status', 'state', 'description'], function (res) {
             try {
                 var resJson = JSON.parse(res['body']);
             } catch (e) {
@@ -43,7 +43,10 @@ module.exports = function (login, password, cb) {
                 cb(null, {
                     'role': ACCOUNT_ROLE.getRoleFromName(resJson['account_role']),
                     'domain': login.split('@')[1],
-                    'cc-agent': resJson['cc-agent']
+                    'cc-agent': resJson['cc-agent'],
+                    'state': resJson['state'],
+                    'status': resJson['status'],
+                    'description': resJson['description']
                 });
             } else {
                 cb('Bad password.');

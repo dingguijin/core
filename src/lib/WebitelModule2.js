@@ -515,7 +515,7 @@ Webitel.prototype.userCreate = function(_caller, args, cb) {
         }
         ;
 
-        if (!args['role'] || (args['role'].indexOf('admin') == -1 && args['role'].indexOf('user') == -1)) {
+        if (!args['role'] || (args['role'].indexOf('conference') == -1 && args['role'].indexOf('admin') == -1 && args['role'].indexOf('user') == -1)) {
             cb({
                 body: "ROLE is require."
             });
