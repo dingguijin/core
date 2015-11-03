@@ -8,16 +8,27 @@ var log = require('../../../lib/log')(module),
     ObjectId = require('mongodb').ObjectId,
     db = require('../../../lib/mongoDrv');
 
-module.exports.Get = function (req, res, next) {
+module.exports.Post = function (req, res, next) {
     let collection = db.getCollection(AS_COLLECTION_NAME);
-    let filter = {},
-        limit = parseInt(req.query['limit']) || 40,
-        orderBy = {}
-    ;
+
+    let columns = req.body.columns || {};
+    let filter = req.body.filter;
+    let limit = parseInt(req.body.limit) || 40;
+    let pageNumber = parseInt(req.body.pageNumber) || 0;
+    let sort = req.body.sort || {};
+    let domainName = req.webitelUser.attr.domain;
+
+    let query = buildFilterQuery(filter);
+
+    if (domainName && typeof domainName == "string")
+        query['$and'].push({
+            "domain": domainName
+        });
 
     collection
-        .find(filter)
-        .sort(orderBy)
+        .find(query, columns)
+        .sort(sort)
+        .skip(pageNumber > 0 ? ((pageNumber - 1) * limit) : 0)
         .limit(limit)
         .toArray(function (err, result) {
             if (err) {
@@ -32,4 +43,27 @@ module.exports.Get = function (req, res, next) {
                 "data": result
             })
         });
+};
+
+function buildFilterQuery(filter) {
+    var filterArray = [];
+    if (filter) {
+        for (var key in filter) {
+            if (key == '_id' && ObjectId.isValid(filter[key])) {
+                filter[key] = ObjectId(filter[key]);
+                continue;
+            }
+            for (var item in filter[key]) {
+                if (filter[key][item] == '_id' && ObjectId.isValid(filter[key])) {
+                    filter[key][item] = ObjectId(filter[key]);
+                }
+            }
+        }
+        filterArray.push(filter)
+    };
+
+    var query = {
+        "$and": filterArray
+    };
+    return query
 };

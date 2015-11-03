@@ -88,7 +88,8 @@ commandEmitter.on('wss::' + WebitelCommandTypes.Auth.name, function (execId, arg
                         'state': userParam['state'],
                         'status': userParam['status'],
                         'description': userParam['description'],
-                        'ws-count': user.ws.length
+                        'ws-count': user.ws.length,
+                        'cc-logged': !!user['cc-logged']
                     }
                 }));
             } catch (e) {

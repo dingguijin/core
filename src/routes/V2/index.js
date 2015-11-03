@@ -33,7 +33,7 @@ module.exports = function (app) {
     app.put('/api/v2/accounts/:name?', require('./account').Update);
     app.delete('/api/v2/accounts/:name', require('./account').Delete);
 
-    app.get('/api/v2/history/status', require('./userStatus').Get);
+    app.post('/api/v2/history/status', require('./userStatus').Post);
 
     /* CONFIGURE */
     app.get('/api/v2/reloadxml', require('./configure').ReloadXml);
