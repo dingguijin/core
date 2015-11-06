@@ -17,10 +17,14 @@ module.exports = function (data) {
             {"date": -1},
             {"$set": {"endDate": data['date']}},
             {limit: 1},
-            (err) => {
+            (err, result) => {
                 if (err)
                     return log.error(err);
-
+                if ((!data['status'] || !data['state']) && result && result['status'] && result['state']) {
+                    data['status'] = result['status'];
+                    data['state'] = result['state'];
+                    data['description'] = result['description'] || "";
+                };
                 collection
                     .insert(data, (err) => {
                         if (err)

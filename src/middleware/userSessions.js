@@ -6,7 +6,9 @@ var HashCollection = require('../lib/HashCollection'),
     ACCOUNT_ROLE = require('../consts').ACCOUNT_ROLE,
     db = require('../lib/mongoDrv'),
     conf = require('../conf'),
-    eventsCollection = require('./EventsCollection');
+    eventsCollection = require('./EventsCollection'),
+    handleStatusDb = require('./userStatus')
+    ;
 
 moduleEventEmitter.on('webitel::ACCOUNT_ROLE', function (evnt) {
     try {
@@ -95,12 +97,14 @@ Users.on('added', function (evn) {
     try {
         var _id = evn.id.split('@'),
             _domain = _id[1] || _id[0],
+            _attr = evn.attr || {},
             domain = Domains.get(_domain),
             jsonEvent;
         try {
             jsonEvent = getJSONUserEvent(ACCOUNT_EVENTS.ONLINE, _domain, _id[0]);
             log.debug(jsonEvent['Event-Name'] + ' -> ' + evn.id);
             Domains.broadcast(_domain, jsonEvent);
+            insertSession(_id[0], _domain, _attr['state'], _attr['status'], _attr['description'], true);
         } catch (e) {
             log.warn('Broadcast account event: ', domain);
         }
@@ -131,6 +135,7 @@ Users.on('removed', function (evn) {
             log.debug(jsonEvent['Event-Name'] + ' -> ' + evn.id);
             Domains.broadcast(_domain, jsonEvent);
             eventsCollection.removeUserSubscribe(_id[0], _domain);
+            insertSession(_id[0], _domain, false, false, false, false);
         } catch (e) {
             log.warn('Broadcast account event: ', domain);
         };
@@ -182,3 +187,17 @@ var getJSONUserEvent = function (eventName, domainName, userId) {
         "webitel-event-name":"user"
     };
 };
+
+function insertSession (account, domain, state, status, description, online) {
+    if (account != 'root') {
+        handleStatusDb({
+            "account": account,
+            "domain": domain,
+            "online": online,
+            "state": (state || "").toUpperCase(),
+            "status": (status || "").toUpperCase(),
+            "description": (description || "").toUpperCase(),
+            "date": Date.now()
+        })
+    }
+}
