@@ -104,12 +104,20 @@ commandEmitter.on('wss::' + WebitelCommandTypes.Auth.name, function (execId, arg
 commandEmitter.on('wss::' + WebitelCommandTypes.Event.On.name, function (execId, args, ws) {
     var _caller = doSendWebitelCommand(execId, ws, WebitelCommandTypes.Event.On);
     if (!_caller) return;
+    var _all = args.all;
     eventCollection.addListener(args['event'], ws['upgradeReq']['webitelId'], ws['webitelSessionId'],
         function (err, resStr) {
             var res = {
                 "body": err
                     ? "-ERR: " + err.message
                     : resStr
+            };
+            // TODO
+            try {
+                if (_all)
+                    _caller['_myEvents'][args['event']] = true;
+            } catch (e) {
+                log.error(e);
             };
             getCommandResponseJSON(ws, execId, res);
         });
@@ -124,6 +132,11 @@ commandEmitter.on('wss::' + WebitelCommandTypes.Event.Off.name, function (execId
                 "body": err
                     ? "-ERR: " + err.message
                     : resStr
+            };
+            try {
+                delete _caller['_myEvents'][args['event']];
+            } catch (e) {
+                log.error(e);
             };
             getCommandResponseJSON(ws, execId, res);
         });

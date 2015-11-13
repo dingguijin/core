@@ -1,10 +1,42 @@
 var log = require('../lib/log')(module),
     CallHandler = require('../mod/call'),
+    webitelEvent = require('./EventsCollection'),
     callHandler = new CallHandler();
+
+// TODO
+const ACR_INFO = 'ACR::INFO';
+webitelEvent.register(ACR_INFO);
 
 module.exports.eventsHandle = function (event) {
     try {
         var jsonEvent = JSON.parse(event.serialize());
+
+        if (event.subclass == 'webitel::acr') {
+            jsonEvent['Event-Name'] = ACR_INFO;
+            var domain = event.getHeader('domain');
+            if (domain) {
+                webitelEvent.fire(
+                    ACR_INFO,
+                    domain,
+                    jsonEvent,
+                    function () {
+                    },
+                    null
+                );
+            };
+
+            webitelEvent.fire(
+                ACR_INFO,
+                'root',
+                jsonEvent,
+                function () {
+                },
+                null
+            );
+            //console.log(event.serialize('plain'));
+            return
+        };
+
         //console.log(jsonEvent['Event-Name'] + '>>>'  + jsonEvent['Channel-Presence-ID'] + '>>>' + jsonEvent['variable_webitel_data']);
         // mod call
         if (jsonEvent['Event-Name'] == 'CHANNEL_DESTROY') {

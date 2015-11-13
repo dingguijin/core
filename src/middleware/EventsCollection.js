@@ -119,7 +119,7 @@ var _eventsModule = {
 
             if (!user) return;
 
-            if (existsFn && !existsFn(user, event)) {
+            if (existsFn && !existsFn(user, event, eventName)) {
                 return;
             };
 

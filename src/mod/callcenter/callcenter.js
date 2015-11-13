@@ -22,6 +22,7 @@ var _srvEvents = [
     'bridge-agent-fail',
     'members-count',
     'member-queue-start',
+    'member-queue-resume',
     'member-queue-end',
     'agent-state-change',
     'agent-status-change'
@@ -43,8 +44,10 @@ CC.prototype._subscribeESL = function () {
     };
 };
 
-CC.prototype._userInQueue = function (user, e) {
+CC.prototype._userInQueue = function (user, e, eventName) {
     try {
+        if (user._myEvents[eventName]) return true;
+
         var queues = this.tiersCollection.get(user.id);
         return queues && queues.existsKey(e['CC-Queue']);
     } catch (e) {
@@ -68,17 +71,25 @@ CC.prototype._onCustomEvent = function (eObj) {
                 this._userInQueue.bind(this)
             );
         };
+
+        webitelEvent.fire(
+            eventName,
+            'root',
+            eObj,
+            function () {
+            },
+            () => (true)
+        );
     } catch (e) {
         log.error(e);
     }
 };
 
 CC.prototype._onEvent = function (e) {
-    if (e.getHeader('Event-Subclass') !== 'callcenter::info')
+    if (e.subclass != 'callcenter::info')
         return;
 
-    var jEvent = JSON.parse(e.serialize('json')),
-        user = jEvent['CC-Agent'] && jEvent['CC-Agent'].split('@')
+    var jEvent = JSON.parse(e.serialize('json'));
         ;
 
     if (_srvEvents.indexOf(jEvent['CC-Action']) > -1) {

@@ -113,6 +113,7 @@ var doConnectFreeSWITCH = function() {
         for (var key in ev) {
             eslConn.filter('Event-Name', ev[key]);
         };
+        eslConn.filter('Event-Subclass', 'webitel::acr');
         //eslConn.subscribe(ev);
     });
 

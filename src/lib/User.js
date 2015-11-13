@@ -7,6 +7,7 @@ var User = function (id, ws, params) {
     this.ws = [ws];
     this.state = '';
     this.status = '';
+    this._myEvents = {};
     this.logged = params['logged'] || false;
     this.attr = params['attr'] || {};
     this.eventsGroup = ['webitel', 'esl'];

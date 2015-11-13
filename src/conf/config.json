@@ -69,8 +69,7 @@
             "CHANNEL_UNBRIDGE",
             "CHANNEL_UUID",
             "DTMF",
-            "CHANNEL_DATA",
-            "CUSTOM callcenter::info"
+            "CHANNEL_DATA"
         ]
     }
 }
