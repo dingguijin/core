@@ -77,7 +77,7 @@ module.exports.eventsHandle = function (event) {
                     "variable_w_jsclient_originate_number": jsonEvent["variable_w_jsclient_originate_number"],
                     "Call-Info": jsonEvent["Call-Info"],
                     "Other-Leg-Unique-ID": jsonEvent["Other-Leg-Unique-ID"],
-                    "variable_hangup_cause": jsonEvent["variable_hangup_cause"],
+                    "variable_hangup_cause": jsonEvent["variable_hangup_cause"] || jsonEvent["Hangup-Cause"],
                     "Caller-Channel-Created-Time": jsonEvent["Caller-Channel-Created-Time"],
                     "Caller-Channel-Answered-Time": jsonEvent["Caller-Channel-Answered-Time"],
                     "Caller-Channel-Hangup-Time": jsonEvent["Caller-Channel-Hangup-Time"],
