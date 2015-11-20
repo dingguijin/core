@@ -1677,6 +1677,8 @@ Webitel.prototype.doSendCommandV2 = function (res) {
     return true;
 };
 
+// Ready Busy Nonreg
+
 /* Parse table */
 var const_DataSeparator = '=================================================================================================';
 Webitel.prototype._parsePlainTableToJSON = function(data, domain, cb) {
@@ -1707,6 +1709,10 @@ Webitel.prototype._parsePlainTableToJSON = function(data, domain, cb) {
                         _user = Users.get(_json[_id]['id'] + '@' + domain);
 
                         _json[_id]['online'] = ((_user && _user.logged)
+                            ? true
+                            : false);
+
+                        _json[_id]['cc_logged'] = ((_user && _user['cc-logged'])
                             ? true
                             : false);
                     } else {

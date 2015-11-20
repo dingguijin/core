@@ -10,12 +10,13 @@ module.exports.eventsHandle = function (events) {
         //    return;
         log.debug(jsonEvent['Event-Name'] + ' -> ' + jsonEvent['Event-Domain']);
         jsonEvent['webitel-event-name'] = 'user';
-        Domains.broadcast(jsonEvent['Event-Domain'], jsonEvent);
 
-        if (jsonEvent['Event-Name']);
-            moduleEventEmitter.emit('webitel::' + jsonEvent['Event-Name'], jsonEvent);
 
         if (events.type == 'ACCOUNT_STATUS') {
+            var user = Users.get(jsonEvent['Account-User'] + '@' + jsonEvent['Account-Domain']);
+            jsonEvent['Account-Online'] = !!user;
+            jsonEvent['cc_logged'] = user && user['cc_logged'];
+
             var data = {
                 "domain": jsonEvent['Account-Domain'],
                 "account": jsonEvent['Account-User'],
@@ -23,11 +24,16 @@ module.exports.eventsHandle = function (events) {
                 "state": jsonEvent['Account-User-State'],
                 // TODO
                 "description": jsonEvent['Account-Status-Descript'] ? decodeURI(decodeURI(jsonEvent['Account-Status-Descript'])) : '',
-                "online": Users.existsKey(jsonEvent['Account-User'] + '@' + jsonEvent['Account-Domain']),
+                "online": !!user,
                 "date": Date.now()
             };
             handleStatusDb(data);
         };
+
+        Domains.broadcast(jsonEvent['Event-Domain'], jsonEvent);
+
+        if (jsonEvent['Event-Name'])
+            moduleEventEmitter.emit('webitel::' + jsonEvent['Event-Name'], jsonEvent);
 
     } catch (e) {
         log.error(e.message);
