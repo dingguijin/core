@@ -196,7 +196,7 @@ function insertSession (account, domain, state, status, description, online) {
             "online": online,
             "state": (state || "").toUpperCase(),
             "status": (status || "").toUpperCase(),
-            "description": (description || "").toUpperCase(),
+            "description": (description || ""),
             "date": Date.now()
         })
     }
