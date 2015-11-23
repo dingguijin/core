@@ -46,7 +46,7 @@ module.exports = function (login, password, cb) {
                     'cc-agent': resJson['cc-agent'],
                     'state': resJson['state'],
                     'status': resJson['status'],
-                    'description': decodeURI(resJson['description'])
+                    'description': decodeURI(resJson['description'] || "")
                 });
             } else {
                 cb('Bad password.');
