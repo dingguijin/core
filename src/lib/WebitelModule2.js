@@ -551,7 +551,7 @@ Webitel.prototype.userCreate = function(_caller, args, cb) {
         }
         ;
         if (variables  instanceof Array) {
-            _str += '{' + encodeURI(variables) + '}';
+            _str += '{' + variables + '}';
         }
         ;
 
@@ -642,7 +642,7 @@ Webitel.prototype.userUpdateV2 = function (_caller, user, domain, option, cb) {
             var cmd = '';
 
             if (params instanceof Array && params.length > 0) {
-                cmd += '[' + encodeURI(params) + ']';
+                cmd += '[' + params + ']';
             };
 
             if (variables instanceof Array && variables.length > 0) {
