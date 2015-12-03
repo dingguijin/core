@@ -642,11 +642,11 @@ Webitel.prototype.userUpdateV2 = function (_caller, user, domain, option, cb) {
             var cmd = '';
 
             if (params instanceof Array && params.length > 0) {
-                cmd += '[' + params + ']';
+                cmd += '[' + params  + ']';
             };
 
             if (variables instanceof Array && variables.length > 0) {
-                cmd += '{' + encodeURI(variables) + '}';
+                cmd += '{' + variables + '}';
             };
 
             scope.api(WebitelCommandTypes.Account.Change, [
@@ -1553,6 +1553,12 @@ Webitel.prototype.upSipGateway = function (_caller, gateway_id, profile, cb) {
         return;
     };
 
+    if (!gateway_id) {
+        return cb({
+            "body": "-ERR: Bad request."
+        })
+    }
+
     this.api(WebitelCommandTypes.Gateway.Index, [
         gateway_id + ' up ' + (profile || 'external')
     ], cb);
@@ -1565,6 +1571,13 @@ Webitel.prototype.downSipGateway = function (_caller, gateway_id, cb) {
         });
         return;
     };
+
+    if (!gateway_id) {
+        return cb({
+            "body": "-ERR: Bad request."
+        })
+    }
+
     this.api(WebitelCommandTypes.Gateway.Index, [
         gateway_id + ' down'
     ], cb);

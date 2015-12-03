@@ -5,7 +5,6 @@ module.exports.eventsHandle = function (events) {
     try {
 
         var jsonEvent = JSON.parse(events.serialize('json'));
-        //console.log(jsonEvent);
         //if (userNotExistsWebitelGroup(jsonEvent))
         //    return;
         log.debug(jsonEvent['Event-Name'] + ' -> ' + jsonEvent['Event-Domain']);
@@ -22,8 +21,8 @@ module.exports.eventsHandle = function (events) {
                 "account": jsonEvent['Account-User'],
                 "status": jsonEvent['Account-Status'],
                 "state": jsonEvent['Account-User-State'],
-                // TODO
-                "description": jsonEvent['Account-Status-Descript'] ? decodeURI(decodeURI(jsonEvent['Account-Status-Descript'])) : '',
+
+                "description": jsonEvent['Account-Status-Descript'] ? decodeURI(jsonEvent['Account-Status-Descript']) : '',
                 "online": !!user,
                 "date": Date.now()
             };
