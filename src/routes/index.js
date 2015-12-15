@@ -1,4 +1,6 @@
-var log = require('../lib/log')(module);
+var log = require('../lib/log')(module),
+    serveStatic = require('serve-static')
+    ;
 
 module.exports = function (app) {
     app.all('/*', function(req, res, next) {
@@ -15,6 +17,10 @@ module.exports = function (app) {
             next();
         }
     });
+
+    app.use('/public', serveStatic( __appRoot  + '/resource', {
+        maxAge: 86400000
+    }));
 
     require('./V1')(app);
 

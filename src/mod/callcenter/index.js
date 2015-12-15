@@ -42,6 +42,8 @@ try {
         });
     });
 
+
+    // TODO add logount cc
     commandEmitter.on('wss::' + WebitelCommandTypes.CallCenter.Login.name, function (execId, args, ws) {
         var _caller = doSendCCCommand(execId, ws, WebitelCommandTypes.CallCenter.Login);
         if (!_caller) return;

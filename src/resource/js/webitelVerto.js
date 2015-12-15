@@ -1,4 +1,15 @@
-define("WebitelVerto", [], function() {
+(function (definition) {
+    // RequireJS
+    if (typeof define == "function") {
+        define(definition);
+        // YUI3
+    } else if (typeof YUI == "function") {
+        YUI.add("es5", definition);
+        // CommonJS and <script>
+    } else {
+        definition();
+    }
+})(function () {
     /*! jQuery v2.1.1 | (c) 2005, 2014 jQuery Foundation, Inc. | jquery.org/license */
     !function(a, b) {
         "object" == typeof module && "object" == typeof module.exports ? module.exports = a.document ? b(a, !0) : function(a) {
@@ -2506,13 +2517,7 @@ define("WebitelVerto", [], function() {
 
     })(jQuery, document);
 
-
-
-
-
-
-
-// region FSRTC	
+    // region FSRTC
 
     /*
      * Verto HTML5/Javascript Telephony Signaling and Control Protocol Stack for FreeSWITCH
@@ -3716,15 +3721,7 @@ define("WebitelVerto", [], function() {
     })(jQuery);
 
 
-
-
-
-
-
 // region JsonRpcClient
-
-
-
 
     /*
      * Verto HTML5/Javascript Telephony Signaling and Control Protocol Stack for FreeSWITCH
@@ -4398,8 +4395,7 @@ define("WebitelVerto", [], function() {
     })(jQuery);
 
 
-
-// region verto	
+// region verto
     /*
      * Verto HTML5/Javascript Telephony Signaling and Control Protocol Stack for FreeSWITCH
      * Copyright (C) 2005-2014, Anthony Minessale II <anthm@freeswitch.org>
@@ -4502,8 +4498,8 @@ define("WebitelVerto", [], function() {
             if (verto.options.sessid) {
                 verto.sessid = verto.options.sessid;
             } else {
-                verto.sessid = localStorage.getItem("verto_session_uuid") || generateGUID();
-                localStorage.setItem("verto_session_uuid", verto.sessid);
+                verto.sessid = /*localStorage.getItem("verto_session_uuid") || */ generateGUID();
+                //localStorage.setItem("verto_session_uuid", verto.sessid);
             }
 
             verto.dialogs = {};
@@ -6422,7 +6418,9 @@ define("WebitelVerto", [], function() {
         $.verto.dialog.prototype.stopRinging = function() {
             var dialog = this;
             if (dialog.verto.ringer) {
-                dialog.verto.ringer.stop();
+                dialog.verto.ringer[0].pause();
+                dialog.verto.ringer.currentTime = 0;
+                //dialog.verto.ringer.stop();
             }
         };
 
@@ -6773,14 +6771,14 @@ define("WebitelVerto", [], function() {
                 $.verto.unloadJobs[f]();
             }
 
-            for (var i in $.verto.saved) {
-                //var verto = $.verto.saved[i];
-                //if (verto) {
+            /* for (var i in $.verto.saved) {
+             var verto = $.verto.saved[i];
+             if (verto) {
 
-                //	verto.purge();
-                //    verto.logout();
-                //}
-            }
+             verto.purge();
+             verto.logout();
+             }
+             } */
 
             return $.verto.warnOnUnload;
         });
@@ -6921,5 +6919,5 @@ define("WebitelVerto", [], function() {
     })(jQuery);
 
 
-    WebitelVerto = jQuery.verto;
+    return WebitelVerto = jQuery.verto;
 });
