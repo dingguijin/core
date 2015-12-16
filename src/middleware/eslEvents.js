@@ -38,12 +38,12 @@ module.exports.eventsHandle = function (event) {
         };
 
         //console.log(jsonEvent['Event-Name'] + '>>>'  + jsonEvent['Channel-Presence-ID'] + '>>>' + jsonEvent['variable_webitel_data']);
-        // mod call
-        if (jsonEvent['Event-Name'] == 'CHANNEL_DESTROY') {
-            callHandler.onHandleCallDestroy(jsonEvent);
-        } else {
-            callHandler.onHandleCallCreate(jsonEvent);
-        };
+        // mod call for 1ec
+        //if (jsonEvent['Event-Name'] == 'CHANNEL_DESTROY') {
+        //    callHandler.onHandleCallDestroy(jsonEvent);
+        //} else {
+        //    callHandler.onHandleCallCreate(jsonEvent);
+        //};
 
 
         if (jsonEvent['Channel-Presence-ID']) {
