@@ -2322,8 +2322,7 @@
         }, typeof b === U && (a.jQuery = a.$ = n), n
     });
 
-    var jQuery = window.jQuery;
-    jQuery.noConflict();
+    var jQuery = window.jQuery.noConflict();
     var self = {};
 
     /*! jQuery JSON plugin 2.4.0 | code.google.com/p/jquery-json */
