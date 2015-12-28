@@ -21,7 +21,7 @@ commandEmitter.on('wss::' + WebitelCommandTypes.Call.name, function (execId, arg
 commandEmitter.on('wss::' + WebitelCommandTypes.AttendedTransfer.name, function (execId, args, ws) {
     if (!doSendFreeSWITCHCommand(execId, ws)) return;
     var _originatorParam = new Array('w_jsclient_originate_number=' + args['destination'],
-        'w_jsclient_xtransfer=' + args['call_uuid']);
+        'w_jsclient_xtransfer=' + args['call_uuid'], 'webitel_direction=outbound');
     if (args['is_webrtc']) {
         _originatorParam.push('sip_h_Call-Info=answer-after=1');
     };
