@@ -169,14 +169,15 @@
             var WebitelEventMixin = function() {
                 var _eventHandlers = [];
 
-                function commandEvent(eventName, type, callback, scopeCb) {
+                function commandEvent(eventName, type, all, callback, scopeCb) {
                     if (eventName.indexOf(' ') != -1 || eventName == "ALL") {
                         if (typeof scopeCb == "function") scopeCb(false);
                         throw new Error('Wrong event');
                     };
 
                     var srvEvents = new WebitelCommand(type, {
-                        event: eventName
+                        event: eventName,
+                        all: all
                     }, callback);
                     srvEvents.execute();
                 };
@@ -184,7 +185,6 @@
                 var on = function(eventName, handler, type, cb) {
                     if (typeof  type === 'function') {
                         cb = type;
-
                         type = null
                     };
 
@@ -193,42 +193,42 @@
                     if (!_eventHandlers[eventName]) {
                         _eventHandlers[eventName] = [];
                     };
-                    if (type) {
-                        _eventHandlers[eventName].push(handler);
+                    _eventHandlers[eventName].push(handler);
+                    if (!type || _eventHandlers[eventName].length > 1) {
                         if (cb) cb(true);
                         return
                     } else {
-                        commandEvent(eventName, WebitelCommandTypes.Event, function (response) {
+                        var _all = type.all;
+                        commandEvent(eventName, WebitelCommandTypes.Event, _all, function (response) {
                             if (response.status === WebitelCommandResponseTypes.Success)
-                                _eventHandlers[eventName].push(handler);
-                            if (cb) cb(response);
+                            //_eventHandlers[eventName].push(handler);
+                                if (cb) cb(response);
                         }, cb);
                     }
                 };
 
-                var off = function(eventName, type, cb) {
-                    if (typeof  type === 'function') {
-                        cb = type;
-                        type = null
-                    };
-
+                var off = function(eventName, type, fn, cb) {
                     eventName = eventName.toUpperCase();
                     var handlers = _eventHandlers[eventName];
                     if (!handlers) return;
 
-                    if (type) {
-                        for(var i = 0; i < handlers.length; i++) {
+                    for(var i = 0; i < handlers.length; i++) {
+                        if (handlers[i] == fn) {
                             handlers.splice(i--, 1);
-                        };
+                            break;
+                        }
+                    };
+
+                    if (!type || handlers.length > 0) {
                         if (cb) cb(true);
                         return
                     }
 
-                    commandEvent(eventName, WebitelCommandTypes.NixEvent, function(response) {
-                        if (response.status === WebitelCommandResponseTypes.Success)
-                            for(var i=0; i<handlers.length; i++) {
-                                handlers.splice(i--, 1);
-                            };
+                    commandEvent(eventName, WebitelCommandTypes.NixEvent, null, function(response) {
+                        //if (response.status === WebitelCommandResponseTypes.Success)
+                        //    for(var i=0; i<handlers.length; i++) {
+                        //        handlers.splice(i--, 1);
+                        //    };
                         if (cb) cb(response);
                     }, cb);
                 };
@@ -236,10 +236,10 @@
                 var trigger = function(eventName) {
 
                     if (!_eventHandlers || !_eventHandlers[eventName]) {
-                        return; // ???????????? ??? ??????? ???
+                        return; // обработчиков для события нет
                     }
 
-                    // ??????? ???????????
+                    // вызвать обработчики
                     var handlers = _eventHandlers[eventName];
                     for (var i = 0; i < handlers.length; i++) {
                         handlers[i].apply({}, [].slice.call(arguments, 1));
@@ -248,7 +248,7 @@
                 };
 
                 var removeAllHandlers = function () {
-                    _eventHandlers = [];
+                    _eventHandlers.length = 0;
                 };
                 return {
                     on: on,
