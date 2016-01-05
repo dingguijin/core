@@ -1727,7 +1727,7 @@
 
                 },
 
-                hangupCall: function(callUUID) {
+                hangupCall: function(callUUID, cause) {
                     var call = OngoingCalls.get(callUUID),
                         channels = [],
                         command;
@@ -1736,7 +1736,8 @@
                         for (var key in channels) {
                             command = new WebitelCommand(
                                 WebitelCommandTypes.Hangup, {
-                                    'channel-uuid': channels[key]
+                                    'channel-uuid': channels[key],
+                                    'cause': cause
                                 }
                             );
                             command.execute();
@@ -1884,15 +1885,20 @@
                     cmd.execute();
                 },
 
-                cancelTransfer: function (callIdA, callIdB) {
+                cancelTransfer: function (callIdA, callIdB, cause) {
                     var call = OngoingCalls.get(callIdA);
                     var consultCall = OngoingCalls.get(callIdB);
                     if (!call || !consultCall) return false;
 
                     var channel = call.getActualChannel();
                     var channelC = consultCall.getActualChannel();
+
+                    if (!cause && channelC['Channel-Call-State'] === "RING_WAIT")
+                        cause = 'ORIGINATOR_CANCEL';
+
                     var command = new WebitelCommand(
                         'att_xfer_cancel', {
+                            'cause': cause,
                             'channel-uuid-leg-a': channel['Unique-ID'],
                             'channel-uuid-leg-b': channel['Other-Leg-Unique-ID'],
                             'channel-uuid-leg-c': channelC['Unique-ID']

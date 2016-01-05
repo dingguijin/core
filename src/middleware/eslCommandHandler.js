@@ -58,7 +58,7 @@ commandEmitter.on('wss::' + WebitelCommandTypes.VideoRefresh.name, function (exe
 
 commandEmitter.on('wss::' + WebitelCommandTypes.Hangup.name, function (execId, args, ws) {
     if (!doSendFreeSWITCHCommand(execId, ws)) return;
-    eslConn.bgapi('uuid_kill ' + args['channel-uuid'], function (res) {
+    eslConn.bgapi('uuid_kill ' + args['channel-uuid']  + ' ' + (args['cause'] || ''), function (res) {
         getCommandResponseJSON(ws, execId, res)
     });
 });
@@ -141,7 +141,7 @@ commandEmitter.on('wss::' + WebitelCommandTypes.AttXferBridge.name, function (ex
 
 commandEmitter.on('wss::' + WebitelCommandTypes.AttXferCancel.name, function (execId, args, ws) {
     if (!doSendFreeSWITCHCommand(execId, ws)) return;
-    eslConn.bgapi('uuid_kill ' + args['channel-uuid-leg-c'], function (res) {
+    eslConn.bgapi('uuid_kill ' + args['channel-uuid-leg-c'] + ' ' + (args['cause'] || ''), function (res) {
         getCommandResponseJSON(ws, execId, res);
     });
 });
