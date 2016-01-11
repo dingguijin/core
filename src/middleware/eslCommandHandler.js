@@ -134,7 +134,10 @@ commandEmitter.on('wss::' + WebitelCommandTypes.AttXfer2.name, function (execId,
 
 commandEmitter.on('wss::' + WebitelCommandTypes.AttXferBridge.name, function (execId, args, ws) {
     if (!doSendFreeSWITCHCommand(execId, ws)) return;
+    eslConn.bgapi('uuid_setvar ' + args['channel-uuid-leg-d'] + ' w_transfer_result confirmed');
     eslConn.bgapi('uuid_bridge ' + args['channel-uuid-leg-c'] + ' ' + args['channel-uuid-leg-b'], function (res) {
+        if ( ~(res.body|| '').indexOf('-ERR'))
+            eslConn.bgapi('uuid_setvar ' + args['channel-uuid-leg-d'] + ' w_transfer_result error');
         getCommandResponseJSON(ws, execId, res);
     });
 });

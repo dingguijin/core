@@ -106,6 +106,12 @@
             InAQueueCall: "In a queue call" // Currently on a queue call.
         };
 
+        WebitelTransferResult = {
+            Originate: "originate",
+            Error: "error",
+            Compleat: "compleat",
+        }
+
         // END GENERAL CONSTANTS
 
         // Webitel = function(host, user, password, domain) {
@@ -728,6 +734,7 @@
                     var channel = that.getActualChannel();
                     result['hangup_cause'] = channel['variable_hangup_cause'];
                     result['cc_queue'] = channel['variable_cc_queue'];
+                    result['transfer_result'] = channel['variable_w_transfer_result'];
                     result['call-created-time'] = channel['Caller-Channel-Created-Time'];
                     result['call-answered-time'] = channel['Caller-Channel-Answered-Time'];
                     result['call-hangup-time'] = channel['Caller-Channel-Hangup-Time'];
@@ -1929,7 +1936,8 @@
                         'att_xfer_bridge', {
                             'channel-uuid-leg-a': channel['Unique-ID'],
                             'channel-uuid-leg-b': channel['Other-Leg-Unique-ID'],
-                            'channel-uuid-leg-c': channelC['Other-Leg-Unique-ID']
+                            'channel-uuid-leg-c': channelC['Other-Leg-Unique-ID'],
+                            'channel-uuid-leg-d': channelC['Unique-ID']
                         }
                     );
                     command.execute();

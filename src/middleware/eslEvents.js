@@ -90,7 +90,8 @@ module.exports.eventsHandle = function (event) {
                     "variable_webitel_att_xfer": jsonEvent["variable_webitel_att_xfer"],
                     "variable_cc_queue": jsonEvent['variable_cc_queue'],
                     "variable_cc_member_session_uuid": jsonEvent['variable_cc_member_session_uuid'],
-                    "variable_webitel_data": "'" + jsonEvent['variable_webitel_data'] + "'"
+                    "variable_webitel_data": "'" + jsonEvent['variable_webitel_data'] + "'",
+                    "variable_w_transfer_result": jsonEvent['variable_w_transfer_result']
                 };
 
                 Users.sendObject(user, jsonRequest);
