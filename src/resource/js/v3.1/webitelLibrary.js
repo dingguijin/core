@@ -1565,7 +1565,7 @@
                                             role: res.response.role,
                                             domain: res.response.domain,
                                             wsCount: res.response['ws-count'],
-                                            agent: Boolean(res.response['cc-agent'])
+                                            agent: res.response['cc-agent'] === 'true'
                                         }
                                     };
                                     that.onConnect.trigger(user);
