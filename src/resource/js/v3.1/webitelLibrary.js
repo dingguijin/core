@@ -1860,16 +1860,15 @@
                 },
 
                 transferCall: function(callUUID, destination, callback) {
-                    var call = OngoingCalls.get(callUUID),
-                        command;
+                    var call = OngoingCalls.get(callUUID), command, _channel;
                     if (call) {
-                        command = new WebitelCommand(
-                            WebitelCommandTypes.Transfer, {
-                                'channel-uuid': call.getActualChannel()['Other-Leg-Unique-ID'],
-                                'destination': destination
-                            },
-                            callback
-                        );
+                        destination = destination.replace(/\D/g, '');
+                        _channel = call.getActualChannel();
+                        command = new WebitelCommand(WebitelCommandTypes.Transfer,
+                            { 'channel-uuid': _channel['variable_cc_member_session_uuid'] ||
+                                _channel['Other-Leg-Unique-ID'] ||
+                                _channel['variable_originating_leg_uuid'], 'destination': destination
+                            }, callback);
                         command.execute();
                         return true;
                     }
