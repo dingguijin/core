@@ -1154,7 +1154,7 @@
                         /* Fix IntegrationID */
                         var newCallId;
                         if (call.getDirection() == "inbound") {
-                            newCallId = e['Other-Leg-Unique-ID'] || channel['variable_originating_leg_uuid'];
+                            newCallId = e['Other-Leg-Unique-ID'] || e["variable_cc_member_session_uuid"] || channel['variable_originating_leg_uuid'];
                         } else {
                             newCallId = e['Unique-ID'];
                         }
