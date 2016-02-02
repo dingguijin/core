@@ -72,7 +72,7 @@ try {
             ws.send(JSON.stringify({
                 'exec-uuid': execId,
                 'exec-complete': "+OK",
-                'exec-response': {'response': res}
+                'exec-response': res
             }));
         } catch (e) {
             //handleSocketError(_ws);
