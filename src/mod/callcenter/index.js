@@ -65,9 +65,23 @@ try {
                 res.push(tiers.get(keys[key]));
             };
         };
-        getCommandResponseV2JSON(ws, execId, {
-            "body": res
-        });
+
+        try {
+            if (res['body'] instanceof Object)
+                res['body'] = JSON.stringify(res['body']);
+            ws.send(JSON.stringify({
+                'exec-uuid': execId,
+                'exec-execId': "+OK",
+                'exec-response': res
+            }));
+        } catch (e) {
+            //handleSocketError(_ws);
+            log.warn('Error send response');
+        };
+
+        //getCommandResponseV2JSON(ws, execId, {
+        //    "body": res
+        //});
     });
 
     moduleEventEmitter.on('cc::TIER_CREATE', function (e) {

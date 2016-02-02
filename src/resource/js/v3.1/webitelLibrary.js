@@ -2412,6 +2412,23 @@
                         return webCall['session'].setMuteVideo(wath, true);
                     };
                     return null;
+                },
+                getTiers: function(cb) {
+                    var cmd = new WebitelCommand(WebitelCommandTypes.CallCenter.Tiers, {}, function(res) {
+                        var _result, err;
+                        if (res.status === WebitelCommandResponseTypes.Fail) {
+                            err = new Error(res.response);
+                        } else {
+                            _result = res.response;
+                        }
+                        ;
+
+                        if (cb) {
+                            cb(err, _result);
+                        }
+
+                    });
+                    cmd.execute();
                 }
 
 
@@ -2513,6 +2530,7 @@
                 busyCallCenter: WebitelConnection.busyCallCenter,
                 logoutCallCenter: WebitelConnection.logoutCallCenter,
                 loginCallCenter: WebitelConnection.loginCallCenter,
+                getTiers: WebitelConnection.getTiers,
 
                 /**
                  *  Выйти из Webitel.
