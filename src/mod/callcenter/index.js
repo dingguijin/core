@@ -71,8 +71,8 @@ try {
                 res['body'] = JSON.stringify(res['body']);
             ws.send(JSON.stringify({
                 'exec-uuid': execId,
-                'exec-execId': "+OK",
-                'exec-response': res
+                'exec-complete': "+OK",
+                'exec-response': {'response': res}
             }));
         } catch (e) {
             //handleSocketError(_ws);
