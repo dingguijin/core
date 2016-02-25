@@ -70,7 +70,8 @@ module.exports.GetItem = function (req, res, next) {
                 "data": request['body']
             });
         } else {
-            res.status(200).json(rUtil.getRequestObject((request['body'] && request['body'].indexOf('-ERR') == 0)
+            var isErr = request['body'] && request['body'].indexOf('-ERR') == 0;
+            res.status(isErr && /not found/.test(request['body']) ? 404 : 200).json(rUtil.getRequestObject(isErr
                 ? "error" : "OK", request['body'], DOCS_LINK_ACCOUNT));
         };
     });
