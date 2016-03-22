@@ -110,7 +110,57 @@
             Originate: "originate",
             Error: "error",
             Compleat: "compleat",
-        }
+        };
+
+        function _parseTable() {
+            var data = this.responseText;
+            return data.split('\n').reduce(function(table, line, index) {
+                var data = line.split('\t'),
+                    arr = [];
+                for (var i = 0; i < data.length; i++) {
+                    arr.push(data[i].trim());
+                };
+                if (index === 0) {
+                    table['headers'] = arr;
+                } else {
+                    if (arr.length === table["headers"].length) {
+                        table['data'].push(arr);
+                    }
+                }
+
+                return table;
+            }, {
+                data: [],
+                headers: []
+            });
+        };
+
+        function _parseCollection() {
+            var _line = "=================================================================================================",
+                data = this.responseText,
+                _start = data.indexOf(_line),
+                _end = data.lastIndexOf(_line);
+
+            data = data.substring(_start + _line.length, _end);
+            data = data.substring(0, data.lastIndexOf('\n\n'));
+            return data.split("\n\n").reduce(function(table, line, index) {
+                table["data"][index] = {};
+                line.split('\n').forEach(function(row, i) {
+                    if (row === "") return;
+                    var item = row.split('\t');
+                    var hed = item[0].trim().replace(/:$/,'');
+                    if (table["headers"].indexOf(hed) === -1) {
+                        table["headers"].push(hed);
+                    }
+                    table["data"][index][hed] = item[1]
+                });
+
+                return table;
+            }, {
+                data: [],
+                headers: []
+            })
+        };
 
         // END GENERAL CONSTANTS
 
@@ -1154,7 +1204,7 @@
                         /* Fix IntegrationID */
                         var newCallId;
                         if (call.getDirection() == "inbound") {
-                            newCallId = e['Other-Leg-Unique-ID'] || e["variable_cc_member_session_uuid"] || channel['variable_originating_leg_uuid'];
+                            newCallId = e['Other-Leg-Unique-ID'] || e["variable_cc_member_session_uuid"] || channel['variable_originating_leg_uuid'] || e['Unique-ID'];
                         } else {
                             newCallId = e['Unique-ID'];
                         }
@@ -2944,54 +2994,5 @@
             return resultInterface;
         };
 
-        function _parseTable() {
-            var data = this.responseText;
-            return data.split('\n').reduce(function(table, line, index) {
-                var data = line.split('\t'),
-                    arr = [];
-                for (var i = 0; i < data.length; i++) {
-                    arr.push(data[i].trim());
-                };
-                if (index === 0) {
-                    table['headers'] = arr;
-                } else {
-                    if (arr.length === table["headers"].length) {
-                        table['data'].push(arr);
-                    }
-                }
-
-                return table;
-            }, {
-                data: [],
-                headers: []
-            });
-        };
-
-        function _parseCollection() {
-            var _line = "=================================================================================================",
-                data = this.responseText,
-                _start = data.indexOf(_line),
-                _end = data.lastIndexOf(_line);
-
-            data = data.substring(_start + _line.length, _end);
-            data = data.substring(0, data.lastIndexOf('\n\n'));
-            return data.split("\n\n").reduce(function(table, line, index) {
-                table["data"][index] = {};
-                line.split('\n').forEach(function(row, i) {
-                    if (row === "") return;
-                    var item = row.split('\t');
-                    var hed = item[0].trim().replace(/:$/,'');
-                    if (table["headers"].indexOf(hed) === -1) {
-                        table["headers"].push(hed);
-                    }
-                    table["data"][index][hed] = item[1]
-                });
-
-                return table;
-            }, {
-                data: [],
-                headers: []
-            })
-        };
     };
 });
