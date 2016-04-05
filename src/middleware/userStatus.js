@@ -9,8 +9,11 @@ var log = require('../lib/log')(module),
     db = require('../lib/mongoDrv')
 ;
 
+const noWriteStatus = String(config.get('application:writeUserStatus')) !== 'true';
+
 module.exports = function (data) {
     try {
+        if (noWriteStatus) return;
         var collection = db.getCollection(AS_COLLECTION_NAME);
         collection.findAndModify(
             {"account": data['account'], "domain": data['domain']},

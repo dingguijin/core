@@ -44,6 +44,7 @@
     "application": {
         "loglevel": "LOGLEVEL",
         "callcenter": true,
+        "writeUserStatus": false,
         "logstash": {
             "enabled": LOGSTASH_ENABLE,
             "host": "LOGSTASH_HOST",
