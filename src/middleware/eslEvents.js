@@ -66,6 +66,7 @@ module.exports.eventsHandle = function (event) {
                     "Channel-State": jsonEvent["Channel-State"],
                     "Answer-State": jsonEvent["Answer-State"],
                     "Call-Direction": jsonEvent["Call-Direction"],
+                    "Caller-Logical-Direction": jsonEvent["Caller-Logical-Direction"],
                     "variable_sip_call_id": jsonEvent["variable_sip_call_id"],
                     "Caller-Callee-ID-Name": jsonEvent["Caller-Callee-ID-Name"],
                     "Caller-Callee-ID-Number": jsonEvent["Caller-Callee-ID-Number"],

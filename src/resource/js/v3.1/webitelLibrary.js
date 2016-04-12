@@ -707,7 +707,8 @@
                     if (chn[WebitelCallChanelVariables.WJsOriginate] && that['state'] < WebitelCallStates.Answered) {
                         return WebitelCallDirectionTypes.Callback;
                     } else {
-                        return (chn[WebitelCallChanelVariables.WJsOriginate] || chn[WebitelCallChanelVariables.Direction] === "inbound")
+                        return (chn[WebitelCallChanelVariables.WJsOriginate]
+                                || chn['Caller-Logical-Direction'] === "inbound")
                             ? WebitelCallDirectionTypes.Outbound
                             : WebitelCallDirectionTypes.Inbound
                     }
@@ -1170,6 +1171,22 @@
             };
 
             function handleChannelState(id, e) {
+                try {
+                    var channel = getChannel(id);
+                    if (channel) {
+                        if (
+                            channel[WebitelCallChanelVariables.CallerCalleeNumber] != e[WebitelCallChanelVariables.CallerCalleeNumber] ||
+                            channel[WebitelCallChanelVariables.CallerCallerNumber] != e[WebitelCallChanelVariables.CallerCallerNumber]
+                        ) {
+                            updateChannelParameters(channel, e);
+                            var call = findCallByChannel(channel);
+                            return OnWebitelCallBridge.trigger(call.getJSONObject());
+                        }
+                        updateChannelParameters(channel, e);
+                    }
+                } catch (e) {
+                    // TODO CALL_STATE > CHANNEL_CREATE
+                }
             };
 
             function handleChannelCallState(id, e) {
