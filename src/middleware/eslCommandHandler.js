@@ -136,7 +136,7 @@ commandEmitter.on('wss::' + WebitelCommandTypes.AttXferBridge.name, function (ex
     if (!doSendFreeSWITCHCommand(execId, ws)) return;
     eslConn.bgapi('uuid_setvar ' + args['channel-uuid-leg-d'] + ' w_transfer_result confirmed');
     eslConn.bgapi('uuid_setvar ' + args['channel-uuid-leg-a'] + ' w_transfer_result confirmed');
-    eslConn.bgapi('uuid_bridge ' + args['channel-uuid-leg-c'] + ' ' + args['channel-uuid-leg-b'], function (res) {
+    eslConn.bgapi('uuid_bridge ' + args['channel-uuid-leg-b'] + ' ' + args['channel-uuid-leg-c'], function (res) {
         if ( ~(res.body|| '').indexOf('-ERR')) {
             eslConn.bgapi('uuid_setvar ' + args['channel-uuid-leg-d'] + ' w_transfer_result error');
             eslConn.bgapi('uuid_setvar ' + args['channel-uuid-leg-a'] + ' w_transfer_result error');
