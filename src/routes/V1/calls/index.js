@@ -78,11 +78,12 @@ module.exports.KillChannelsFromDomain =  function (req, res, next) {
 
 module.exports.fakeCall = function (req, res, next) {
     var number = req.body.number || '',
-        domainName = number.split('@')[1] || '',
         displayNumber = req.body.displayNumber || '00000',
-        dialString =  ''.concat('originate ', '{presence_data=@', domainName, '}[origination_caller_id_number=', displayNumber, ']', 'user/', number,
+        domainName = number.split('@')[1] || '',
+        dialString =  ''.concat('originate ', '{presence_data=@', domainName, '}[sip_h_X-Test=', number.split('@')[0], ',origination_callee_id_number=',displayNumber,
+            ',origination_caller_id_number=', displayNumber, ']', 'user/', number,
             ' &bridge(sofia/external/test_terrasoft@switch-d1.webitel.com)');
-        ;
+    ;
     eslConn.bgapi(dialString, function (result) {
         sendResponse(result, res, "https://docs.webitel.com/display/SDKRU/REST+API+v1#RESTAPIv1-Создатьканал.");
     });
